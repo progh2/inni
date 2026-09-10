@@ -1,0 +1,8 @@
+# Point document root to /public
+# Deny direct access to app data outside public when using parent as root (optional)
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^$ public/ [L]
+  RewriteRule (.*) public/$1 [L]
+</IfModule>

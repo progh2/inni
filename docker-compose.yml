@@ -1,0 +1,12 @@
+services:
+  inni:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./data:/var/www/inni/data
+      - ./public/uploads:/var/www/inni/public/uploads
+      - ./config.example.php:/var/www/inni/config.example.php:ro
+    environment:
+      - TZ=Asia/Seoul
+    restart: unless-stopped
