@@ -1,14 +1,8 @@
 FROM php:8.3-apache
 
-# Required extensions: pdo_sqlite, sqlite3, curl, fileinfo, mbstring
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      libsqlite3-dev \
-      libcurl4-openssl-dev \
-      libonig-dev \
-    && docker-php-ext-install -j"$(nproc)" pdo pdo_sqlite sqlite3 curl mbstring \
-    && (php -m | grep -qi '^fileinfo$' || docker-php-ext-install fileinfo) \
-    && a2enmod rewrite headers \
-    && rm -rf /var/lib/apt/lists/* \
+# php:8.3-apache already ships these; re-running docker-php-ext-install
+# on them fails (deleted source tree / missing config.m4). Verify instead.
+RUN a2enmod rewrite headers \
     && php -r 'foreach (["pdo_sqlite","sqlite3","curl","fileinfo","mbstring"] as $ext) { if (!extension_loaded($ext)) { fwrite(STDERR, "missing PHP extension: {$ext}\n"); exit(1);} }'
 
 COPY docker/apache-vhost.conf /etc/apache2/sites-available/inni.conf
