@@ -8,6 +8,7 @@ use Inni\App;
 use Inni\Auth;
 use Inni\Csrf;
 use Inni\Database;
+use Inni\Loan;
 use Inni\Logger;
 use Inni\Support;
 use Inni\Uploader;
@@ -83,37 +84,23 @@ final class AssetController
             $borrowerName = $user['display_name'];
         }
 
-        $pdo = Database::pdo();
-        $stmt = $pdo->prepare('SELECT * FROM assets WHERE id = ?');
-        $stmt->execute([$assetId]);
-        $asset = $stmt->fetch();
-        if (!$asset || $asset['status'] !== 'available') {
-            App::flash('error', '대여할 수 없는 장비입니다.');
-            App::redirect('assets/show', ['id' => $assetId]);
-        }
-
-        $t = Support::now();
-        $loanId = Support::id('loan');
-        $pdo->beginTransaction();
         try {
-            $pdo->prepare(
-                'INSERT INTO loans(id,kind,asset_id,quantity,borrower_user_id,borrower_name,borrower_note,from_location_id,due_at,status,purpose,created_at,created_by)
-                 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'
-            )->execute([
-                $loanId, 'asset', $assetId, 1, $user['id'], $borrowerName, $borrowerNote,
-                $asset['location_id'], $dueIso, 'active', $purpose, $t, $user['id'],
-            ]);
-            $pdo->prepare('UPDATE assets SET status = ?, updated_at = ? WHERE id = ?')
-                ->execute(['on_loan', $t, $assetId]);
-            $pdo->commit();
-        } catch (\Throwable $e) {
-            $pdo->rollBack();
+            Loan::checkout(
+                Database::pdo(),
+                $user,
+                $assetId,
+                $borrowerName,
+                $borrowerNote,
+                $purpose,
+                $dueIso,
+            );
+            App::flash('ok', '대여 처리되었습니다.');
+        } catch (\InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());
-            App::redirect('assets/show', ['id' => $assetId]);
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '대여를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
         }
-
-        Logger::write('loan', 'loan', $loanId, "«{$asset['name']}» 대여 → {$borrowerName}");
-        App::flash('ok', '대여 처리되었습니다.');
         App::redirect('assets/show', ['id' => $assetId]);
     }
 

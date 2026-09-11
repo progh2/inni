@@ -21,7 +21,7 @@ use Inni\Support;
       </div>
       <div class="actions">
         <span class="badge <?= Support::e($loan['status']) ?>"><?= Support::e(Support::statusLabel($loan['status'])) ?></span>
-        <?php if (Auth::canLoan($user ?? Auth::user())): ?>
+        <?php if (Auth::canReturn($user ?? Auth::user(), $loan)): ?>
           <form method="post" action="<?= Support::e(App::url('loans/return')) ?>">
             <?= Csrf::field() ?>
             <input type="hidden" name="loan_id" value="<?= Support::e($loan['id']) ?>">

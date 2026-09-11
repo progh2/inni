@@ -30,6 +30,7 @@ final class Database
         ]);
         $pdo->exec('PRAGMA foreign_keys = ON');
         $pdo->exec('PRAGMA journal_mode = WAL');
+        $pdo->exec('PRAGMA busy_timeout = 5000');
 
         if ($isNew) {
             $schema = file_get_contents(App::root() . '/sql/schema.sql');
@@ -41,8 +42,21 @@ final class Database
             Seed::run($pdo);
         } else {
             self::$pdo = $pdo;
+            self::ensureGuards($pdo);
         }
 
         return self::$pdo;
+    }
+
+    /**
+     * Idempotent guards for databases created before the open-loan unique index.
+     */
+    private static function ensureGuards(PDO $pdo): void
+    {
+        $pdo->exec(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_loans_one_open_asset
+             ON loans(asset_id)
+             WHERE asset_id IS NOT NULL AND status IN ('active','overdue')"
+        );
     }
 }

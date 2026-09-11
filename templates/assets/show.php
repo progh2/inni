@@ -52,7 +52,7 @@ use Inni\Support;
     <span class="badge <?= Support::e($loan['status']) ?>"><?= Support::e(Support::statusLabel($loan['status'])) ?></span>
   </p>
   <p class="muted">예정 <?= Support::e(Support::formatWhen($loan['due_at'])) ?></p>
-  <?php if (Auth::canLoan($user)): ?>
+  <?php if (Auth::canReturn($user, $loan)): ?>
     <form method="post" action="<?= Support::e(App::url('loans/return')) ?>">
       <?= Csrf::field() ?>
       <input type="hidden" name="loan_id" value="<?= Support::e($loan['id']) ?>">

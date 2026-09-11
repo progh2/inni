@@ -8,7 +8,7 @@ use Inni\App;
 use Inni\Auth;
 use Inni\Csrf;
 use Inni\Database;
-use Inni\Logger;
+use Inni\Loan;
 use Inni\Support;
 use Inni\View;
 
@@ -38,40 +38,23 @@ final class LoanController
     public function returnLoan(): void
     {
         $user = Auth::requireLogin();
-        if (!Auth::canLoan($user)) {
-            App::flash('error', '권한이 없습니다.');
+        if (!Auth::canReturn($user)) {
+            App::flash('error', '반납 권한이 없습니다.');
             App::redirect('loans');
         }
         Csrf::requirePost();
         $loanId = (string) ($_POST['loan_id'] ?? '');
-        $pdo = Database::pdo();
-        $stmt = $pdo->prepare('SELECT * FROM loans WHERE id = ?');
-        $stmt->execute([$loanId]);
-        $loan = $stmt->fetch();
-        if (!$loan || $loan['status'] === 'returned') {
-            App::redirect('loans');
-        }
-
-        $t = Support::now();
-        $pdo->beginTransaction();
         try {
-            $pdo->prepare('UPDATE loans SET status = ?, returned_at = ? WHERE id = ?')
-                ->execute(['returned', $t, $loanId]);
-            if ($loan['asset_id']) {
-                $pdo->prepare('UPDATE assets SET status = ?, updated_at = ? WHERE id = ?')
-                    ->execute(['available', $t, $loan['asset_id']]);
+            $assetId = Loan::checkin(Database::pdo(), $user, $loanId);
+            App::flash('ok', '반납 처리되었습니다.');
+            if ($assetId) {
+                App::redirect('assets/show', ['id' => $assetId]);
             }
-            $pdo->commit();
-        } catch (\Throwable $e) {
-            $pdo->rollBack();
+        } catch (\InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());
-            App::redirect('loans');
-        }
-
-        Logger::write('return', 'loan', $loanId, '대여 반납');
-        App::flash('ok', '반납 처리되었습니다.');
-        if ($loan['asset_id']) {
-            App::redirect('assets/show', ['id' => $loan['asset_id']]);
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '반납을 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
         }
         App::redirect('loans');
     }
