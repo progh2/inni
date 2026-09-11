@@ -16,6 +16,37 @@ php -S 0.0.0.0:8080 -t public
 브라우저: http://localhost:8080  
 → **담당교사로 들어가기** (데모)
 
+## Docker (로컬 스모크 / 자가 호스팅)
+
+문서 루트는 이미지에서 `public/` 입니다. 컨테이너가 처음 뜰 때 `config.example.php` → `config.php`를 만듭니다. 예시 설정의 `demo_login`은 `true`라서 데모 로그인으로 바로 확인할 수 있습니다.
+
+```bash
+docker compose up --build
+```
+
+구버전 Docker는 `docker-compose up --build` 와 같습니다.
+
+브라우저: http://localhost:8080  
+→ **담당교사로 들어가기** (데모)
+
+운영에서 데모 로그인을 끄려면 호스트에 `config.php`를 **먼저** 만든 뒤 `demo_login => false`로 바꾸고, `docker-compose.yml`의 주석 처리된 볼륨을 켭니다. 없는 경로를 마운트하면 Docker가 `config.php`를 디렉터리로 만들어 기동이 실패합니다.
+
+```bash
+cp config.example.php config.php
+# config.php 편집 후:
+#   volumes:
+#     - ./config.php:/var/www/inni/config.php:ro
+```
+
+이미지에 포함·빌드 검증되는 PHP 확장: `pdo_sqlite`, `sqlite3`, `curl`, `fileinfo`, `mbstring`.
+
+### 볼륨
+
+| 호스트 | 컨테이너 | 내용 |
+|--------|----------|------|
+| `./data` | `/var/www/inni/data` | SQLite (`inni.sqlite` + WAL/SHM) |
+| `./public/uploads` | `/var/www/inni/public/uploads` | 업로드 사진 |
+
 ## 서버 배포
 
 1. PHP 8.1+ (확장: `pdo_sqlite`, `sqlite3`, `curl`, `fileinfo`, `mbstring`)
@@ -47,8 +78,24 @@ Nginx 예: `root .../public;` + `try_files $uri /index.php?$query_string;`
 
 ### 백업
 
-- DB: `data/inni.sqlite` (+ `-wal`/`-shm` 있으면 함께)
-- 사진: `public/uploads/`
+복사할 경로 (호스트 기준, Compose 볼륨과 동일):
+
+- DB: `data/inni.sqlite`
+- WAL/SHM이 있으면 함께: `data/inni.sqlite-wal`, `data/inni.sqlite-shm`
+- 사진: `public/uploads/` 디렉터리 전체
+
+일관된 복사본이 필요하면 앱을 잠시 멈춘 뒤 복사하세요.
+
+```bash
+docker compose stop
+mkdir -p "backup/$(date +%Y%m%d)"
+cp -a data/inni.sqlite "backup/$(date +%Y%m%d)/" 2>/dev/null || true
+cp -a data/inni.sqlite-wal data/inni.sqlite-shm "backup/$(date +%Y%m%d)/" 2>/dev/null || true
+cp -a public/uploads "backup/$(date +%Y%m%d)/"
+docker compose start
+```
+
+동작 중 백업은 SQLite `.backup` / `VACUUM INTO`로 DB만 뜨고, 사진은 별도로 `public/uploads/`를 복사합니다.
 
 ## 데모 계정
 

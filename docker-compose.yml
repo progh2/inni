@@ -1,12 +1,21 @@
 services:
   inni:
     build: .
+    image: inni:local
     ports:
       - "8080:80"
     volumes:
+      # Persist SQLite (inni.sqlite + -wal / -shm) and uploaded photos on the host.
       - ./data:/var/www/inni/data
       - ./public/uploads:/var/www/inni/public/uploads
-      - ./config.example.php:/var/www/inni/config.example.php:ro
+      # Optional school config — create the host file first (a missing path becomes a directory):
+      # - ./config.php:/var/www/inni/config.php:ro
     environment:
-      - TZ=Asia/Seoul
+      TZ: Asia/Seoul
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "php", "/var/www/inni/docker/healthcheck.php"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
