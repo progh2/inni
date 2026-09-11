@@ -137,5 +137,8 @@ CREATE INDEX IF NOT EXISTS idx_locations_kind ON locations(kind);
 CREATE INDEX IF NOT EXISTS idx_stock_location ON stock_lots(location_id);
 CREATE INDEX IF NOT EXISTS idx_loans_status ON loans(status);
 CREATE INDEX IF NOT EXISTS idx_loans_asset ON loans(asset_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_loans_one_open_asset
+  ON loans(asset_id)
+  WHERE asset_id IS NOT NULL AND status IN ('active','overdue');
 CREATE INDEX IF NOT EXISTS idx_logs_entity ON activity_logs(entity_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);

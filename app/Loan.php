@@ -1,0 +1,204 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Inni;
+
+use InvalidArgumentException;
+use PDO;
+use PDOException;
+use Throwable;
+
+final class Loan
+{
+    public static function checkout(
+        PDO $pdo,
+        array $actor,
+        string $assetId,
+        string $borrowerName,
+        ?string $borrowerNote,
+        ?string $purpose,
+        ?string $dueAt,
+    ): string {
+        if (!Auth::canLoan($actor) || ($actor['status'] ?? '') !== 'active') {
+            throw new InvalidArgumentException('대여 권한이 없습니다.');
+        }
+
+        $assetId = trim($assetId);
+        if ($assetId === '') {
+            throw new InvalidArgumentException('대여할 수 없는 장비입니다.');
+        }
+
+        $borrowerName = trim($borrowerName);
+        if ($borrowerName === '') {
+            $borrowerName = trim((string) ($actor['display_name'] ?? ''));
+        }
+        if ($borrowerName === '') {
+            throw new InvalidArgumentException('빌리는 사람을 입력하세요.');
+        }
+
+        $borrowerNote = self::nullableTrim($borrowerNote);
+        $purpose = self::nullableTrim($purpose);
+        $dueAt = self::nullableTrim($dueAt);
+
+        self::beginImmediate($pdo);
+        try {
+            $t = Support::now();
+            $claim = $pdo->prepare(
+                "UPDATE assets SET status = 'on_loan', updated_at = ?
+                 WHERE id = ? AND status = 'available'"
+            );
+            $claim->execute([$t, $assetId]);
+            if ($claim->rowCount() !== 1) {
+                throw new InvalidArgumentException('대여할 수 없는 장비입니다.');
+            }
+
+            $assetStmt = $pdo->prepare('SELECT id, name, location_id FROM assets WHERE id = ?');
+            $assetStmt->execute([$assetId]);
+            $asset = $assetStmt->fetch(PDO::FETCH_ASSOC);
+            if (!$asset) {
+                throw new InvalidArgumentException('대여할 수 없는 장비입니다.');
+            }
+
+            $loanId = Support::id('loan');
+            try {
+                $pdo->prepare(
+                    'INSERT INTO loans(id,kind,asset_id,quantity,borrower_user_id,borrower_name,borrower_note,from_location_id,due_at,status,purpose,created_at,created_by)
+                     VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                )->execute([
+                    $loanId, 'asset', $assetId, 1, $actor['id'] ?? null, $borrowerName, $borrowerNote,
+                    $asset['location_id'], $dueAt, 'active', $purpose, $t, $actor['id'],
+                ]);
+            } catch (PDOException $e) {
+                if (self::isOpenLoanConflict($e)) {
+                    throw new InvalidArgumentException('대여할 수 없는 장비입니다.', 0, $e);
+                }
+                throw $e;
+            }
+
+            $pdo->prepare(
+                'INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,meta_json,created_at)
+                 VALUES(?,?,?,?,?,?,?,?,?)'
+            )->execute([
+                Support::id('log'),
+                'loan',
+                'loan',
+                $loanId,
+                $actor['id'] ?? null,
+                $actor['display_name'] ?? '시스템',
+                "«{$asset['name']}» 대여 → {$borrowerName}",
+                null,
+                $t,
+            ]);
+
+            self::commitImmediate($pdo);
+            return $loanId;
+        } catch (Throwable $e) {
+            self::rollBackImmediate($pdo);
+            throw $e;
+        }
+    }
+
+    /**
+     * @return string|null Asset id when the returned loan was tied to an asset.
+     */
+    public static function checkin(PDO $pdo, array $actor, string $loanId): ?string
+    {
+        $loanId = trim($loanId);
+        if ($loanId === '') {
+            throw new InvalidArgumentException('반납할 대여를 확인하세요.');
+        }
+
+        self::beginImmediate($pdo);
+        try {
+            $stmt = $pdo->prepare('SELECT * FROM loans WHERE id = ?');
+            $stmt->execute([$loanId]);
+            $loan = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$loan) {
+                throw new InvalidArgumentException('반납할 대여를 확인하세요.');
+            }
+            if (!Auth::canReturn($actor, $loan)) {
+                throw new InvalidArgumentException('반납 권한이 없습니다.');
+            }
+
+            $t = Support::now();
+            $close = $pdo->prepare(
+                "UPDATE loans SET status = 'returned', returned_at = ?
+                 WHERE id = ? AND status IN ('active','overdue')"
+            );
+            $close->execute([$t, $loanId]);
+            if ($close->rowCount() !== 1) {
+                throw new InvalidArgumentException('이미 반납되었거나 반납할 수 없는 대여입니다.');
+            }
+
+            $assetId = $loan['asset_id'] ?? null;
+            if (is_string($assetId) && $assetId !== '') {
+                $free = $pdo->prepare(
+                    "UPDATE assets SET status = 'available', updated_at = ?
+                     WHERE id = ? AND status = 'on_loan'"
+                );
+                $free->execute([$t, $assetId]);
+                if ($free->rowCount() !== 1) {
+                    throw new InvalidArgumentException('장비 상태가 대여중이 아니라 반납할 수 없습니다.');
+                }
+            } else {
+                $assetId = null;
+            }
+
+            $pdo->prepare(
+                'INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,meta_json,created_at)
+                 VALUES(?,?,?,?,?,?,?,?,?)'
+            )->execute([
+                Support::id('log'),
+                'return',
+                'loan',
+                $loanId,
+                $actor['id'] ?? null,
+                $actor['display_name'] ?? '시스템',
+                '대여 반납',
+                null,
+                $t,
+            ]);
+
+            self::commitImmediate($pdo);
+            return $assetId;
+        } catch (Throwable $e) {
+            self::rollBackImmediate($pdo);
+            throw $e;
+        }
+    }
+
+    private static function nullableTrim(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        $value = trim($value);
+        return $value === '' ? null : $value;
+    }
+
+    private static function isOpenLoanConflict(PDOException $e): bool
+    {
+        return str_contains($e->getMessage(), 'UNIQUE constraint failed');
+    }
+
+    private static function beginImmediate(PDO $pdo): void
+    {
+        $pdo->exec('PRAGMA busy_timeout = 5000');
+        $pdo->exec('BEGIN IMMEDIATE');
+    }
+
+    private static function commitImmediate(PDO $pdo): void
+    {
+        $pdo->exec('COMMIT');
+    }
+
+    private static function rollBackImmediate(PDO $pdo): void
+    {
+        try {
+            $pdo->exec('ROLLBACK');
+        } catch (Throwable) {
+            // Transaction may already be closed after a constraint abort.
+        }
+    }
+}

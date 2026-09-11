@@ -52,7 +52,46 @@ final class Auth
 
     public static function canLoan(?array $user): bool
     {
-        return $user && in_array($user['role'], ['owner', 'manager', 'teacher'], true);
+        return self::isActiveRole($user, ['owner', 'manager', 'teacher']);
+    }
+
+    /**
+     * 반납 권한은 대여(canLoan)와 분리한다.
+     * owner/manager/teacher: 진행 중(active/overdue) 대여 전부.
+     * student: borrower_user_id가 본인인 대여만.
+     * $loan이 없으면 역할만 검사하고, 있으면 건별 범위까지 적용한다.
+     */
+    public static function canReturn(?array $user, ?array $loan = null): bool
+    {
+        if (!self::isActiveRole($user, ['owner', 'manager', 'teacher', 'student'])) {
+            return false;
+        }
+        if ($loan === null) {
+            return true;
+        }
+        if (!in_array((string) ($loan['status'] ?? ''), ['active', 'overdue'], true)) {
+            return false;
+        }
+        if (($user['role'] ?? '') === 'student') {
+            $uid = $user['id'] ?? null;
+            return is_string($uid) && $uid !== '' && ($loan['borrower_user_id'] ?? null) === $uid;
+        }
+        return true;
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    private static function isActiveRole(?array $user, array $roles): bool
+    {
+        if (!$user) {
+            return false;
+        }
+        $status = $user['status'] ?? 'active';
+        if ($status !== 'active') {
+            return false;
+        }
+        return in_array((string) ($user['role'] ?? ''), $roles, true);
     }
 
     public static function isOwner(?array $user): bool

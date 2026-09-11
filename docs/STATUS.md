@@ -25,6 +25,7 @@
 - PHP 8.4 임시 실행 환경에서 전체 PHP 파일 45개 문법 검사 통과.
 - `php tests/stock.php`: 메모리 SQLite DB를 사용하는 25개 검증 통과.
 - `php tests/csrf.php`: 세션 CSRF 허용/거부, GET 거부, 반납 경로 실패 폐쇄 검증.
+- `php tests/loan.php`: 대여·반납 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위, 이력 실패 롤백.
 - 임시 앱 복사본·DB에서 HTTP 검증 통과: 로그인, 품목 화면, 정상 출고와 이력, 재고 부족, GET 거부, 잘못된 CSRF 토큰, 학생 권한 차단.
 - 브라우저 시각 검증, 실제 카메라 스캔, Google OAuth 실연동은 미실시.
 - Docker: `docker compose up --build` 경로를 정리함. `php:8.3-apache`에 이미 있는 `pdo_sqlite`/`sqlite3`/`curl`/`fileinfo`/`mbstring`을 빌드에서 재설치하지 않고 검증만 함. entrypoint가 `config.php` 생성과 `data/`·`public/uploads/` 권한을 맞춤.
@@ -33,7 +34,7 @@
 
 1. ~~최초 Google 관리자 생성: 시드 데모 사용자와 OAuth 최초 owner 판정 불일치.~~ 데모 시드 계정은 첫 Google=owner 카운트에서 제외. `demo_login` 로컬 데모는 유지. `tests/bootstrap_owner.php`.
 2. ~~기존 변경 요청 전반에 POST·CSRF 검사 적용.~~ 대여·반납·이동·등록·설정·사용자 승인·고장 신고·사진 업로드·출고에 `Csrf::requirePost()` 적용. 스캔 조회·라벨 인쇄·데모 로그인·로그아웃 GET은 상태 변경이 아니거나 인증 진입이라 제외.
-3. 장비 대여·반납의 동시 요청 및 반납 권한 범위 검토.
+3. ~~장비 대여·반납의 동시 요청 및 반납 권한 범위 검토.~~ `Loan::checkout`/`checkin`이 `BEGIN IMMEDIATE` + 상태 조건부 UPDATE + rowCount로 이중 대여·반납을 실패 폐쇄. 반납은 `Auth::canReturn`(owner/manager/teacher=전체, student=본인). 열린 대여는 자산당 1건 unique index.
 4. 품목 수정·재입고, 출고 취소와 취소 이력, 실사 등 남은 요구사항 구현.
 5. ~~Docker의 설정 파일 생성 권한 및 필요한 PHP 확장 점검.~~ → issue #5 / Compose 경로로 처리.
 
