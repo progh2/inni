@@ -1,4 +1,4 @@
-# 개발 현황 (2026-09-10)
+# 개발 현황 (2026-09-11)
 
 ## 프로젝트 구조
 
@@ -27,7 +27,8 @@
 - `php tests/csrf.php`: 세션 CSRF 허용/거부, GET 거부, 반납 경로 실패 폐쇄 검증.
 - `php tests/loan.php`: 대여·반납 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위, 이력 실패 롤백.
 - 임시 앱 복사본·DB에서 HTTP 검증 통과: 로그인, 품목 화면, 정상 출고와 이력, 재고 부족, GET 거부, 잘못된 CSRF 토큰, 학생 권한 차단.
-- 브라우저 시각 검증, 실제 카메라 스캔, Google OAuth 실연동은 미실시.
+- 브라우저 시각 검증, 실제 카메라 스캔, Google Cloud Console 실연동(실제 client_id/secret)은 미실시.
+- Google OAuth: 승인된 리디렉션 URI는 `{base_url}/index.php?r=auth/google/callback`로 고정. 로그인·설정에 동일 문자열 표시. `allowed_domains`는 비면 인증된 메일 허용, 값이 있으면 정확 일치 실패 폐쇄. `email_verified` 필수. `php tests/google_oauth.php`가 토큰 교환을 스텁한다.
 - Docker: `docker compose up --build` 경로를 정리함. `php:8.3-apache`에 이미 있는 `pdo_sqlite`/`sqlite3`/`curl`/`fileinfo`/`mbstring`을 빌드에서 재설치하지 않고 검증만 함. entrypoint가 `config.php` 생성과 `data/`·`public/uploads/` 권한을 맞춤.
 
 ## 다음 작업 후보
@@ -37,6 +38,7 @@
 3. ~~장비 대여·반납의 동시 요청 및 반납 권한 범위 검토.~~ `Loan::checkout`/`checkin`이 `BEGIN IMMEDIATE` + 상태 조건부 UPDATE + rowCount로 이중 대여·반납을 실패 폐쇄. 반납은 `Auth::canReturn`(owner/manager/teacher=전체, student=본인). 열린 대여는 자산당 1건 unique index.
 4. 품목 수정·재입고, 출고 취소와 취소 이력, 실사 등 남은 요구사항 구현.
 5. ~~Docker의 설정 파일 생성 권한 및 필요한 PHP 확장 점검.~~ → issue #5 / Compose 경로로 처리.
+6. ~~Google OAuth 리다이렉트 URI·allowed_domains.~~ 키 없이 단위/스텁 검사까지. Console 실스모크는 사람 자격 증명 필요 (issue #6).
 
 ## 작업 환경 참고
 

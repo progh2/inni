@@ -58,12 +58,14 @@ final class App
 
     public static function baseUrl(): string
     {
-        $configured = rtrim((string) self::config('base_url', ''), '/');
+        $configured = self::normalizeConfiguredBaseUrl((string) self::config('base_url', ''));
         if ($configured !== '') {
             return $configured;
         }
+        $forwarded = strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
         $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || (($_SERVER['SERVER_PORT'] ?? null) == 443);
+            || (($_SERVER['SERVER_PORT'] ?? null) == 443)
+            || $forwarded === 'https';
         $scheme = $https ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         $script = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
@@ -72,6 +74,18 @@ final class App
             $dir = '';
         }
         return $scheme . '://' . $host . $dir;
+    }
+
+    /** Strip trailing slash and a mistaken /index.php so OAuth URIs stay stable. */
+    public static function normalizeConfiguredBaseUrl(string $configured): string
+    {
+        $configured = trim($configured);
+        $configured = rtrim($configured, '/');
+        if ($configured !== '' && str_ends_with(strtolower($configured), '/index.php')) {
+            $configured = substr($configured, 0, -strlen('/index.php'));
+            $configured = rtrim($configured, '/');
+        }
+        return $configured;
     }
 
     public static function url(string $route = 'home', array $query = []): string

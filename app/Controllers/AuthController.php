@@ -17,6 +17,8 @@ final class AuthController
         }
         View::render('auth/login', [
             'google' => Auth::googleEnabled(),
+            'googleStatus' => Auth::googleConfigStatus(),
+            'googleRedirectUri' => Auth::googleRedirectUri(),
             'demo' => (bool) App::config('demo_login', true),
         ], 'layouts/bare');
     }
@@ -36,7 +38,10 @@ final class AuthController
     public function googleStart(): void
     {
         if (!Auth::googleEnabled()) {
-            App::flash('error', 'Google 클라이언트 ID/시크릿을 config.php에 넣어 주세요.');
+            $message = Auth::googleConfigStatus() === Auth::GOOGLE_STATUS_PARTIAL
+                ? 'Google 클라이언트가 불완전합니다. client_id와 client_secret을 모두 설정하세요.'
+                : 'Google 클라이언트 ID/시크릿이 비어 있습니다. config.php에 넣어 주세요.';
+            App::flash('error', $message);
             App::redirect('login');
         }
         header('Location: ' . Auth::googleAuthUrl());
