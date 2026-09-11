@@ -5,7 +5,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libsqlite3-dev \
       libcurl4-openssl-dev \
       libonig-dev \
-    && docker-php-ext-install -j"$(nproc)" pdo pdo_sqlite sqlite3 curl mbstring \
+    && docker-php-ext-install pdo_sqlite \
+    && docker-php-ext-install sqlite3 \
+    && docker-php-ext-install curl \
+    && docker-php-ext-install mbstring \
     && (php -m | grep -qi '^fileinfo$' || docker-php-ext-install fileinfo) \
     && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/* \
