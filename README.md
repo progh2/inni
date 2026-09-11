@@ -38,7 +38,7 @@ cp config.example.php config.php
 #     - ./config.php:/var/www/inni/config.php:ro
 ```
 
-이미지에 포함·빌드 검증되는 PHP 확장: `pdo_sqlite`, `sqlite3`, `curl`, `fileinfo`, `mbstring`.
+`php:8.3-apache`에 이미 들어 있는 PHP 확장을 빌드에서 검증합니다: `pdo_sqlite`, `sqlite3`, `curl`, `fileinfo`, `mbstring`.
 
 ### 볼륨
 

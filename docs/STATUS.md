@@ -27,7 +27,7 @@
 - `php tests/csrf.php`: 세션 CSRF 허용/거부, GET 거부, 반납 경로 실패 폐쇄 검증.
 - 임시 앱 복사본·DB에서 HTTP 검증 통과: 로그인, 품목 화면, 정상 출고와 이력, 재고 부족, GET 거부, 잘못된 CSRF 토큰, 학생 권한 차단.
 - 브라우저 시각 검증, 실제 카메라 스캔, Google OAuth 실연동은 미실시.
-- Docker: `docker compose up --build` 경로를 정리함. 이미지에 `pdo_sqlite`/`sqlite3`/`curl`/`fileinfo`/`mbstring` 설치·빌드 검증, entrypoint가 `config.php` 생성과 `data/`·`public/uploads/` 권한을 맞춤. 에이전트 환경에서 Compose 기동을 확인하려면 Docker 소켓이 필요함.
+- Docker: `docker compose up --build` 경로를 정리함. `php:8.3-apache`에 이미 있는 `pdo_sqlite`/`sqlite3`/`curl`/`fileinfo`/`mbstring`을 빌드에서 재설치하지 않고 검증만 함. entrypoint가 `config.php` 생성과 `data/`·`public/uploads/` 권한을 맞춤.
 
 ## 다음 작업 후보
 
