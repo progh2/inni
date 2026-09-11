@@ -10,6 +10,7 @@ return [
     'school_name' => 'inni 데모 마이스터고',
     'base_url' => '', // 비우면 자동. 서브경로면 예: https://school.kr/inni/public
     'timezone' => 'Asia/Seoul',
+    // Local shortcut only. Demo-seed users are ignored for first-Google-owner.
     'demo_login' => true,
     'session_name' => 'inni_sess',
 

@@ -62,14 +62,130 @@ final class Auth
 
     public static function loginDemo(string $which = 'owner'): void
     {
-        if (!App::config('demo_login', true)) {
+        $id = self::demoLoginUserId($which);
+        if ($id === null) {
             App::flash('error', '데모 로그인이 비활성화되어 있습니다.');
             App::redirect('login');
         }
-        $id = $which === 'teacher' ? 'demo-teacher' : 'demo-owner';
         self::login($id);
         App::flash('ok', '데모 계정으로 로그인했습니다.');
         App::redirect('home');
+    }
+
+    /** Demo-seed id when demo_login is on; null when the shortcut is disabled. */
+    public static function demoLoginUserId(string $which = 'owner'): ?string
+    {
+        if (!App::config('demo_login', true)) {
+            return null;
+        }
+        return $which === 'teacher' ? Seed::DEMO_TEACHER_ID : Seed::DEMO_OWNER_ID;
+    }
+
+    /** Users created only by Seed::run — ignored for first-Google-owner. */
+    public static function countNonDemoUsers(PDO $pdo): int
+    {
+        $ids = Seed::demoUserIds();
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE id NOT IN ($placeholders)");
+        $stmt->execute($ids);
+        return (int) $stmt->fetchColumn();
+    }
+
+    public static function hasRealOwner(PDO $pdo): bool
+    {
+        $ids = Seed::demoUserIds();
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $pdo->prepare(
+            "SELECT COUNT(*) FROM users WHERE role = 'owner' AND status = 'active' AND id NOT IN ($placeholders)"
+        );
+        $stmt->execute($ids);
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    /**
+     * Create or refresh a Google account.
+     * First non-demo user becomes owner; later signups stay pending until an admin approves.
+     * A leftover pending account is promoted if no real (non-demo) owner exists yet.
+     *
+     * @return array{user: array, created: bool, allowed: bool}
+     */
+    public static function provisionGoogleUser(
+        PDO $pdo,
+        string $email,
+        string $sub,
+        string $name,
+        ?string $photoUrl
+    ): array {
+        $email = strtolower($email);
+        $t = Support::now();
+
+        $stmt = $pdo->prepare('SELECT * FROM users WHERE google_sub = ? OR email = ? LIMIT 1');
+        $stmt->execute([$sub, $email]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            $isFirst = self::countNonDemoUsers($pdo) === 0;
+            $role = $isFirst ? 'owner' : 'teacher';
+            $status = $isFirst ? 'active' : 'pending';
+            $id = Support::id('usr');
+            $pdo->prepare(
+                'INSERT INTO users(id,email,display_name,photo_url,role,status,google_sub,created_at,updated_at)
+                 VALUES(?,?,?,?,?,?,?,?,?)'
+            )->execute([
+                $id, $email, $name !== '' ? $name : $email, $photoUrl,
+                $role, $status, $sub, $t, $t,
+            ]);
+            $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
+            $stmt->execute([$id]);
+            $user = $stmt->fetch();
+            return [
+                'user' => is_array($user) ? $user : [],
+                'created' => true,
+                'allowed' => $status === 'active',
+            ];
+        }
+
+        if ($user['status'] !== 'active') {
+            if (
+                $user['status'] === 'pending'
+                && !Seed::isDemoUserId((string) $user['id'])
+                && !self::hasRealOwner($pdo)
+            ) {
+                $pdo->prepare(
+                    'UPDATE users SET role = ?, status = ?, google_sub = ?, display_name = ?, photo_url = ?, updated_at = ? WHERE id = ?'
+                )->execute([
+                    'owner',
+                    'active',
+                    $sub,
+                    $name !== '' ? $name : $user['display_name'],
+                    $photoUrl ?? $user['photo_url'],
+                    $t,
+                    $user['id'],
+                ]);
+            } else {
+                return ['user' => $user, 'created' => false, 'allowed' => false];
+            }
+        } else {
+            $pdo->prepare(
+                'UPDATE users SET google_sub = ?, display_name = ?, photo_url = ?, updated_at = ? WHERE id = ?'
+            )->execute([
+                $sub,
+                $name !== '' ? $name : $user['display_name'],
+                $photoUrl ?? $user['photo_url'],
+                $t,
+                $user['id'],
+            ]);
+        }
+
+        $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
+        $stmt->execute([$user['id']]);
+        $fresh = $stmt->fetch();
+        $user = is_array($fresh) ? $fresh : $user;
+        return [
+            'user' => $user,
+            'created' => false,
+            'allowed' => ($user['status'] ?? '') === 'active',
+        ];
     }
 
     public static function googleEnabled(): bool
@@ -143,45 +259,21 @@ final class Auth
             }
         }
 
-        $pdo = Database::pdo();
-        $stmt = $pdo->prepare('SELECT * FROM users WHERE google_sub = ? OR email = ? LIMIT 1');
-        $stmt->execute([$sub, $email]);
-        $user = $stmt->fetch();
-        $t = Support::now();
-
-        if (!$user) {
-            $count = (int) $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
-            $role = $count === 0 ? 'owner' : 'teacher';
-            $status = $count === 0 ? 'active' : 'pending';
-            $id = Support::id('usr');
-            $pdo->prepare(
-                'INSERT INTO users(id,email,display_name,photo_url,role,status,google_sub,created_at,updated_at)
-                 VALUES(?,?,?,?,?,?,?,?,?)'
-            )->execute([
-                $id, $email, $info['name'] ?? $email, $info['picture'] ?? null,
-                $role, $status, $sub, $t, $t,
-            ]);
-            if ($status !== 'active') {
-                App::flash('ok', '가입 요청이 접수되었습니다. 관리자 승인 후 이용할 수 있습니다.');
-                App::redirect('login');
-            }
-            self::login($id);
-        } else {
-            if ($user['status'] !== 'active') {
-                App::flash('error', '계정이 아직 승인되지 않았거나 비활성 상태입니다.');
-                App::redirect('login');
-            }
-            $pdo->prepare(
-                'UPDATE users SET google_sub = ?, display_name = ?, photo_url = ?, updated_at = ? WHERE id = ?'
-            )->execute([
-                $sub,
-                $info['name'] ?? $user['display_name'],
-                $info['picture'] ?? $user['photo_url'],
-                $t,
-                $user['id'],
-            ]);
-            self::login($user['id']);
+        $result = self::provisionGoogleUser(
+            Database::pdo(),
+            $email,
+            $sub,
+            (string) ($info['name'] ?? $email),
+            isset($info['picture']) ? (string) $info['picture'] : null
+        );
+        if (!$result['allowed']) {
+            $message = $result['created']
+                ? '가입 요청이 접수되었습니다. 관리자 승인 후 이용할 수 있습니다.'
+                : '계정이 아직 승인되지 않았거나 비활성 상태입니다.';
+            App::flash($result['created'] ? 'ok' : 'error', $message);
+            App::redirect('login');
         }
+        self::login((string) $result['user']['id']);
 
         App::flash('ok', '로그인되었습니다.');
         App::redirect('home');
