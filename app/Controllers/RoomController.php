@@ -6,6 +6,7 @@ namespace Inni\Controllers;
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Csrf;
 use Inni\Database;
 use Inni\Logger;
 use Inni\Support;
@@ -102,9 +103,7 @@ final class RoomController
             App::flash('error', '등록 권한이 없습니다.');
             App::redirect('rooms');
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            App::redirect('rooms');
-        }
+        Csrf::requirePost();
 
         $name = trim((string) ($_POST['name'] ?? ''));
         $kind = (string) ($_POST['kind'] ?? 'room');

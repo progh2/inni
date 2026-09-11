@@ -6,6 +6,7 @@ namespace Inni\Controllers;
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Csrf;
 use Inni\Database;
 use Inni\Logger;
 use Inni\Support;
@@ -35,9 +36,7 @@ final class ItemController
             App::flash('error', '등록 권한이 없습니다.');
             App::redirect('home');
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            App::redirect('items/new');
-        }
+        Csrf::requirePost();
 
         $name = trim((string) ($_POST['name'] ?? ''));
         $type = (string) ($_POST['type'] ?? 'equipment');
@@ -157,7 +156,6 @@ final class ItemController
         );
         $logs->execute([$id]);
         $logs = $logs->fetchAll();
-        $_SESSION['stock_csrf'] ??= bin2hex(random_bytes(32));
 
         View::render('items/show', compact('item', 'assets', 'lots', 'logs'));
     }
@@ -165,20 +163,10 @@ final class ItemController
     public function issue(): void
     {
         $user = Auth::requireLogin();
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            header('Allow: POST');
-            return;
-        }
+        Csrf::requirePost();
         if (!Auth::canLoan($user)) {
             http_response_code(403);
             echo '출고 권한이 없습니다.';
-            return;
-        }
-        $token = $_POST['csrf_token'] ?? null;
-        if (!is_string($token) || !isset($_SESSION['stock_csrf']) || !hash_equals($_SESSION['stock_csrf'], $token)) {
-            http_response_code(403);
-            echo '요청이 만료되었습니다. 품목 화면을 새로고침한 뒤 다시 시도하세요.';
             return;
         }
 

@@ -2,6 +2,7 @@
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Csrf;
 use Inni\Support;
 ?>
 <h1><?= Support::e($item['name']) ?></h1>
@@ -36,7 +37,7 @@ use Inni\Support;
     </div>
     <?php if (in_array($item['type'], ['consumable', 'part'], true) && Auth::canLoan($user) && (float) $lot['quantity'] > 0): ?>
     <form method="post" action="<?= Support::e(App::url('items/issue')) ?>">
-      <input type="hidden" name="csrf_token" value="<?= Support::e($_SESSION['stock_csrf']) ?>">
+      <?= Csrf::field() ?>
       <input type="hidden" name="item_id" value="<?= Support::e($item['id']) ?>">
       <input type="hidden" name="lot_id" value="<?= Support::e($lot['id']) ?>">
       <div class="field">

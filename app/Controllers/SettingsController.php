@@ -6,6 +6,7 @@ namespace Inni\Controllers;
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Csrf;
 use Inni\Database;
 use Inni\Support;
 use Inni\View;
@@ -30,6 +31,7 @@ final class SettingsController
         if (!Auth::isOwner($user)) {
             App::redirect('more');
         }
+        Csrf::requirePost();
         $name = trim((string) ($_POST['school_name'] ?? ''));
         if ($name !== '') {
             $pdo = Database::pdo();
@@ -60,6 +62,7 @@ final class SettingsController
         if (!Auth::isOwner($user)) {
             App::redirect('more');
         }
+        Csrf::requirePost();
         $id = (string) ($_POST['user_id'] ?? '');
         $status = (string) ($_POST['status'] ?? 'active');
         $role = (string) ($_POST['role'] ?? 'teacher');

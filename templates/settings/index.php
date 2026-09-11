@@ -1,10 +1,12 @@
 <?php
 
 use Inni\App;
+use Inni\Csrf;
 use Inni\Support;
 ?>
 <h1>학교 설정</h1>
 <form class="card" method="post" action="<?= Support::e(App::url('settings/save')) ?>" style="margin-top:1rem">
+  <?= Csrf::field() ?>
   <div class="field">
     <label>학교명</label>
     <input name="school_name" value="<?= Support::e($school) ?>" required>
