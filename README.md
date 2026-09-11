@@ -66,17 +66,45 @@ DocumentRoot /var/www/inni/public
 
 Nginx 예: `root .../public;` + `try_files $uri /index.php?$query_string;`
 
-### Google 로그인
+### Google 로그인 (운영)
 
-1. Google Cloud Console에서 OAuth 클라이언트(웹) 생성  
-2. 승인된 리디렉션 URI: 설정 화면 또는 로그인 안내에 표시되는  
-   `.../index.php?r=auth/google/callback`  
-3. `config.php`에 `client_id`, `client_secret` 입력  
-4. 필요 시 `allowed_domains`에 학교 메일 도메인
+문서 루트가 `public/` 이므로 콜백은 예쁜 경로가 아닙니다. Google이 비교하는 문자열은 **한 가지**입니다.
+
+```
+{base_url}/index.php?r=auth/google/callback
+```
+
+예: `https://school.example/index.php?r=auth/google/callback`  
+서브경로 배포: `https://school.example/inni/public/index.php?r=auth/google/callback`
+
+로그인 화면과 설정 → Google 로그인에 현재 인스턴스의 **정확한 문자열**이 표시됩니다. Console에 그 값을 그대로 넣으세요. `/auth/google/callback` 만 등록하면 앱 라우트와 맞지 않습니다.
+
+1. [Google Cloud Console](https://console.cloud.google.com/)에서 프로젝트 선택 (또는 생성)
+2. **API 및 서비스 → OAuth 동의 화면**을 외부/내부 중 학교 정책에 맞게 구성. 테스트 사용자를 넣어야 하면 담당 교사 메일을 추가
+3. **API 및 서비스 → 사용자 인증 정보 → 사용자 인증 정보 만들기 → OAuth 클라이언트 ID → 웹 애플리케이션**
+4. **승인된 자바스크립트 원본**: 사이트의 origin (예: `https://school.example`)
+5. **승인된 리디렉션 URI**: 위에서 표시된 `{base_url}/index.php?r=auth/google/callback` **한 줄, 글자 그대로**
+6. 발급된 값을 **서버의 `config.php`에만** 넣기. 저장소에 `client_id` / `client_secret`을 커밋하지 말 것
+   ```php
+   'base_url' => 'https://school.example', // 운영에서는 반드시 공개 URL로 고정
+   'demo_login' => false,
+   'google' => [
+       'client_id' => '...',
+       'client_secret' => '...',
+       'allowed_domains' => ['school.go.kr'], // 아래 정책
+       'redirect_uri' => '', // 비우면 base_url로 조합. Console과 다를 때만 Exact URI
+   ],
+   ```
+7. `allowed_domains`
+   - `[]` (비움): Google이 **인증한(`email_verified`)** 모든 도메인 허용
+   - 값이 있으면 **정확 일치만** 허용 (대소문자 무시). `mail.school.go.kr`은 `school.go.kr`에 포함되지 않음. 목록 밖은 거부(실패 폐쇄)
+8. 운영에서는 **`demo_login => false`**. 데모 버튼이 남아 있으면 학교 계정 없이 들어갑니다
 
 첫 Google 로그인 사용자가 owner, 이후 사용자는 `pending` → 관리자 승인.
 
 데모 시드 계정(`demo-owner`, `demo-teacher`)은 이 판정에서 제외합니다. 로컬에서 `demo_login`이 켜져 있어도 운영의 첫 Google 사용자는 owner가 됩니다. 시드만 있고 실제 owner가 없는 DB에 남아 있는 `pending` Google 계정도 다음 로그인 때 owner로 승격됩니다.
+
+`redirect_uri_mismatch`가 나면 Console 값과 로그인 화면에 찍힌 URI가 한 글자라도 다른지(http/https, 포트, 서브경로, `index.php?r=`)를 먼저 봅니다. `base_url`을 비우면 호스트/리버스 프록시에 따라 URI가 달라질 수 있습니다.
 
 ### 백업
 
@@ -135,6 +163,7 @@ php tests/stock.php
 php tests/csrf.php
 php tests/bootstrap_owner.php
 php tests/loan.php
+php tests/google_oauth.php
 ```
 
-메모리 DB로 수량 검증, 재고 부족, 권한, 품목·위치 일치, 출고 이력 및 저장 실패 시 롤백을 확인합니다. CSRF 검사는 유효 토큰 허용, 잘못된 토큰 거부, 반납 경로 GET 거부를 임시 SQLite로 확인합니다. `bootstrap_owner`는 데모 시드 사용자를 건너뛰고 첫 Google 계정을 owner로 두는 초기화 규칙을 확인합니다. 대여·반납 검사는 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위를 확인합니다. 실제 재고 데이터는 변경하지 않습니다.
+메모리 DB로 수량 검증, 재고 부족, 권한, 품목·위치 일치, 출고 이력 및 저장 실패 시 롤백을 확인합니다. CSRF 검사는 유효 토큰 허용, 잘못된 토큰 거부, 반납 경로 GET 거부를 임시 SQLite로 확인합니다. `bootstrap_owner`는 데모 시드 사용자를 건너뛰고 첫 Google 계정을 owner로 두는 초기화 규칙을 확인합니다. 대여·반납 검사는 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위를 확인합니다. `google_oauth`는 리디렉션 URI 조합, `allowed_domains` 실패 폐쇄, 빈/불완전 클라이언트 안내를 실제 Google 키 없이(토큰 교환 스텁) 확인합니다. 실제 재고 데이터는 변경하지 않습니다.

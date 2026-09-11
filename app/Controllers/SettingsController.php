@@ -22,7 +22,23 @@ final class SettingsController
         }
         $school = View::schoolName();
         $google = Auth::googleEnabled();
-        View::render('settings/index', compact('user', 'school', 'google'));
+        $googleStatus = Auth::googleConfigStatus();
+        $googleRedirectUri = Auth::googleRedirectUri();
+        $allowedDomains = Auth::normalizedAllowedDomains();
+        $baseUrlConfigured = App::normalizeConfiguredBaseUrl((string) App::config('base_url', '')) !== '';
+        $redirectUriOverride = trim((string) App::config('google.redirect_uri', '')) !== '';
+        $demoLogin = (bool) App::config('demo_login', true);
+        View::render('settings/index', compact(
+            'user',
+            'school',
+            'google',
+            'googleStatus',
+            'googleRedirectUri',
+            'allowedDomains',
+            'baseUrlConfigured',
+            'redirectUriOverride',
+            'demoLogin'
+        ));
     }
 
     public function save(): void

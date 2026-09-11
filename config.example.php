@@ -8,16 +8,19 @@ declare(strict_types=1);
 return [
     'app_name' => 'inni',
     'school_name' => 'inni 데모 마이스터고',
-    'base_url' => '', // 비우면 자동. 서브경로면 예: https://school.kr/inni/public
+    'base_url' => '', // 운영 OAuth는 공개 URL로 고정. 예: https://school.kr/inni/public
     'timezone' => 'Asia/Seoul',
-    // Local shortcut only. Demo-seed users are ignored for first-Google-owner.
+    // Local shortcut only. Turn off in production. Demo-seed users are ignored for first-Google-owner.
     'demo_login' => true,
     'session_name' => 'inni_sess',
 
     'google' => [
         'client_id' => '',
         'client_secret' => '',
+        // Empty = any Google-verified email. Non-empty = exact domain match only (fail closed).
         'allowed_domains' => [], // 예: ['school.go.kr']
+        // Optional exact Console URI. Empty = {base_url}/index.php?r=auth/google/callback
+        'redirect_uri' => '',
     ],
 
     'db_path' => null,     // default: data/inni.sqlite

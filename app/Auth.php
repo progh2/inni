@@ -8,6 +8,18 @@ use PDO;
 
 final class Auth
 {
+    public const GOOGLE_CALLBACK_ROUTE = 'auth/google/callback';
+
+    public const GOOGLE_STATUS_READY = 'ready';
+    public const GOOGLE_STATUS_EMPTY = 'empty';
+    public const GOOGLE_STATUS_PARTIAL = 'partial';
+
+    /** @var null|callable(string, array<string, mixed>): array */
+    private static $httpPostHandler = null;
+
+    /** @var null|callable(string, string): array */
+    private static $httpGetHandler = null;
+
     public static function user(): ?array
     {
         $id = $_SESSION['user_id'] ?? null;
@@ -227,17 +239,143 @@ final class Auth
         ];
     }
 
+    public static function googleClientId(): string
+    {
+        return trim((string) App::config('google.client_id', ''));
+    }
+
+    public static function googleClientSecret(): string
+    {
+        return trim((string) App::config('google.client_secret', ''));
+    }
+
+    /** @return self::GOOGLE_STATUS_* */
+    public static function googleConfigStatus(): string
+    {
+        $id = self::googleClientId();
+        $secret = self::googleClientSecret();
+        if ($id !== '' && $secret !== '') {
+            return self::GOOGLE_STATUS_READY;
+        }
+        if ($id === '' && $secret === '') {
+            return self::GOOGLE_STATUS_EMPTY;
+        }
+        return self::GOOGLE_STATUS_PARTIAL;
+    }
+
     public static function googleEnabled(): bool
     {
-        $g = App::config('google', []);
-        return !empty($g['client_id']) && !empty($g['client_secret']);
+        return self::googleConfigStatus() === self::GOOGLE_STATUS_READY;
+    }
+
+    /**
+     * Exact Authorized redirect URI for Google Cloud Console.
+     * Same string is sent as redirect_uri on /auth and /token.
+     * Pretty paths like /auth/google/callback are not routes — r= query is required.
+     */
+    public static function googleRedirectUri(): string
+    {
+        $override = trim((string) App::config('google.redirect_uri', ''));
+        if ($override !== '') {
+            return $override;
+        }
+        return rtrim(App::baseUrl(), '/') . '/index.php?r=' . self::GOOGLE_CALLBACK_ROUTE;
+    }
+
+    /**
+     * @return list<string> lowercase exact domains; empty = any Google-verified domain
+     */
+    public static function normalizedAllowedDomains(mixed $domains = null): array
+    {
+        if ($domains === null) {
+            $domains = App::config('google.allowed_domains', []);
+        }
+        if (is_string($domains)) {
+            $domains = preg_split('/[\s,]+/', $domains) ?: [];
+        }
+        if (!is_array($domains)) {
+            return [];
+        }
+        $out = [];
+        foreach ($domains as $domain) {
+            $domain = strtolower(trim((string) $domain));
+            $domain = ltrim($domain, '@');
+            $domain = rtrim($domain, '.');
+            if ($domain === '') {
+                continue;
+            }
+            $out[$domain] = $domain;
+        }
+        return array_values($out);
+    }
+
+    public static function emailDomain(string $email): string
+    {
+        $email = strtolower(trim($email));
+        $at = strrpos($email, '@');
+        if ($at === false) {
+            return '';
+        }
+        return substr($email, $at + 1);
+    }
+
+    /**
+     * Empty allowlist: any address with a domain part.
+     * Non-empty: fail closed, exact domain match (case-insensitive). Subdomains do not inherit.
+     */
+    public static function isEmailDomainAllowed(string $email, mixed $allowedDomains = null): bool
+    {
+        $domain = self::emailDomain($email);
+        if ($domain === '') {
+            return false;
+        }
+        $allowed = self::normalizedAllowedDomains($allowedDomains);
+        if ($allowed === []) {
+            return true;
+        }
+        return in_array($domain, $allowed, true);
+    }
+
+    public static function isGoogleEmailVerified(array $userinfo): bool
+    {
+        $verified = $userinfo['email_verified'] ?? false;
+        return $verified === true || $verified === 1 || $verified === '1' || $verified === 'true';
+    }
+
+    /**
+     * @return array{ok: bool, error: ?string, email: string, sub: string}
+     */
+    public static function evaluateGoogleProfile(array $info): array
+    {
+        $email = strtolower(trim((string) ($info['email'] ?? '')));
+        $sub = trim((string) ($info['sub'] ?? ''));
+        if ($email === '' || $sub === '') {
+            return ['ok' => false, 'error' => 'Google 프로필을 가져오지 못했습니다.', 'email' => $email, 'sub' => $sub];
+        }
+        if (!self::isGoogleEmailVerified($info)) {
+            return [
+                'ok' => false,
+                'error' => '인증되지 않은 Google 이메일은 사용할 수 없습니다.',
+                'email' => $email,
+                'sub' => $sub,
+            ];
+        }
+        if (!self::isEmailDomainAllowed($email)) {
+            return [
+                'ok' => false,
+                'error' => '허용되지 않은 이메일 도메인입니다.',
+                'email' => $email,
+                'sub' => $sub,
+            ];
+        }
+        return ['ok' => true, 'error' => null, 'email' => $email, 'sub' => $sub];
     }
 
     public static function googleAuthUrl(): string
     {
         $params = [
-            'client_id' => App::config('google.client_id'),
-            'redirect_uri' => App::url('auth/google/callback'),
+            'client_id' => self::googleClientId(),
+            'redirect_uri' => self::googleRedirectUri(),
             'response_type' => 'code',
             'scope' => 'openid email profile',
             'access_type' => 'online',
@@ -250,76 +388,106 @@ final class Auth
 
     public static function handleGoogleCallback(): void
     {
+        $result = self::processGoogleCallback($_GET, $_SESSION);
+        if (($result['user_id'] ?? '') !== '') {
+            self::login((string) $result['user_id']);
+        }
+        App::flash((string) $result['flash_type'], (string) $result['message']);
+        App::redirect(($result['user_id'] ?? '') !== '' ? 'home' : 'login');
+    }
+
+    /**
+     * Token exchange + domain policy. HTTP can be stubbed in CLI tests.
+     *
+     * @param array<string, mixed> $query
+     * @param array<string, mixed> $session
+     * @return array{ok: bool, flash_type: string, message: string, user_id: ?string}
+     */
+    public static function processGoogleCallback(array $query, array &$session, ?PDO $pdo = null): array
+    {
         if (!self::googleEnabled()) {
-            App::flash('error', 'Google 로그인이 설정되지 않았습니다.');
-            App::redirect('login');
+            $message = self::googleConfigStatus() === self::GOOGLE_STATUS_PARTIAL
+                ? 'Google 클라이언트가 불완전합니다. client_id와 client_secret을 모두 설정하세요.'
+                : 'Google 로그인이 설정되지 않았습니다.';
+            return ['ok' => false, 'flash_type' => 'error', 'message' => $message, 'user_id' => null];
         }
-        $state = $_GET['state'] ?? '';
-        if (!$state || !hash_equals($_SESSION['oauth_state'] ?? '', $state)) {
-            App::flash('error', 'OAuth state 검증 실패');
-            App::redirect('login');
+        $state = (string) ($query['state'] ?? '');
+        $expected = (string) ($session['oauth_state'] ?? '');
+        if ($state === '' || $expected === '' || !hash_equals($expected, $state)) {
+            return ['ok' => false, 'flash_type' => 'error', 'message' => 'OAuth state 검증 실패', 'user_id' => null];
         }
-        unset($_SESSION['oauth_state']);
-        $code = $_GET['code'] ?? '';
+        unset($session['oauth_state']);
+        $code = (string) ($query['code'] ?? '');
         if ($code === '') {
-            App::flash('error', '인증 코드가 없습니다.');
-            App::redirect('login');
+            return ['ok' => false, 'flash_type' => 'error', 'message' => '인증 코드가 없습니다.', 'user_id' => null];
         }
 
+        $redirectUri = self::googleRedirectUri();
         $token = self::httpPost('https://oauth2.googleapis.com/token', [
             'code' => $code,
-            'client_id' => App::config('google.client_id'),
-            'client_secret' => App::config('google.client_secret'),
-            'redirect_uri' => App::url('auth/google/callback'),
+            'client_id' => self::googleClientId(),
+            'client_secret' => self::googleClientSecret(),
+            'redirect_uri' => $redirectUri,
             'grant_type' => 'authorization_code',
         ]);
         if (empty($token['access_token'])) {
-            App::flash('error', '토큰 교환 실패');
-            App::redirect('login');
+            return ['ok' => false, 'flash_type' => 'error', 'message' => '토큰 교환 실패', 'user_id' => null];
         }
 
         $info = self::httpGet(
             'https://openidconnect.googleapis.com/v1/userinfo',
-            $token['access_token']
+            (string) $token['access_token']
         );
-        $email = strtolower((string) ($info['email'] ?? ''));
-        $sub = (string) ($info['sub'] ?? '');
-        if ($email === '' || $sub === '') {
-            App::flash('error', 'Google 프로필을 가져오지 못했습니다.');
-            App::redirect('login');
-        }
-
-        $domains = App::config('google.allowed_domains', []) ?: [];
-        if ($domains) {
-            $domain = substr(strrchr($email, '@') ?: '', 1);
-            if (!in_array($domain, $domains, true)) {
-                App::flash('error', '허용되지 않은 이메일 도메인입니다.');
-                App::redirect('login');
-            }
+        $profile = self::evaluateGoogleProfile(is_array($info) ? $info : []);
+        if (!$profile['ok']) {
+            return [
+                'ok' => false,
+                'flash_type' => 'error',
+                'message' => (string) $profile['error'],
+                'user_id' => null,
+            ];
         }
 
         $result = self::provisionGoogleUser(
-            Database::pdo(),
-            $email,
-            $sub,
-            (string) ($info['name'] ?? $email),
+            $pdo ?? Database::pdo(),
+            $profile['email'],
+            $profile['sub'],
+            (string) ($info['name'] ?? $profile['email']),
             isset($info['picture']) ? (string) $info['picture'] : null
         );
         if (!$result['allowed']) {
             $message = $result['created']
                 ? '가입 요청이 접수되었습니다. 관리자 승인 후 이용할 수 있습니다.'
                 : '계정이 아직 승인되지 않았거나 비활성 상태입니다.';
-            App::flash($result['created'] ? 'ok' : 'error', $message);
-            App::redirect('login');
+            return [
+                'ok' => false,
+                'flash_type' => $result['created'] ? 'ok' : 'error',
+                'message' => $message,
+                'user_id' => null,
+            ];
         }
-        self::login((string) $result['user']['id']);
 
-        App::flash('ok', '로그인되었습니다.');
-        App::redirect('home');
+        return [
+            'ok' => true,
+            'flash_type' => 'ok',
+            'message' => '로그인되었습니다.',
+            'user_id' => (string) $result['user']['id'],
+        ];
+    }
+
+    /** @internal CLI tests stub token/userinfo — never used in production. */
+    public static function setGoogleHttpHandlers(?callable $post, ?callable $get): void
+    {
+        self::$httpPostHandler = $post;
+        self::$httpGetHandler = $get;
     }
 
     private static function httpPost(string $url, array $fields): array
     {
+        if (self::$httpPostHandler !== null) {
+            $data = (self::$httpPostHandler)($url, $fields);
+            return is_array($data) ? $data : [];
+        }
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
@@ -336,6 +504,10 @@ final class Auth
 
     private static function httpGet(string $url, string $accessToken): array
     {
+        if (self::$httpGetHandler !== null) {
+            $data = (self::$httpGetHandler)($url, $accessToken);
+            return is_array($data) ? $data : [];
+        }
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
