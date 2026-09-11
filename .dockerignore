@@ -1,0 +1,10 @@
+.git
+.github
+config.php
+data/*.sqlite
+data/*.sqlite-*
+public/uploads/**
+!public/uploads/.gitignore
+!public/uploads/.htaccess
+**/.DS_Store
+*.log

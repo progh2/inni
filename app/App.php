@@ -18,7 +18,10 @@ final class App
             if (!is_file($example)) {
                 throw new \RuntimeException('config.example.php missing');
             }
-            copy($example, $configFile);
+            // Docker / read-only app root: boot from the example instead of failing.
+            if (!@copy($example, $configFile)) {
+                $configFile = $example;
+            }
         }
         self::$config = require $configFile;
         date_default_timezone_set(self::$config['timezone'] ?? 'Asia/Seoul');

@@ -25,7 +25,8 @@
 - PHP 8.4 임시 실행 환경에서 전체 PHP 파일 45개 문법 검사 통과.
 - `php tests/stock.php`: 메모리 SQLite DB를 사용하는 25개 검증 통과.
 - 임시 앱 복사본·DB에서 HTTP 검증 통과: 로그인, 품목 화면, 정상 출고와 이력, 재고 부족, GET 거부, 잘못된 CSRF 토큰, 학생 권한 차단.
-- 브라우저 시각 검증, 실제 카메라 스캔, Google OAuth 실연동, Docker 배포 검증은 미실시.
+- 브라우저 시각 검증, 실제 카메라 스캔, Google OAuth 실연동은 미실시.
+- Docker: `docker compose up --build` 경로를 정리함. 이미지에 `pdo_sqlite`/`sqlite3`/`curl`/`fileinfo`/`mbstring` 설치·빌드 검증, entrypoint가 `config.php` 생성과 `data/`·`public/uploads/` 권한을 맞춤. 에이전트 환경에서 Compose 기동을 확인하려면 Docker 소켓이 필요함.
 
 ## 다음 작업 후보
 
@@ -33,7 +34,7 @@
 2. 기존 변경 요청 전반에 POST·CSRF 검사 적용. 이번 출고 경로에는 적용했지만 기존 경로는 별도 점검 필요.
 3. 장비 대여·반납의 동시 요청 및 반납 권한 범위 검토.
 4. 품목 수정·재입고, 출고 취소와 취소 이력, 실사 등 남은 요구사항 구현.
-5. Docker의 설정 파일 생성 권한 및 필요한 PHP 확장 점검.
+5. ~~Docker의 설정 파일 생성 권한 및 필요한 PHP 확장 점검.~~ → issue #5 / Compose 경로로 처리.
 
 ## 작업 환경 참고
 
