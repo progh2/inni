@@ -2,6 +2,7 @@
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Csrf;
 use Inni\Support;
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('search')) ?>">← 찾기</a></p>
@@ -21,6 +22,7 @@ use Inni\Support;
 <div class="card">
   <h2 class="section-title" style="margin-top:0">대여</h2>
   <form method="post" action="<?= Support::e(App::url('assets/loan')) ?>">
+    <?= Csrf::field() ?>
     <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
     <div class="field">
       <label>빌리는 사람</label>
@@ -52,6 +54,7 @@ use Inni\Support;
   <p class="muted">예정 <?= Support::e(Support::formatWhen($loan['due_at'])) ?></p>
   <?php if (Auth::canLoan($user)): ?>
     <form method="post" action="<?= Support::e(App::url('loans/return')) ?>">
+      <?= Csrf::field() ?>
       <input type="hidden" name="loan_id" value="<?= Support::e($loan['id']) ?>">
       <button class="btn btn-ink btn-block" type="submit">반납 처리</button>
     </form>
@@ -62,6 +65,7 @@ use Inni\Support;
 <div class="card">
   <h2 class="section-title" style="margin-top:0">위치 이동</h2>
   <form method="post" action="<?= Support::e(App::url('assets/move')) ?>">
+    <?= Csrf::field() ?>
     <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
     <div class="field">
       <label>새 위치</label>
@@ -81,6 +85,7 @@ use Inni\Support;
 <div class="card">
   <h2 class="section-title" style="margin-top:0">사진 업로드</h2>
   <form method="post" action="<?= Support::e(App::url('assets/photo')) ?>" enctype="multipart/form-data">
+    <?= Csrf::field() ?>
     <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
     <div class="field">
       <label>사진</label>
@@ -94,6 +99,7 @@ use Inni\Support;
 <div class="card">
   <h2 class="section-title" style="margin-top:0">고장 · 이상 신고</h2>
   <form method="post" action="<?= Support::e(App::url('assets/report')) ?>" enctype="multipart/form-data">
+    <?= Csrf::field() ?>
     <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
     <div class="field">
       <label>제목</label>

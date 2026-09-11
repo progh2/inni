@@ -1,12 +1,14 @@
 <?php
 
 use Inni\App;
+use Inni\Csrf;
 use Inni\Support;
 ?>
 <h1>빠른 등록</h1>
 <p class="muted">필수만 채우고 저장하세요. 사진은 나중에 추가해도 됩니다.</p>
 
 <form class="card" method="post" action="<?= Support::e(App::url('items/save')) ?>" enctype="multipart/form-data" style="margin-top:1rem">
+  <?= Csrf::field() ?>
   <div class="field">
     <label>이름 *</label>
     <input name="name" required placeholder="디지털 멀티미터">

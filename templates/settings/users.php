@@ -1,6 +1,7 @@
 <?php
 
 use Inni\App;
+use Inni\Csrf;
 use Inni\Support;
 ?>
 <h1>사용자</h1>
@@ -12,6 +13,7 @@ use Inni\Support;
         <div class="meta"><?= Support::e($u['email']) ?> · <?= Support::e($u['role']) ?> · <?= Support::e($u['status']) ?></div>
       </div>
       <form method="post" action="<?= Support::e(App::url('settings/approve')) ?>" style="display:flex;gap:0.35rem;flex-wrap:wrap">
+        <?= Csrf::field() ?>
         <input type="hidden" name="user_id" value="<?= Support::e($u['id']) ?>">
         <select name="role">
           <?php foreach (['owner','manager','teacher','student'] as $role): ?>

@@ -2,6 +2,7 @@
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Csrf;
 use Inni\Support;
 ?>
 <h1>실 · 위치</h1>
@@ -26,6 +27,7 @@ use Inni\Support;
 <div class="card">
   <h2 class="section-title" style="margin-top:0">위치 추가</h2>
   <form method="post" action="<?= Support::e(App::url('rooms/save')) ?>" enctype="multipart/form-data">
+    <?= Csrf::field() ?>
     <div class="field">
       <label>이름</label>
       <input name="name" required placeholder="예: 제어실습실">

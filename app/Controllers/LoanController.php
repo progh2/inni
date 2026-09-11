@@ -6,6 +6,7 @@ namespace Inni\Controllers;
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Csrf;
 use Inni\Database;
 use Inni\Logger;
 use Inni\Support;
@@ -41,6 +42,7 @@ final class LoanController
             App::flash('error', '권한이 없습니다.');
             App::redirect('loans');
         }
+        Csrf::requirePost();
         $loanId = (string) ($_POST['loan_id'] ?? '');
         $pdo = Database::pdo();
         $stmt = $pdo->prepare('SELECT * FROM loans WHERE id = ?');

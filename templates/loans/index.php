@@ -2,6 +2,7 @@
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Csrf;
 use Inni\Support;
 ?>
 <h1>대여 현황</h1>
@@ -22,6 +23,7 @@ use Inni\Support;
         <span class="badge <?= Support::e($loan['status']) ?>"><?= Support::e(Support::statusLabel($loan['status'])) ?></span>
         <?php if (Auth::canLoan($user ?? Auth::user())): ?>
           <form method="post" action="<?= Support::e(App::url('loans/return')) ?>">
+            <?= Csrf::field() ?>
             <input type="hidden" name="loan_id" value="<?= Support::e($loan['id']) ?>">
             <button class="btn btn-ghost" type="submit">반납</button>
           </form>

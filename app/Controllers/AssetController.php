@@ -6,6 +6,7 @@ namespace Inni\Controllers;
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Csrf;
 use Inni\Database;
 use Inni\Logger;
 use Inni\Support;
@@ -69,9 +70,7 @@ final class AssetController
             App::flash('error', '대여 권한이 없습니다.');
             App::redirect('home');
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            App::redirect('home');
-        }
+        Csrf::requirePost();
 
         $assetId = (string) ($_POST['asset_id'] ?? '');
         $borrowerName = trim((string) ($_POST['borrower_name'] ?? ''));
@@ -125,6 +124,7 @@ final class AssetController
             App::flash('error', '권한이 없습니다.');
             App::redirect('home');
         }
+        Csrf::requirePost();
         $assetId = (string) ($_POST['asset_id'] ?? '');
         $locationId = (string) ($_POST['location_id'] ?? '');
         $pdo = Database::pdo();
@@ -149,6 +149,7 @@ final class AssetController
     public function report(): void
     {
         $user = Auth::requireLogin();
+        Csrf::requirePost();
         $assetId = (string) ($_POST['asset_id'] ?? '');
         $title = trim((string) ($_POST['title'] ?? ''));
         $body = trim((string) ($_POST['body'] ?? ''));
@@ -186,6 +187,7 @@ final class AssetController
             App::flash('error', '권한이 없습니다.');
             App::redirect('home');
         }
+        Csrf::requirePost();
         $assetId = (string) ($_POST['asset_id'] ?? '');
         try {
             $path = Uploader::store($_FILES['photo'] ?? [], 'assets');
