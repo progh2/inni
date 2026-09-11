@@ -8,11 +8,25 @@ use PDO;
 
 final class Seed
 {
+    public const DEMO_OWNER_ID = 'demo-owner';
+    public const DEMO_TEACHER_ID = 'demo-teacher';
+
+    /** Local convenience accounts; they do not occupy the first-Google-owner slot. */
+    public static function demoUserIds(): array
+    {
+        return [self::DEMO_OWNER_ID, self::DEMO_TEACHER_ID];
+    }
+
+    public static function isDemoUserId(string $id): bool
+    {
+        return in_array($id, self::demoUserIds(), true);
+    }
+
     public static function run(PDO $pdo): void
     {
         $t = Support::now();
-        $ownerId = 'demo-owner';
-        $teacherId = 'demo-teacher';
+        $ownerId = self::DEMO_OWNER_ID;
+        $teacherId = self::DEMO_TEACHER_ID;
 
         $pdo->prepare(
             'INSERT INTO settings(key, value) VALUES(?, ?), (?, ?), (?, ?)'

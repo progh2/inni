@@ -76,6 +76,8 @@ Nginx 예: `root .../public;` + `try_files $uri /index.php?$query_string;`
 
 첫 Google 로그인 사용자가 owner, 이후 사용자는 `pending` → 관리자 승인.
 
+데모 시드 계정(`demo-owner`, `demo-teacher`)은 이 판정에서 제외합니다. 로컬에서 `demo_login`이 켜져 있어도 운영의 첫 Google 사용자는 owner가 됩니다. 시드만 있고 실제 owner가 없는 DB에 남아 있는 `pending` Google 계정도 다음 로그인 때 owner로 승격됩니다.
+
 ### 백업
 
 복사할 경로 (호스트 기준, Compose 볼륨과 동일):
@@ -131,6 +133,7 @@ PHP CLI와 `pdo_sqlite` 확장이 있는 환경에서:
 ```bash
 php tests/stock.php
 php tests/csrf.php
+php tests/bootstrap_owner.php
 ```
 
-메모리 DB로 수량 검증, 재고 부족, 권한, 품목·위치 일치, 출고 이력 및 저장 실패 시 롤백을 확인합니다. CSRF 검사는 유효 토큰 허용, 잘못된 토큰 거부, 반납 경로 GET 거부를 임시 SQLite로 확인합니다. 실제 재고 데이터는 변경하지 않습니다.
+메모리 DB로 수량 검증, 재고 부족, 권한, 품목·위치 일치, 출고 이력 및 저장 실패 시 롤백을 확인합니다. CSRF 검사는 유효 토큰 허용, 잘못된 토큰 거부, 반납 경로 GET 거부를 임시 SQLite로 확인합니다. `bootstrap_owner`는 데모 시드 사용자를 건너뛰고 첫 Google 계정을 owner로 두는 초기화 규칙을 확인합니다. 실제 재고 데이터는 변경하지 않습니다.
