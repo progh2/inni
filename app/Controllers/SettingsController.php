@@ -27,7 +27,7 @@ final class SettingsController
         $allowedDomains = Auth::normalizedAllowedDomains();
         $baseUrlConfigured = App::normalizeConfiguredBaseUrl((string) App::config('base_url', '')) !== '';
         $redirectUriOverride = trim((string) App::config('google.redirect_uri', '')) !== '';
-        $demoLogin = (bool) App::config('demo_login', true);
+        $demoLogin = Auth::isDemoLoginEnabled();
         View::render('settings/index', compact(
             'user',
             'school',

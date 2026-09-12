@@ -16,7 +16,8 @@ if [ -d "$APP_ROOT/config.php" ]; then
   exit 1
 fi
 
-# First boot: seed config.php from the example (demo_login stays true).
+# First boot: seed from config.example.php (demo_login stays true for local smoke).
+# Production: bind-mount a host config.php from config.production.example.php (demo_login false).
 if [ ! -f "$APP_ROOT/config.php" ]; then
   if [ ! -f "$APP_ROOT/config.example.php" ]; then
     echo "config.example.php missing" >&2

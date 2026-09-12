@@ -9,16 +9,16 @@
 
 ```bash
 cd /path/to/inni
-cp config.example.php config.php   # 최초 1회 자동 복사되기도 함
+cp config.example.php config.php   # 로컬 예시: demo_login => true. 최초 1회 자동 복사되기도 함
 php -S 0.0.0.0:8080 -t public
 ```
 
 브라우저: http://localhost:8080  
-→ **담당교사로 들어가기** (데모)
+→ **담당교사로 들어가기** (데모). `demo_login`이 `true`이면 데모 버튼이 유지됩니다.
 
 ## Docker (로컬 스모크 / 자가 호스팅)
 
-문서 루트는 이미지에서 `public/` 입니다. 컨테이너가 처음 뜰 때 `config.example.php` → `config.php`를 만듭니다. 예시 설정의 `demo_login`은 `true`라서 데모 로그인으로 바로 확인할 수 있습니다.
+문서 루트는 이미지에서 `public/` 입니다. 컨테이너가 처음 뜰 때 `config.example.php` → `config.php`를 만듭니다. **로컬/스모크 예시의 `demo_login`은 `true`**라서 데모 로그인으로 바로 확인할 수 있습니다. 운영 설정 예시는 `config.production.example.php` (`demo_login => false`)입니다.
 
 ```bash
 docker compose up --build
@@ -29,11 +29,11 @@ docker compose up --build
 브라우저: http://localhost:8080  
 → **담당교사로 들어가기** (데모)
 
-운영에서 데모 로그인을 끄려면 호스트에 `config.php`를 **먼저** 만든 뒤 `demo_login => false`로 바꾸고, `docker-compose.yml`의 주석 처리된 볼륨을 켭니다. 없는 경로를 마운트하면 Docker가 `config.php`를 디렉터리로 만들어 기동이 실패합니다.
+운영에서는 데모 로그인을 **반드시** 끕니다. 호스트에 `config.php`를 **먼저** 만든 뒤 `demo_login => false`로 두고, `docker-compose.yml`의 주석 처리된 볼륨을 켭니다. 없는 경로를 마운트하면 Docker가 `config.php`를 디렉터리로 만들어 기동이 실패합니다.
 
 ```bash
-cp config.example.php config.php
-# config.php 편집 후:
+cp config.production.example.php config.php
+# config.php 에만 Google client_id / client_secret 입력. demo_login 은 false 유지.
 #   volumes:
 #     - ./config.php:/var/www/inni/config.php:ro
 ```
@@ -52,7 +52,7 @@ cp config.example.php config.php
 1. PHP 8.1+ (확장: `pdo_sqlite`, `sqlite3`, `curl`, `fileinfo`, `mbstring`)
 2. 문서 루트를 **`public/`** 으로 지정
 3. `data/` 와 `public/uploads/` 쓰기 권한
-4. `config.example.php` → `config.php` 수정
+4. `config.production.example.php` → `config.php` 수정 (`demo_login => false`). 로컬 예시(`config.example.php`)를 복사했다면 이 값을 **반드시 false**로 바꾸세요. 키가 없으면 앱도 false로 취급합니다.
 
 Apache 예:
 
@@ -98,7 +98,7 @@ Nginx 예: `root .../public;` + `try_files $uri /index.php?$query_string;`
 7. `allowed_domains`
    - `[]` (비움): Google이 **인증한(`email_verified`)** 모든 도메인 허용
    - 값이 있으면 **정확 일치만** 허용 (대소문자 무시). `mail.school.go.kr`은 `school.go.kr`에 포함되지 않음. 목록 밖은 거부(실패 폐쇄)
-8. 운영에서는 **`demo_login => false`**. 데모 버튼이 남아 있으면 학교 계정 없이 들어갑니다
+8. 운영에서는 **`demo_login => false`가 필수**. 데모 버튼이 남아 있으면 학교 계정 없이 들어갑니다. 로컬/Docker 스모크만 `true`
 
 첫 Google 로그인 사용자가 owner, 이후 사용자는 `pending` → 관리자 승인.
 
@@ -134,7 +134,7 @@ docker compose start
 | 담당교사 | owner — 등록·설정 |
 | 일반교사 | teacher — 대여·조회 |
 
-운영 시 `demo_login => false` 권장.
+운영에서는 `demo_login => false`가 **필수** (`config.production.example.php` 기본값). 로컬/Docker 스모크만 `true`.
 
 ## 주요 화면
 
@@ -164,6 +164,7 @@ php tests/csrf.php
 php tests/bootstrap_owner.php
 php tests/loan.php
 php tests/google_oauth.php
+php tests/role_block.php
 ```
 
-메모리 DB로 수량 검증, 재고 부족, 권한, 품목·위치 일치, 출고 이력 및 저장 실패 시 롤백을 확인합니다. CSRF 검사는 유효 토큰 허용, 잘못된 토큰 거부, 반납 경로 GET 거부를 임시 SQLite로 확인합니다. `bootstrap_owner`는 데모 시드 사용자를 건너뛰고 첫 Google 계정을 owner로 두는 초기화 규칙을 확인합니다. 대여·반납 검사는 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위를 확인합니다. `google_oauth`는 리디렉션 URI 조합, `allowed_domains` 실패 폐쇄, 빈/불완전 클라이언트 안내를 실제 Google 키 없이(토큰 교환 스텁) 확인합니다. 실제 재고 데이터는 변경하지 않습니다.
+메모리 DB로 수량 검증, 재고 부족, 권한, 품목·위치 일치, 출고 이력 및 저장 실패 시 롤백을 확인합니다. CSRF 검사는 유효 토큰 허용, 잘못된 토큰 거부, 반납 경로 GET 거부를 임시 SQLite로 확인합니다. `bootstrap_owner`는 데모 시드 사용자를 건너뛰고 첫 Google 계정을 owner로 두는 초기화 규칙을 확인합니다. 대여·반납 검사는 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위를 확인합니다. `google_oauth`는 리디렉션 URI 조합, `allowed_domains` 실패 폐쇄, 빈/불완전 클라이언트 안내를 실제 Google 키 없이(토큰 교환 스텁) 확인합니다. `role_block`은 학생·pending·disabled의 대여·출고·등록 차단과 `demo_login` 키 생략 시 off를 확인합니다. 실제 재고 데이터는 변경하지 않습니다.

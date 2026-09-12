@@ -279,5 +279,12 @@ $example = (string) file_get_contents(dirname(__DIR__) . '/config.example.php');
 check(!preg_match('/client_id\'\s*=>\s*\'(?!\')[^\'].+\'/', $example), 'example config must not ship a real client_id');
 check(str_contains($example, "'client_id' => ''"), 'example client_id stays empty');
 check(str_contains($example, "'client_secret' => ''"), 'example client_secret stays empty');
+check(str_contains($example, "'demo_login' => true"), 'local example keeps demo_login true');
+
+$production = (string) file_get_contents(dirname(__DIR__) . '/config.production.example.php');
+check(!preg_match('/client_id\'\s*=>\s*\'(?!\')[^\'].+\'/', $production), 'production example must not ship a real client_id');
+check(str_contains($production, "'client_id' => ''"), 'production example client_id stays empty');
+check(str_contains($production, "'client_secret' => ''"), 'production example client_secret stays empty');
+check(str_contains($production, "'demo_login' => false"), 'production example shows demo_login false');
 
 echo "PASS: {$checks} google-oauth checks\n";
