@@ -61,6 +61,7 @@ final class Stock
             self::rollBackImmediate($pdo);
             throw $e;
         }
+        Alert::notifyLowStock($pdo, $itemId);
     }
 
     public static function restock(
@@ -159,6 +160,7 @@ final class Stock
             self::rollBackImmediate($pdo);
             throw $e;
         }
+        Alert::notifyLowStock($pdo, $itemId);
     }
 
     public static function cancelIssue(PDO $pdo, array $actor, string $itemId, string $issueLogId, string $reason): void
@@ -263,6 +265,7 @@ final class Stock
             self::rollBackImmediate($pdo);
             throw $e;
         }
+        Alert::notifyLowStock($pdo, $itemId);
     }
 
     private static function parsePositiveQuantity(mixed $quantity, string $message): float

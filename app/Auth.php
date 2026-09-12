@@ -68,6 +68,12 @@ final class Auth
         return self::isActiveRole($user, ['owner', 'manager']);
     }
 
+    /** 알림·텔레그램 설정: owner/manager. 봇 토큰은 config.php에만 둔다. */
+    public static function canConfigureAlerts(?array $user): bool
+    {
+        return self::isActiveRole($user, ['owner', 'manager']);
+    }
+
     public static function canLoan(?array $user): bool
     {
         return self::isActiveRole($user, ['owner', 'manager', 'teacher']);

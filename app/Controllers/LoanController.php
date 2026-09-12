@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Inni\Controllers;
 
+use Inni\Alert;
 use Inni\App;
 use Inni\Auth;
 use Inni\Csrf;
 use Inni\Database;
 use Inni\Loan;
-use Inni\Support;
 use Inni\View;
 
 final class LoanController
@@ -18,11 +18,7 @@ final class LoanController
     {
         Auth::requireLogin();
         $pdo = Database::pdo();
-        // mark overdue (ISO-8601 lexical compare)
-        $pdo->prepare(
-            "UPDATE loans SET status = 'overdue'
-             WHERE status = 'active' AND due_at IS NOT NULL AND due_at < ?"
-        )->execute([Support::now()]);
+        Alert::refreshOverdue($pdo);
 
         $loans = $pdo->query(
             "SELECT l.*, a.name AS asset_name, a.management_number

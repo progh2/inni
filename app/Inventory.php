@@ -272,6 +272,7 @@ final class Inventory
      * @param array<string, mixed> $actor
      * @return array<string, mixed>
      */
+    /** 종료 시 미확인 목록만. 텔레그램·엑셀·이어하기는 범위 밖. */
     public static function finish(PDO $pdo, array $actor, string $checkId): array
     {
         self::requireActor($actor);

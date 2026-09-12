@@ -79,6 +79,7 @@ final class Router
             'more' => [MoreController::class, 'index'],
             'settings' => [SettingsController::class, 'index'],
             'settings/save' => [SettingsController::class, 'save'],
+            'settings/telegram' => [SettingsController::class, 'saveTelegram'],
             'settings/users' => [SettingsController::class, 'users'],
             'settings/approve' => [SettingsController::class, 'approve'],
         ];

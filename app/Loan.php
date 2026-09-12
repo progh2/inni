@@ -41,6 +41,7 @@ final class Loan
         $purpose = self::nullableTrim($purpose);
         $dueAt = self::nullableTrim($dueAt);
 
+        $loanId = '';
         self::beginImmediate($pdo);
         try {
             $t = Support::now();
@@ -92,11 +93,12 @@ final class Loan
             ]);
 
             self::commitImmediate($pdo);
-            return $loanId;
         } catch (Throwable $e) {
             self::rollBackImmediate($pdo);
             throw $e;
         }
+        Alert::refreshOverdue($pdo);
+        return $loanId;
     }
 
     /**
@@ -109,6 +111,7 @@ final class Loan
             throw new InvalidArgumentException('반납할 대여를 확인하세요.');
         }
 
+        $assetId = null;
         self::beginImmediate($pdo);
         try {
             $stmt = $pdo->prepare('SELECT * FROM loans WHERE id = ?');
@@ -161,11 +164,12 @@ final class Loan
             ]);
 
             self::commitImmediate($pdo);
-            return $assetId;
         } catch (Throwable $e) {
             self::rollBackImmediate($pdo);
             throw $e;
         }
+        Alert::clearDispatch($pdo, Alert::EVENT_OVERDUE_LOAN, $loanId);
+        return $assetId;
     }
 
     private static function nullableTrim(?string $value): ?string

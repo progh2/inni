@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Inni\Controllers;
 
+use Inni\Alert;
 use Inni\App;
 use Inni\Auth;
 use Inni\Csrf;
 use Inni\Database;
 use Inni\Support;
+use Inni\Telegram;
 use Inni\View;
 
 final class SettingsController
@@ -16,8 +18,8 @@ final class SettingsController
     public function index(): void
     {
         $user = Auth::requireLogin();
-        if (!Auth::isOwner($user)) {
-            App::flash('error', '관리자만 설정할 수 있습니다.');
+        if (!Auth::canConfigureAlerts($user)) {
+            App::flash('error', '담당교사만 설정할 수 있습니다.');
             App::redirect('more');
         }
         $school = View::schoolName();
@@ -28,6 +30,12 @@ final class SettingsController
         $baseUrlConfigured = App::normalizeConfiguredBaseUrl((string) App::config('base_url', '')) !== '';
         $redirectUriOverride = trim((string) App::config('google.redirect_uri', '')) !== '';
         $demoLogin = Auth::isDemoLoginEnabled();
+        $canEditSchool = Auth::isOwner($user);
+        $telegramReady = Telegram::isReady();
+        $telegramSettings = Alert::settings(Database::pdo());
+        $telegramChatId = $telegramSettings['chat_id'];
+        $telegramEvents = $telegramSettings['events'];
+        $telegramDefaultChat = Telegram::defaultChatId();
         View::render('settings/index', compact(
             'user',
             'school',
@@ -37,7 +45,12 @@ final class SettingsController
             'allowedDomains',
             'baseUrlConfigured',
             'redirectUriOverride',
-            'demoLogin'
+            'demoLogin',
+            'canEditSchool',
+            'telegramReady',
+            'telegramChatId',
+            'telegramEvents',
+            'telegramDefaultChat'
         ));
     }
 
@@ -57,6 +70,28 @@ final class SettingsController
             )->execute(['school_name', $name]);
         }
         App::flash('ok', '설정을 저장했습니다.');
+        App::redirect('settings');
+    }
+
+    public function saveTelegram(): void
+    {
+        $user = Auth::requireLogin();
+        if (!Auth::canConfigureAlerts($user)) {
+            App::flash('error', '알림 설정 권한이 없습니다.');
+            App::redirect('more');
+        }
+        Csrf::requirePost();
+        $chatId = is_string($_POST['chat_id'] ?? null) ? $_POST['chat_id'] : '';
+        $events = [
+            Alert::EVENT_LOW_STOCK => !empty($_POST['event_low_stock']),
+            Alert::EVENT_OVERDUE_LOAN => !empty($_POST['event_overdue_loan']),
+        ];
+        try {
+            Alert::saveSettings(Database::pdo(), $user, $chatId, $events);
+            App::flash('ok', '텔레그램 알림 설정을 저장했습니다.');
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        }
         App::redirect('settings');
     }
 

@@ -32,6 +32,8 @@ return [
     'upload_url' => '/uploads',
     'max_upload_bytes' => 8 * 1024 * 1024,
 
+    // Bot token stays in the server config.php only. Never commit a real token.
+    // Empty token = fail closed (UI shows 연결 필요). Chat id / event on-off also live in 설정.
     'telegram' => [
         'bot_token' => '',
         'default_chat_id' => '',

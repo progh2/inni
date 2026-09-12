@@ -153,6 +153,13 @@ CREATE TABLE IF NOT EXISTS inventory_checks (
   finished_at TEXT
 );
 
+CREATE TABLE IF NOT EXISTS alert_dispatches (
+  event_key TEXT NOT NULL,
+  entity_id TEXT NOT NULL,
+  sent_at TEXT NOT NULL,
+  PRIMARY KEY (event_key, entity_id)
+);
+
 CREATE TABLE IF NOT EXISTS inventory_check_lines (
   id TEXT PRIMARY KEY,
   check_id TEXT NOT NULL REFERENCES inventory_checks(id) ON DELETE CASCADE,
