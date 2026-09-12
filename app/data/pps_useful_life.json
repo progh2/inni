@@ -1,0 +1,8615 @@
+{
+  "notice": {
+    "id": "제2024-30호",
+    "effective": "2025-01-01",
+    "revised": "2024-12-26",
+    "title": "조달청고시 제2024-30호",
+    "label": "조달청고시 제2024-30호 (2025-01-01 시행)"
+  },
+  "extend": "items 배열에 {class_number(8자리), name, years(1-100)}를 추가하거나 고시 개정 시 notice와 품명을 교체하세요. 실시간 조달청 API·PDF 크롤은 쓰지 않습니다.",
+  "items": [
+    {
+      "class_number": "10131601",
+      "name": "애완동물사육장",
+      "years": 10
+    },
+    {
+      "class_number": "10131702",
+      "name": "수중생물용유리상자및수조",
+      "years": 8
+    },
+    {
+      "class_number": "10191703",
+      "name": "포충기",
+      "years": 7
+    },
+    {
+      "class_number": "20101601",
+      "name": "광업용스크린",
+      "years": 11
+    },
+    {
+      "class_number": "20101706",
+      "name": "죠크러셔",
+      "years": 11
+    },
+    {
+      "class_number": "20101707",
+      "name": "크러싱플랜트",
+      "years": 11
+    },
+    {
+      "class_number": "20101709",
+      "name": "볼밀",
+      "years": 11
+    },
+    {
+      "class_number": "20101710",
+      "name": "미분쇄기",
+      "years": 11
+    },
+    {
+      "class_number": "20101711",
+      "name": "록브레이커",
+      "years": 7
+    },
+    {
+      "class_number": "21101501",
+      "name": "쟁기",
+      "years": 10
+    },
+    {
+      "class_number": "21101502",
+      "name": "쇄토기",
+      "years": 10
+    },
+    {
+      "class_number": "21101503",
+      "name": "관리기",
+      "years": 10
+    },
+    {
+      "class_number": "21101504",
+      "name": "제초기",
+      "years": 10
+    },
+    {
+      "class_number": "21101506",
+      "name": "그레이더또는정지기",
+      "years": 9
+    },
+    {
+      "class_number": "21101508",
+      "name": "잔디밭및운동장용롤러",
+      "years": 10
+    },
+    {
+      "class_number": "21101518",
+      "name": "토양소독기",
+      "years": 9
+    },
+    {
+      "class_number": "21101590",
+      "name": "농업용인양장비",
+      "years": 10
+    },
+    {
+      "class_number": "21101592",
+      "name": "경운기",
+      "years": 11
+    },
+    {
+      "class_number": "21101598",
+      "name": "배토기",
+      "years": 9
+    },
+    {
+      "class_number": "21101601",
+      "name": "파종기",
+      "years": 10
+    },
+    {
+      "class_number": "21101602",
+      "name": "이식기",
+      "years": 10
+    },
+    {
+      "class_number": "21101612",
+      "name": "종자발아기",
+      "years": 9
+    },
+    {
+      "class_number": "21101701",
+      "name": "예취기",
+      "years": 9
+    },
+    {
+      "class_number": "21101702",
+      "name": "건초기",
+      "years": 9
+    },
+    {
+      "class_number": "21101703",
+      "name": "수확기",
+      "years": 10
+    },
+    {
+      "class_number": "21101704",
+      "name": "콤바인",
+      "years": 9
+    },
+    {
+      "class_number": "21101705",
+      "name": "탈곡기",
+      "years": 10
+    },
+    {
+      "class_number": "21101706",
+      "name": "작물분절기",
+      "years": 10
+    },
+    {
+      "class_number": "21101709",
+      "name": "목초결속기",
+      "years": 8
+    },
+    {
+      "class_number": "21101710",
+      "name": "수확용건조기",
+      "years": 10
+    },
+    {
+      "class_number": "21101788",
+      "name": "곡물이송기",
+      "years": 9
+    },
+    {
+      "class_number": "21101801",
+      "name": "분무기",
+      "years": 10
+    },
+    {
+      "class_number": "21101803",
+      "name": "살수기",
+      "years": 9
+    },
+    {
+      "class_number": "21101804",
+      "name": "비료살포기또는분배기",
+      "years": 11
+    },
+    {
+      "class_number": "21101806",
+      "name": "퇴비살포기",
+      "years": 10
+    },
+    {
+      "class_number": "21101897",
+      "name": "동력살분무기",
+      "years": 10
+    },
+    {
+      "class_number": "21101899",
+      "name": "농축산용방역장비",
+      "years": 8
+    },
+    {
+      "class_number": "21101901",
+      "name": "착유기",
+      "years": 10
+    },
+    {
+      "class_number": "21101903",
+      "name": "가금의부란기와양육기",
+      "years": 10
+    },
+    {
+      "class_number": "21101904",
+      "name": "사료배합기",
+      "years": 11
+    },
+    {
+      "class_number": "21101906",
+      "name": "계란검사및선별기",
+      "years": 8
+    },
+    {
+      "class_number": "21101915",
+      "name": "돼지등지방측정기",
+      "years": 10
+    },
+    {
+      "class_number": "21101982",
+      "name": "사료절단기",
+      "years": 10
+    },
+    {
+      "class_number": "21102001",
+      "name": "정선기",
+      "years": 9
+    },
+    {
+      "class_number": "21102002",
+      "name": "종자또는곡물선별기",
+      "years": 10
+    },
+    {
+      "class_number": "21102004",
+      "name": "정미기및현미기",
+      "years": 10
+    },
+    {
+      "class_number": "21102005",
+      "name": "제분기",
+      "years": 9
+    },
+    {
+      "class_number": "21102006",
+      "name": "곡물분쇄기",
+      "years": 10
+    },
+    {
+      "class_number": "21102098",
+      "name": "선과기",
+      "years": 9
+    },
+    {
+      "class_number": "21102102",
+      "name": "압착추출기",
+      "years": 9
+    },
+    {
+      "class_number": "21102202",
+      "name": "잡목벌채기",
+      "years": 7
+    },
+    {
+      "class_number": "21102204",
+      "name": "벌목톱",
+      "years": 8
+    },
+    {
+      "class_number": "21102206",
+      "name": "임업용생장추",
+      "years": 10
+    },
+    {
+      "class_number": "21102299",
+      "name": "임업용집재기",
+      "years": 10
+    },
+    {
+      "class_number": "21102399",
+      "name": "수경재배장치",
+      "years": 8
+    },
+    {
+      "class_number": "21102402",
+      "name": "양잠장비",
+      "years": 10
+    },
+    {
+      "class_number": "22101502",
+      "name": "그레이더",
+      "years": 11
+    },
+    {
+      "class_number": "22101505",
+      "name": "롤러",
+      "years": 10
+    },
+    {
+      "class_number": "22101525",
+      "name": "차륜굴착기",
+      "years": 9
+    },
+    {
+      "class_number": "22101526",
+      "name": "궤도굴착기",
+      "years": 9
+    },
+    {
+      "class_number": "22101528",
+      "name": "차륜로더",
+      "years": 7
+    },
+    {
+      "class_number": "22101529",
+      "name": "스키드스티어로더",
+      "years": 7
+    },
+    {
+      "class_number": "22101531",
+      "name": "제설기(除雪機)",
+      "years": 8
+    },
+    {
+      "class_number": "22101614",
+      "name": "노면절단기",
+      "years": 9
+    },
+    {
+      "class_number": "22101802",
+      "name": "플랫폼리프트",
+      "years": 6
+    },
+    {
+      "class_number": "23101511",
+      "name": "비금속가공용선반",
+      "years": 13
+    },
+    {
+      "class_number": "23101512",
+      "name": "제재기계",
+      "years": 13
+    },
+    {
+      "class_number": "23101513",
+      "name": "비금속용밀링머신",
+      "years": 12
+    },
+    {
+      "class_number": "23101514",
+      "name": "비금속용플레이닝기계",
+      "years": 13
+    },
+    {
+      "class_number": "23101523",
+      "name": "산업용벨트샌더",
+      "years": 10
+    },
+    {
+      "class_number": "23101524",
+      "name": "산업용디스크샌더",
+      "years": 10
+    },
+    {
+      "class_number": "23101525",
+      "name": "스핀들샌더",
+      "years": 9
+    },
+    {
+      "class_number": "23101528",
+      "name": "드럼샌더",
+      "years": 10
+    },
+    {
+      "class_number": "23101537",
+      "name": "벨트디스크샌더",
+      "years": 10
+    },
+    {
+      "class_number": "23101580",
+      "name": "만능목공기",
+      "years": 10
+    },
+    {
+      "class_number": "23121506",
+      "name": "편직기",
+      "years": 13
+    },
+    {
+      "class_number": "23121507",
+      "name": "제직기",
+      "years": 13
+    },
+    {
+      "class_number": "23121519",
+      "name": "실험실용방사장치",
+      "years": 12
+    },
+    {
+      "class_number": "23121610",
+      "name": "날염기",
+      "years": 10
+    },
+    {
+      "class_number": "23121614",
+      "name": "산업용재봉기",
+      "years": 13
+    },
+    {
+      "class_number": "23121616",
+      "name": "염색시험기",
+      "years": 13
+    },
+    {
+      "class_number": "23141603",
+      "name": "피혁염색기계",
+      "years": 9
+    },
+    {
+      "class_number": "23151502",
+      "name": "코팅기",
+      "years": 10
+    },
+    {
+      "class_number": "23151503",
+      "name": "압출성형기",
+      "years": 10
+    },
+    {
+      "class_number": "23151504",
+      "name": "사출성형기",
+      "years": 10
+    },
+    {
+      "class_number": "23151507",
+      "name": "압축성형기",
+      "years": 13
+    },
+    {
+      "class_number": "23151606",
+      "name": "시멘트,도자기,유리및유사제품가공기계",
+      "years": 10
+    },
+    {
+      "class_number": "23151610",
+      "name": "마이크로피펫제작기",
+      "years": 12
+    },
+    {
+      "class_number": "23151808",
+      "name": "과립조제설비",
+      "years": 10
+    },
+    {
+      "class_number": "23151996",
+      "name": "종이기록물복원장비",
+      "years": 8
+    },
+    {
+      "class_number": "23152199",
+      "name": "산업용절단기",
+      "years": 13
+    },
+    {
+      "class_number": "23152901",
+      "name": "포장기계",
+      "years": 10
+    },
+    {
+      "class_number": "23152902",
+      "name": "충진또는봉인기계",
+      "years": 11
+    },
+    {
+      "class_number": "23152903",
+      "name": "진공포장기",
+      "years": 12
+    },
+    {
+      "class_number": "23152995",
+      "name": "라벨기",
+      "years": 7
+    },
+    {
+      "class_number": "23153298",
+      "name": "산업용로봇",
+      "years": 10
+    },
+    {
+      "class_number": "23161510",
+      "name": "주조기",
+      "years": 9
+    },
+    {
+      "class_number": "23161517",
+      "name": "다이캐스팅머신",
+      "years": 11
+    },
+    {
+      "class_number": "23161581",
+      "name": "분사기",
+      "years": 9
+    },
+    {
+      "class_number": "23161582",
+      "name": "조형기",
+      "years": 10
+    },
+    {
+      "class_number": "23161592",
+      "name": "가마",
+      "years": 11
+    },
+    {
+      "class_number": "23161593",
+      "name": "고주파유도진공용해로",
+      "years": 11
+    },
+    {
+      "class_number": "23161596",
+      "name": "전기로",
+      "years": 11
+    },
+    {
+      "class_number": "23161597",
+      "name": "도가니로",
+      "years": 13
+    },
+    {
+      "class_number": "23171670",
+      "name": "고속절단기",
+      "years": 13
+    },
+    {
+      "class_number": "23171677",
+      "name": "레이저가공기",
+      "years": 10
+    },
+    {
+      "class_number": "23171678",
+      "name": "복합공작기계",
+      "years": 12
+    },
+    {
+      "class_number": "23171685",
+      "name": "자동화생산시스템",
+      "years": 9
+    },
+    {
+      "class_number": "23171686",
+      "name": "전단기",
+      "years": 12
+    },
+    {
+      "class_number": "23171688",
+      "name": "초음파가공기",
+      "years": 10
+    },
+    {
+      "class_number": "23172495",
+      "name": "절단기",
+      "years": 10
+    },
+    {
+      "class_number": "23172583",
+      "name": "만능공구연삭기",
+      "years": 12
+    },
+    {
+      "class_number": "23181501",
+      "name": "충진기",
+      "years": 11
+    },
+    {
+      "class_number": "23181506",
+      "name": "세척장치",
+      "years": 9
+    },
+    {
+      "class_number": "23181507",
+      "name": "분쇄기",
+      "years": 10
+    },
+    {
+      "class_number": "23181511",
+      "name": "음식물성형기",
+      "years": 12
+    },
+    {
+      "class_number": "23181518",
+      "name": "식품발효기",
+      "years": 10
+    },
+    {
+      "class_number": "23181604",
+      "name": "음식물절단기",
+      "years": 9
+    },
+    {
+      "class_number": "23181998",
+      "name": "음식물쓰레기처리기",
+      "years": 8
+    },
+    {
+      "class_number": "23191099",
+      "name": "파우더혼합기",
+      "years": 9
+    },
+    {
+      "class_number": "23211103",
+      "name": "웨이퍼와이어본딩기",
+      "years": 8
+    },
+    {
+      "class_number": "23211106",
+      "name": "이온주입기",
+      "years": 11
+    },
+    {
+      "class_number": "23211176",
+      "name": "스핀코팅기",
+      "years": 11
+    },
+    {
+      "class_number": "23211177",
+      "name": "열산화반응챔버",
+      "years": 8
+    },
+    {
+      "class_number": "23211178",
+      "name": "웨이퍼다이본딩기",
+      "years": 8
+    },
+    {
+      "class_number": "23211180",
+      "name": "웨이퍼식각기",
+      "years": 8
+    },
+    {
+      "class_number": "23211183",
+      "name": "웨이퍼증착적층기",
+      "years": 8
+    },
+    {
+      "class_number": "23211192",
+      "name": "진공함침기",
+      "years": 13
+    },
+    {
+      "class_number": "23211194",
+      "name": "포토레지스트노광기",
+      "years": 8
+    },
+    {
+      "class_number": "23211198",
+      "name": "플라즈마처리기",
+      "years": 8
+    },
+    {
+      "class_number": "23211199",
+      "name": "회로기판제작기",
+      "years": 10
+    },
+    {
+      "class_number": "23241402",
+      "name": "평면연삭기",
+      "years": 13
+    },
+    {
+      "class_number": "23241407",
+      "name": "원통연삭기",
+      "years": 13
+    },
+    {
+      "class_number": "23241502",
+      "name": "전해가공기",
+      "years": 11
+    },
+    {
+      "class_number": "23241506",
+      "name": "플라스마절단기",
+      "years": 12
+    },
+    {
+      "class_number": "23241509",
+      "name": "금속띠톱머신",
+      "years": 12
+    },
+    {
+      "class_number": "23241511",
+      "name": "나사절삭기",
+      "years": 11
+    },
+    {
+      "class_number": "23241596",
+      "name": "방전가공기기",
+      "years": 12
+    },
+    {
+      "class_number": "23241598",
+      "name": "자동가스절단기",
+      "years": 10
+    },
+    {
+      "class_number": "23241802",
+      "name": "다축드릴링머신",
+      "years": 12
+    },
+    {
+      "class_number": "23241809",
+      "name": "탁상드릴링머신",
+      "years": 11
+    },
+    {
+      "class_number": "23241894",
+      "name": "CNC드릴링머신",
+      "years": 12
+    },
+    {
+      "class_number": "23241896",
+      "name": "레이디얼드릴링머신",
+      "years": 12
+    },
+    {
+      "class_number": "23241898",
+      "name": "직립드릴링머신",
+      "years": 12
+    },
+    {
+      "class_number": "23242305",
+      "name": "터릿선반",
+      "years": 12
+    },
+    {
+      "class_number": "23242398",
+      "name": "선반",
+      "years": 13
+    },
+    {
+      "class_number": "23242403",
+      "name": "수직형머시닝센터",
+      "years": 12
+    },
+    {
+      "class_number": "23242501",
+      "name": "베드형밀링머신",
+      "years": 10
+    },
+    {
+      "class_number": "23242507",
+      "name": "만능밀링머신",
+      "years": 12
+    },
+    {
+      "class_number": "23242509",
+      "name": "터릿밀링머신",
+      "years": 10
+    },
+    {
+      "class_number": "23242590",
+      "name": "CNC밀링머신",
+      "years": 12
+    },
+    {
+      "class_number": "23242591",
+      "name": "공구밀링머신",
+      "years": 11
+    },
+    {
+      "class_number": "23242595",
+      "name": "수직밀링머신",
+      "years": 13
+    },
+    {
+      "class_number": "23242596",
+      "name": "수평밀링머신",
+      "years": 12
+    },
+    {
+      "class_number": "23242612",
+      "name": "금속조각기계",
+      "years": 11
+    },
+    {
+      "class_number": "23251508",
+      "name": "철근벤딩머신",
+      "years": 11
+    },
+    {
+      "class_number": "23251602",
+      "name": "판금용성형기",
+      "years": 12
+    },
+    {
+      "class_number": "23251782",
+      "name": "시트압연기",
+      "years": 10
+    },
+    {
+      "class_number": "23251784",
+      "name": "압축공기프레스",
+      "years": 12
+    },
+    {
+      "class_number": "23251785",
+      "name": "압출기",
+      "years": 11
+    },
+    {
+      "class_number": "23251788",
+      "name": "유압프레스",
+      "years": 13
+    },
+    {
+      "class_number": "23261507",
+      "name": "3차원프린터",
+      "years": 7
+    },
+    {
+      "class_number": "23271405",
+      "name": "레이저용접기",
+      "years": 11
+    },
+    {
+      "class_number": "23271483",
+      "name": "교류아크용접기",
+      "years": 13
+    },
+    {
+      "class_number": "23271486",
+      "name": "불활성가스차폐아크용접기",
+      "years": 10
+    },
+    {
+      "class_number": "23271493",
+      "name": "이산화탄소가스용접기",
+      "years": 12
+    },
+    {
+      "class_number": "23271496",
+      "name": "직류아크용접기",
+      "years": 11
+    },
+    {
+      "class_number": "23271603",
+      "name": "납땜인두",
+      "years": 8
+    },
+    {
+      "class_number": "23271707",
+      "name": "산소아세틸렌용접기",
+      "years": 10
+    },
+    {
+      "class_number": "23281591",
+      "name": "도금장치",
+      "years": 9
+    },
+    {
+      "class_number": "23281601",
+      "name": "고주파유도가열기",
+      "years": 12
+    },
+    {
+      "class_number": "23281698",
+      "name": "침탄및질화전기로",
+      "years": 13
+    },
+    {
+      "class_number": "23990394",
+      "name": "산업용건조기",
+      "years": 13
+    },
+    {
+      "class_number": "23990398",
+      "name": "진공증착기",
+      "years": 13
+    },
+    {
+      "class_number": "23990399",
+      "name": "건조로",
+      "years": 12
+    },
+    {
+      "class_number": "24101501",
+      "name": "카트",
+      "years": 8
+    },
+    {
+      "class_number": "24101503",
+      "name": "돌리",
+      "years": 9
+    },
+    {
+      "class_number": "24101504",
+      "name": "핸드트럭또는액세서리",
+      "years": 12
+    },
+    {
+      "class_number": "24101505",
+      "name": "팰릿트럭",
+      "years": 12
+    },
+    {
+      "class_number": "24101506",
+      "name": "푸시카트",
+      "years": 8
+    },
+    {
+      "class_number": "24101511",
+      "name": "다단식운반차",
+      "years": 13
+    },
+    {
+      "class_number": "24101516",
+      "name": "동력플랫폼트럭",
+      "years": 8
+    },
+    {
+      "class_number": "24101599",
+      "name": "플랫폼트럭",
+      "years": 9
+    },
+    {
+      "class_number": "24101602",
+      "name": "호이스트",
+      "years": 10
+    },
+    {
+      "class_number": "24101603",
+      "name": "지게차",
+      "years": 10
+    },
+    {
+      "class_number": "24101604",
+      "name": "리프트",
+      "years": 9
+    },
+    {
+      "class_number": "24101608",
+      "name": "권양기",
+      "years": 9
+    },
+    {
+      "class_number": "24101612",
+      "name": "잭",
+      "years": 10
+    },
+    {
+      "class_number": "24101613",
+      "name": "블록또는도르래",
+      "years": 10
+    },
+    {
+      "class_number": "24101617",
+      "name": "가위승강기또는리프트테이블",
+      "years": 8
+    },
+    {
+      "class_number": "24101624",
+      "name": "유압식트럭기중기",
+      "years": 11
+    },
+    {
+      "class_number": "24101661",
+      "name": "자동차리프트",
+      "years": 11
+    },
+    {
+      "class_number": "24101689",
+      "name": "주차관제장치",
+      "years": 9
+    },
+    {
+      "class_number": "24101696",
+      "name": "휠체어리프트",
+      "years": 8
+    },
+    {
+      "class_number": "24101709",
+      "name": "롤러컨베이어",
+      "years": 11
+    },
+    {
+      "class_number": "24101712",
+      "name": "벨트컨베이어",
+      "years": 11
+    },
+    {
+      "class_number": "24101746",
+      "name": "이동식컨베이어",
+      "years": 10
+    },
+    {
+      "class_number": "24101749",
+      "name": "수직컨베이어",
+      "years": 12
+    },
+    {
+      "class_number": "24102004",
+      "name": "보관용선반",
+      "years": 10
+    },
+    {
+      "class_number": "24102006",
+      "name": "작업용벤치",
+      "years": 13
+    },
+    {
+      "class_number": "24102298",
+      "name": "재활용품압축기",
+      "years": 9
+    },
+    {
+      "class_number": "24111802",
+      "name": "공기,가스탱크또는실린더",
+      "years": 13
+    },
+    {
+      "class_number": "24111805",
+      "name": "약품탱크",
+      "years": 11
+    },
+    {
+      "class_number": "24111810",
+      "name": "저수탱크",
+      "years": 9
+    },
+    {
+      "class_number": "24111816",
+      "name": "초저온용기",
+      "years": 11
+    },
+    {
+      "class_number": "24111894",
+      "name": "액체질소통",
+      "years": 12
+    },
+    {
+      "class_number": "24111897",
+      "name": "온수탱크",
+      "years": 10
+    },
+    {
+      "class_number": "24112401",
+      "name": "공구보관용함,상자또는캐비닛",
+      "years": 12
+    },
+    {
+      "class_number": "24112898",
+      "name": "일반화물컨테이너",
+      "years": 9
+    },
+    {
+      "class_number": "24112901",
+      "name": "나무상자",
+      "years": 11
+    },
+    {
+      "class_number": "24131501",
+      "name": "냉장냉동겸용장치",
+      "years": 10
+    },
+    {
+      "class_number": "24131503",
+      "name": "대형냉장고",
+      "years": 10
+    },
+    {
+      "class_number": "24131602",
+      "name": "상업용냉동고",
+      "years": 10
+    },
+    {
+      "class_number": "24131604",
+      "name": "냉동건조장비",
+      "years": 12
+    },
+    {
+      "class_number": "24131902",
+      "name": "덩어리얼음제조기",
+      "years": 9
+    },
+    {
+      "class_number": "25111520",
+      "name": "부표",
+      "years": 5
+    },
+    {
+      "class_number": "25111527",
+      "name": "소형보트",
+      "years": 7
+    },
+    {
+      "class_number": "25111597",
+      "name": "기동정",
+      "years": 7
+    },
+    {
+      "class_number": "25111601",
+      "name": "구명정",
+      "years": 5
+    },
+    {
+      "class_number": "25111603",
+      "name": "구조선",
+      "years": 9
+    },
+    {
+      "class_number": "25111698",
+      "name": "고무보트",
+      "years": 7
+    },
+    {
+      "class_number": "25111804",
+      "name": "카누또는카약",
+      "years": 10
+    },
+    {
+      "class_number": "25111808",
+      "name": "요트",
+      "years": 6
+    },
+    {
+      "class_number": "25111899",
+      "name": "조정경기정",
+      "years": 8
+    },
+    {
+      "class_number": "25111999",
+      "name": "선박모의조종장치",
+      "years": 9
+    },
+    {
+      "class_number": "25131899",
+      "name": "무인비행기",
+      "years": 4
+    },
+    {
+      "class_number": "25161507",
+      "name": "일반자전거",
+      "years": 7
+    },
+    {
+      "class_number": "25173108",
+      "name": "차량용항법장치",
+      "years": 7
+    },
+    {
+      "class_number": "25173813",
+      "name": "자동변속기",
+      "years": 8
+    },
+    {
+      "class_number": "25173898",
+      "name": "차량엔진용공기청정기",
+      "years": 9
+    },
+    {
+      "class_number": "25174490",
+      "name": "차량용운행기록계",
+      "years": 6
+    },
+    {
+      "class_number": "25174491",
+      "name": "엔진오일압력계",
+      "years": 12
+    },
+    {
+      "class_number": "25174496",
+      "name": "차량용음향영상시스템",
+      "years": 8
+    },
+    {
+      "class_number": "25174892",
+      "name": "모래살포기",
+      "years": 6
+    },
+    {
+      "class_number": "25174894",
+      "name": "차량차체용적재함",
+      "years": 9
+    },
+    {
+      "class_number": "25174895",
+      "name": "트럭장착식제설기",
+      "years": 6
+    },
+    {
+      "class_number": "25175199",
+      "name": "차량용영상기록장치",
+      "years": 6
+    },
+    {
+      "class_number": "25179997",
+      "name": "차량용냉방기",
+      "years": 7
+    },
+    {
+      "class_number": "25181717",
+      "name": "저상형트레일러",
+      "years": 11
+    },
+    {
+      "class_number": "25181795",
+      "name": "농업용트레일러",
+      "years": 11
+    },
+    {
+      "class_number": "25181799",
+      "name": "특수용도형트레일러",
+      "years": 8
+    },
+    {
+      "class_number": "25191509",
+      "name": "항공기푸시백또는견인차",
+      "years": 9
+    },
+    {
+      "class_number": "25191510",
+      "name": "항공기용지상전원부",
+      "years": 9
+    },
+    {
+      "class_number": "25191522",
+      "name": "항공기엔진정비세트",
+      "years": 9
+    },
+    {
+      "class_number": "25191701",
+      "name": "차륜평형기",
+      "years": 11
+    },
+    {
+      "class_number": "25191702",
+      "name": "차륜정렬기",
+      "years": 11
+    },
+    {
+      "class_number": "25191739",
+      "name": "조타장치모의시험기",
+      "years": 11
+    },
+    {
+      "class_number": "25191797",
+      "name": "차량세차기",
+      "years": 9
+    },
+    {
+      "class_number": "25191808",
+      "name": "브레이크시험기",
+      "years": 12
+    },
+    {
+      "class_number": "25191810",
+      "name": "섀시동력계",
+      "years": 7
+    },
+    {
+      "class_number": "25191821",
+      "name": "엔진모의시험기",
+      "years": 10
+    },
+    {
+      "class_number": "25191822",
+      "name": "엔진인젝터시험기",
+      "years": 11
+    },
+    {
+      "class_number": "25191824",
+      "name": "엔진튠업시험기",
+      "years": 12
+    },
+    {
+      "class_number": "25191924",
+      "name": "엔진종합검사장비",
+      "years": 11
+    },
+    {
+      "class_number": "25191932",
+      "name": "자동차종합검사장치",
+      "years": 10
+    },
+    {
+      "class_number": "25201707",
+      "name": "항공기자이로",
+      "years": 10
+    },
+    {
+      "class_number": "25202198",
+      "name": "항공기가속도계기",
+      "years": 11
+    },
+    {
+      "class_number": "25230529",
+      "name": "철도용공기압축기",
+      "years": 9
+    },
+    {
+      "class_number": "26101115",
+      "name": "삼상유도전동기",
+      "years": 13
+    },
+    {
+      "class_number": "26101205",
+      "name": "서보모터",
+      "years": 11
+    },
+    {
+      "class_number": "26101212",
+      "name": "스핀들모터",
+      "years": 8
+    },
+    {
+      "class_number": "26101504",
+      "name": "디젤엔진",
+      "years": 11
+    },
+    {
+      "class_number": "26101515",
+      "name": "가솔린선외모터",
+      "years": 8
+    },
+    {
+      "class_number": "26101593",
+      "name": "가솔린엔진",
+      "years": 11
+    },
+    {
+      "class_number": "26111601",
+      "name": "디젤발전기",
+      "years": 12
+    },
+    {
+      "class_number": "26111604",
+      "name": "가스또는가솔린발전기",
+      "years": 12
+    },
+    {
+      "class_number": "26111607",
+      "name": "태양광발전장치",
+      "years": 11
+    },
+    {
+      "class_number": "26111611",
+      "name": "보조발전기",
+      "years": 11
+    },
+    {
+      "class_number": "26111699",
+      "name": "태양전지조절기",
+      "years": 10
+    },
+    {
+      "class_number": "26111704",
+      "name": "충전장치",
+      "years": 8
+    },
+    {
+      "class_number": "26111719",
+      "name": "배터리시험기",
+      "years": 11
+    },
+    {
+      "class_number": "26111729",
+      "name": "자동충전기유닛",
+      "years": 7
+    },
+    {
+      "class_number": "26141702",
+      "name": "방사선측정기",
+      "years": 12
+    },
+    {
+      "class_number": "27111511",
+      "name": "선재절단기",
+      "years": 11
+    },
+    {
+      "class_number": "27111715",
+      "name": "토크렌치",
+      "years": 9
+    },
+    {
+      "class_number": "27111802",
+      "name": "수준기",
+      "years": 12
+    },
+    {
+      "class_number": "27111814",
+      "name": "검사용거울",
+      "years": 7
+    },
+    {
+      "class_number": "27111822",
+      "name": "각폭측정기",
+      "years": 11
+    },
+    {
+      "class_number": "27111826",
+      "name": "정밀정반",
+      "years": 13
+    },
+    {
+      "class_number": "27112035",
+      "name": "동력전정기",
+      "years": 9
+    },
+    {
+      "class_number": "27112043",
+      "name": "수목진단기",
+      "years": 10
+    },
+    {
+      "class_number": "27112046",
+      "name": "잔디청소기",
+      "years": 8
+    },
+    {
+      "class_number": "27112701",
+      "name": "낙엽청소기",
+      "years": 9
+    },
+    {
+      "class_number": "27112703",
+      "name": "전동드릴",
+      "years": 11
+    },
+    {
+      "class_number": "27112704",
+      "name": "전동그라인더",
+      "years": 10
+    },
+    {
+      "class_number": "27112706",
+      "name": "전동대패",
+      "years": 12
+    },
+    {
+      "class_number": "27112707",
+      "name": "핸드라우터",
+      "years": 9
+    },
+    {
+      "class_number": "27112709",
+      "name": "전기톱",
+      "years": 10
+    },
+    {
+      "class_number": "27112739",
+      "name": "벨트샌더",
+      "years": 9
+    },
+    {
+      "class_number": "27112742",
+      "name": "디스크샌더",
+      "years": 9
+    },
+    {
+      "class_number": "27112799",
+      "name": "전기절단기",
+      "years": 12
+    },
+    {
+      "class_number": "27112809",
+      "name": "공구정리대",
+      "years": 11
+    },
+    {
+      "class_number": "27113201",
+      "name": "일반도구키트",
+      "years": 9
+    },
+    {
+      "class_number": "27113295",
+      "name": "전문용공구세트",
+      "years": 9
+    },
+    {
+      "class_number": "27113299",
+      "name": "항공기용공구세트",
+      "years": 9
+    },
+    {
+      "class_number": "27131605",
+      "name": "에어커튼",
+      "years": 9
+    },
+    {
+      "class_number": "30161505",
+      "name": "내벽패널",
+      "years": 6
+    },
+    {
+      "class_number": "30171505",
+      "name": "금속문",
+      "years": 7
+    },
+    {
+      "class_number": "30181502",
+      "name": "비데",
+      "years": 7
+    },
+    {
+      "class_number": "30181504",
+      "name": "세면기",
+      "years": 8
+    },
+    {
+      "class_number": "30191501",
+      "name": "사다리",
+      "years": 10
+    },
+    {
+      "class_number": "30191898",
+      "name": "안전펜스",
+      "years": 7
+    },
+    {
+      "class_number": "30201705",
+      "name": "이동식부스",
+      "years": 10
+    },
+    {
+      "class_number": "30201789",
+      "name": "패스박스",
+      "years": 8
+    },
+    {
+      "class_number": "30201790",
+      "name": "에어샤워",
+      "years": 7
+    },
+    {
+      "class_number": "30201796",
+      "name": "조립식구조물",
+      "years": 12
+    },
+    {
+      "class_number": "30222064",
+      "name": "자전거보관대",
+      "years": 8
+    },
+    {
+      "class_number": "30231602",
+      "name": "이동식화장실",
+      "years": 8
+    },
+    {
+      "class_number": "30231699",
+      "name": "컨테이너하우스",
+      "years": 8
+    },
+    {
+      "class_number": "31241501",
+      "name": "렌즈",
+      "years": 10
+    },
+    {
+      "class_number": "31242104",
+      "name": "옵티컬레일또는베이스",
+      "years": 10
+    },
+    {
+      "class_number": "31242107",
+      "name": "광학실험대",
+      "years": 10
+    },
+    {
+      "class_number": "32101514",
+      "name": "증폭기",
+      "years": 12
+    },
+    {
+      "class_number": "32101515",
+      "name": "감쇠기",
+      "years": 12
+    },
+    {
+      "class_number": "32101519",
+      "name": "검파기",
+      "years": 11
+    },
+    {
+      "class_number": "32101528",
+      "name": "변조기",
+      "years": 10
+    },
+    {
+      "class_number": "32101617",
+      "name": "스마트카드",
+      "years": 7
+    },
+    {
+      "class_number": "32121616",
+      "name": "조정저항기",
+      "years": 10
+    },
+    {
+      "class_number": "32121701",
+      "name": "정류기",
+      "years": 12
+    },
+    {
+      "class_number": "32121704",
+      "name": "정적변환기",
+      "years": 9
+    },
+    {
+      "class_number": "32131005",
+      "name": "집적회로패키지",
+      "years": 9
+    },
+    {
+      "class_number": "32131010",
+      "name": "인쇄회로기판",
+      "years": 10
+    },
+    {
+      "class_number": "32131096",
+      "name": "복합전자장치",
+      "years": 11
+    },
+    {
+      "class_number": "32141009",
+      "name": "광전관",
+      "years": 6
+    },
+    {
+      "class_number": "39101616",
+      "name": "자외선램프",
+      "years": 10
+    },
+    {
+      "class_number": "39101699",
+      "name": "LED램프",
+      "years": 8
+    },
+    {
+      "class_number": "39111501",
+      "name": "형광등기구",
+      "years": 7
+    },
+    {
+      "class_number": "39111504",
+      "name": "무대프로젝션또는방송실용조명기기",
+      "years": 11
+    },
+    {
+      "class_number": "39111526",
+      "name": "가로등주및부속자재",
+      "years": 8
+    },
+    {
+      "class_number": "39111611",
+      "name": "투광조명",
+      "years": 6
+    },
+    {
+      "class_number": "39111706",
+      "name": "스트로보또는경고등",
+      "years": 9
+    },
+    {
+      "class_number": "39111708",
+      "name": "비상구용발광표지",
+      "years": 9
+    },
+    {
+      "class_number": "39111709",
+      "name": "비상조명장치",
+      "years": 10
+    },
+    {
+      "class_number": "39112003",
+      "name": "조명스탠드",
+      "years": 9
+    },
+    {
+      "class_number": "39112012",
+      "name": "휴대용등또는작업등",
+      "years": 7
+    },
+    {
+      "class_number": "39112102",
+      "name": "LED실내조명등",
+      "years": 7
+    },
+    {
+      "class_number": "39121001",
+      "name": "배전용변압기",
+      "years": 11
+    },
+    {
+      "class_number": "39121002",
+      "name": "전력용변압기",
+      "years": 11
+    },
+    {
+      "class_number": "39121004",
+      "name": "전원공급장치",
+      "years": 11
+    },
+    {
+      "class_number": "39121006",
+      "name": "파워어댑터또는인버터",
+      "years": 10
+    },
+    {
+      "class_number": "39121007",
+      "name": "주파수변환기",
+      "years": 11
+    },
+    {
+      "class_number": "39121008",
+      "name": "신호변환기",
+      "years": 11
+    },
+    {
+      "class_number": "39121011",
+      "name": "무정전전원장치",
+      "years": 8
+    },
+    {
+      "class_number": "39121026",
+      "name": "전력제어용변압기",
+      "years": 11
+    },
+    {
+      "class_number": "39121083",
+      "name": "전동발전기",
+      "years": 12
+    },
+    {
+      "class_number": "39121101",
+      "name": "분전반",
+      "years": 8
+    },
+    {
+      "class_number": "39121103",
+      "name": "배전반",
+      "years": 12
+    },
+    {
+      "class_number": "39121104",
+      "name": "전동기제어반",
+      "years": 9
+    },
+    {
+      "class_number": "39121106",
+      "name": "전력감시또는제어장치",
+      "years": 12
+    },
+    {
+      "class_number": "39121107",
+      "name": "조명제어장치",
+      "years": 10
+    },
+    {
+      "class_number": "39121198",
+      "name": "프로그래머블로직컨트롤러(PLC)",
+      "years": 12
+    },
+    {
+      "class_number": "39121308",
+      "name": "아웃렛박스",
+      "years": 7
+    },
+    {
+      "class_number": "39121510",
+      "name": "컨트롤스위치(CS)",
+      "years": 10
+    },
+    {
+      "class_number": "39121521",
+      "name": "모터시동기",
+      "years": 11
+    },
+    {
+      "class_number": "39121532",
+      "name": "무선(RF)스위치",
+      "years": 9
+    },
+    {
+      "class_number": "39121610",
+      "name": "서지방지장치",
+      "years": 7
+    },
+    {
+      "class_number": "39121621",
+      "name": "피뢰장치및액세서리",
+      "years": 9
+    },
+    {
+      "class_number": "39121635",
+      "name": "전압조정기",
+      "years": 13
+    },
+    {
+      "class_number": "39121801",
+      "name": "빌딩자동제어장치",
+      "years": 11
+    },
+    {
+      "class_number": "39122171",
+      "name": "전주",
+      "years": 11
+    },
+    {
+      "class_number": "40101502",
+      "name": "배기장치",
+      "years": 6
+    },
+    {
+      "class_number": "40101601",
+      "name": "송풍기",
+      "years": 10
+    },
+    {
+      "class_number": "40101602",
+      "name": "공기순환기",
+      "years": 9
+    },
+    {
+      "class_number": "40101701",
+      "name": "냉방기",
+      "years": 10
+    },
+    {
+      "class_number": "40101708",
+      "name": "팬코일유닛",
+      "years": 11
+    },
+    {
+      "class_number": "40101709",
+      "name": "공기조화기",
+      "years": 10
+    },
+    {
+      "class_number": "40101710",
+      "name": "왕복동식냉동기",
+      "years": 13
+    },
+    {
+      "class_number": "40101711",
+      "name": "터보냉동기",
+      "years": 11
+    },
+    {
+      "class_number": "40101714",
+      "name": "흡수식냉온수기",
+      "years": 10
+    },
+    {
+      "class_number": "40101715",
+      "name": "항온항습기",
+      "years": 10
+    },
+    {
+      "class_number": "40101716",
+      "name": "냉각탑",
+      "years": 12
+    },
+    {
+      "class_number": "40101787",
+      "name": "냉난방기",
+      "years": 9
+    },
+    {
+      "class_number": "40101796",
+      "name": "냉풍기",
+      "years": 8
+    },
+    {
+      "class_number": "40101801",
+      "name": "방열기",
+      "years": 9
+    },
+    {
+      "class_number": "40101802",
+      "name": "열교환장치",
+      "years": 11
+    },
+    {
+      "class_number": "40101806",
+      "name": "열펌프",
+      "years": 9
+    },
+    {
+      "class_number": "40101808",
+      "name": "스토브",
+      "years": 6
+    },
+    {
+      "class_number": "40101811",
+      "name": "대류식난방기",
+      "years": 6
+    },
+    {
+      "class_number": "40101825",
+      "name": "가정용온수기",
+      "years": 8
+    },
+    {
+      "class_number": "40101826",
+      "name": "상업용온수기",
+      "years": 6
+    },
+    {
+      "class_number": "40101834",
+      "name": "연소기또는버너",
+      "years": 7
+    },
+    {
+      "class_number": "40101866",
+      "name": "온풍난방기",
+      "years": 11
+    },
+    {
+      "class_number": "40101895",
+      "name": "자동연소제어기",
+      "years": 11
+    },
+    {
+      "class_number": "40101902",
+      "name": "제습기",
+      "years": 10
+    },
+    {
+      "class_number": "40101903",
+      "name": "가습기",
+      "years": 7
+    },
+    {
+      "class_number": "40102001",
+      "name": "연관보일러",
+      "years": 10
+    },
+    {
+      "class_number": "40102002",
+      "name": "수관보일러",
+      "years": 9
+    },
+    {
+      "class_number": "40102003",
+      "name": "전기보일러",
+      "years": 13
+    },
+    {
+      "class_number": "40102004",
+      "name": "천연가스동력보일러",
+      "years": 9
+    },
+    {
+      "class_number": "40102007",
+      "name": "소형기름보일러",
+      "years": 10
+    },
+    {
+      "class_number": "40102091",
+      "name": "입형보일러",
+      "years": 12
+    },
+    {
+      "class_number": "40102092",
+      "name": "주철제보일러",
+      "years": 11
+    },
+    {
+      "class_number": "40102095",
+      "name": "간접가열보일러",
+      "years": 8
+    },
+    {
+      "class_number": "40141609",
+      "name": "제어밸브",
+      "years": 12
+    },
+    {
+      "class_number": "40142201",
+      "name": "가스조절기",
+      "years": 12
+    },
+    {
+      "class_number": "40151502",
+      "name": "진공펌프",
+      "years": 13
+    },
+    {
+      "class_number": "40151503",
+      "name": "원심펌프",
+      "years": 12
+    },
+    {
+      "class_number": "40151505",
+      "name": "정량펌프",
+      "years": 11
+    },
+    {
+      "class_number": "40151513",
+      "name": "수중펌프",
+      "years": 10
+    },
+    {
+      "class_number": "40151551",
+      "name": "기어펌프",
+      "years": 11
+    },
+    {
+      "class_number": "40151566",
+      "name": "부스터펌프",
+      "years": 10
+    },
+    {
+      "class_number": "40151597",
+      "name": "엔진펌프",
+      "years": 6
+    },
+    {
+      "class_number": "40151599",
+      "name": "자동펌프",
+      "years": 12
+    },
+    {
+      "class_number": "40151601",
+      "name": "이동식공기압축기",
+      "years": 11
+    },
+    {
+      "class_number": "40151606",
+      "name": "왕복압축기",
+      "years": 13
+    },
+    {
+      "class_number": "40151608",
+      "name": "회전압축기",
+      "years": 13
+    },
+    {
+      "class_number": "40151610",
+      "name": "압축기부품또는액세서리",
+      "years": 12
+    },
+    {
+      "class_number": "40151697",
+      "name": "실험실습용압축기",
+      "years": 13
+    },
+    {
+      "class_number": "40161502",
+      "name": "워터필터",
+      "years": 9
+    },
+    {
+      "class_number": "40161503",
+      "name": "집진기",
+      "years": 10
+    },
+    {
+      "class_number": "40161505",
+      "name": "공기여과기",
+      "years": 8
+    },
+    {
+      "class_number": "40161602",
+      "name": "공기청정기",
+      "years": 7
+    },
+    {
+      "class_number": "40161605",
+      "name": "탈취기",
+      "years": 9
+    },
+    {
+      "class_number": "40161606",
+      "name": "공기정화용오존발생기",
+      "years": 11
+    },
+    {
+      "class_number": "40161699",
+      "name": "공기살균기",
+      "years": 6
+    },
+    {
+      "class_number": "40161701",
+      "name": "원심분리기",
+      "years": 11
+    },
+    {
+      "class_number": "40161799",
+      "name": "오일분리기",
+      "years": 12
+    },
+    {
+      "class_number": "41101503",
+      "name": "실험실용분무기",
+      "years": 10
+    },
+    {
+      "class_number": "41101504",
+      "name": "균질화기기",
+      "years": 12
+    },
+    {
+      "class_number": "41101518",
+      "name": "실험실용혼합기및유화기",
+      "years": 10
+    },
+    {
+      "class_number": "41101701",
+      "name": "실험실용밀",
+      "years": 12
+    },
+    {
+      "class_number": "41101705",
+      "name": "실험실용분쇄기",
+      "years": 10
+    },
+    {
+      "class_number": "41101707",
+      "name": "실험실용프레스",
+      "years": 13
+    },
+    {
+      "class_number": "41101708",
+      "name": "실험실용연마기및연삭기",
+      "years": 12
+    },
+    {
+      "class_number": "41101797",
+      "name": "실험실용선별기",
+      "years": 11
+    },
+    {
+      "class_number": "41101802",
+      "name": "엑스레이발생기",
+      "years": 11
+    },
+    {
+      "class_number": "41101805",
+      "name": "자속계",
+      "years": 9
+    },
+    {
+      "class_number": "41101806",
+      "name": "자력계",
+      "years": 12
+    },
+    {
+      "class_number": "41101807",
+      "name": "전자회절장치",
+      "years": 11
+    },
+    {
+      "class_number": "41101811",
+      "name": "전자탐침마이크로분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41101813",
+      "name": "엑스선장치제어기",
+      "years": 9
+    },
+    {
+      "class_number": "41102404",
+      "name": "실험실용히터",
+      "years": 12
+    },
+    {
+      "class_number": "41102405",
+      "name": "히팅맨틀또는테이프",
+      "years": 11
+    },
+    {
+      "class_number": "41102406",
+      "name": "실험용가열판",
+      "years": 12
+    },
+    {
+      "class_number": "41102407",
+      "name": "보온함",
+      "years": 9
+    },
+    {
+      "class_number": "41102412",
+      "name": "열풍기",
+      "years": 8
+    },
+    {
+      "class_number": "41102423",
+      "name": "교반가열판",
+      "years": 10
+    },
+    {
+      "class_number": "41102513",
+      "name": "곤충관찰장치",
+      "years": 7
+    },
+    {
+      "class_number": "41102601",
+      "name": "소형동물용우리",
+      "years": 11
+    },
+    {
+      "class_number": "41102608",
+      "name": "동물실험장치",
+      "years": 6
+    },
+    {
+      "class_number": "41102704",
+      "name": "엑스레이회절장치",
+      "years": 11
+    },
+    {
+      "class_number": "41102909",
+      "name": "조직처리장치",
+      "years": 12
+    },
+    {
+      "class_number": "41102910",
+      "name": "조직배양장치",
+      "years": 7
+    },
+    {
+      "class_number": "41102914",
+      "name": "초음파분쇄기",
+      "years": 10
+    },
+    {
+      "class_number": "41102916",
+      "name": "마이크로톰",
+      "years": 13
+    },
+    {
+      "class_number": "41102923",
+      "name": "체세포수측정장치",
+      "years": 10
+    },
+    {
+      "class_number": "41103005",
+      "name": "실험실용초저온냉동고",
+      "years": 11
+    },
+    {
+      "class_number": "41103006",
+      "name": "저온또는액화질소냉동고",
+      "years": 11
+    },
+    {
+      "class_number": "41103011",
+      "name": "실험실용일반냉장고또는냉동고",
+      "years": 8
+    },
+    {
+      "class_number": "41103202",
+      "name": "실험용세척기",
+      "years": 12
+    },
+    {
+      "class_number": "41103207",
+      "name": "마이크로플레이트세척기",
+      "years": 9
+    },
+    {
+      "class_number": "41103301",
+      "name": "실험실용액체섬광계수기",
+      "years": 10
+    },
+    {
+      "class_number": "41103303",
+      "name": "농도계",
+      "years": 11
+    },
+    {
+      "class_number": "41103311",
+      "name": "유체압력계",
+      "years": 12
+    },
+    {
+      "class_number": "41103312",
+      "name": "점도계",
+      "years": 13
+    },
+    {
+      "class_number": "41103317",
+      "name": "표면장력측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41103324",
+      "name": "실험실용조파장치",
+      "years": 11
+    },
+    {
+      "class_number": "41103325",
+      "name": "유체흐름가시화장치",
+      "years": 12
+    },
+    {
+      "class_number": "41103326",
+      "name": "풍동실험장치",
+      "years": 11
+    },
+    {
+      "class_number": "41103327",
+      "name": "유속계",
+      "years": 13
+    },
+    {
+      "class_number": "41103385",
+      "name": "농도측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41103386",
+      "name": "밀도측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41103392",
+      "name": "수로실험장치",
+      "years": 12
+    },
+    {
+      "class_number": "41103406",
+      "name": "무균함",
+      "years": 12
+    },
+    {
+      "class_number": "41103415",
+      "name": "무균대",
+      "years": 12
+    },
+    {
+      "class_number": "41103417",
+      "name": "실내환경측정장치",
+      "years": 10
+    },
+    {
+      "class_number": "41103418",
+      "name": "대형온습도환경조성실",
+      "years": 12
+    },
+    {
+      "class_number": "41103491",
+      "name": "항온항습조",
+      "years": 12
+    },
+    {
+      "class_number": "41103502",
+      "name": "실험실용배기기",
+      "years": 8
+    },
+    {
+      "class_number": "41103515",
+      "name": "실험실용가스발생기",
+      "years": 12
+    },
+    {
+      "class_number": "41103587",
+      "name": "공기흐름실험장치",
+      "years": 10
+    },
+    {
+      "class_number": "41103590",
+      "name": "실험실용가스캐비닛",
+      "years": 9
+    },
+    {
+      "class_number": "41103701",
+      "name": "순환식수조",
+      "years": 12
+    },
+    {
+      "class_number": "41103702",
+      "name": "자동온도조절식수조",
+      "years": 10
+    },
+    {
+      "class_number": "41103704",
+      "name": "생물학용온도조절조",
+      "years": 11
+    },
+    {
+      "class_number": "41103706",
+      "name": "항온수조",
+      "years": 12
+    },
+    {
+      "class_number": "41103712",
+      "name": "용액순환기",
+      "years": 11
+    },
+    {
+      "class_number": "41103799",
+      "name": "실험실용물통",
+      "years": 10
+    },
+    {
+      "class_number": "41103801",
+      "name": "실험용혼합기",
+      "years": 12
+    },
+    {
+      "class_number": "41103802",
+      "name": "회전혼합기",
+      "years": 10
+    },
+    {
+      "class_number": "41103805",
+      "name": "실험실용진동기",
+      "years": 12
+    },
+    {
+      "class_number": "41103806",
+      "name": "자력교반기",
+      "years": 13
+    },
+    {
+      "class_number": "41103810",
+      "name": "오버헤드교반기",
+      "years": 11
+    },
+    {
+      "class_number": "41103811",
+      "name": "회전식진탕기",
+      "years": 12
+    },
+    {
+      "class_number": "41103812",
+      "name": "왕복식진탕기",
+      "years": 11
+    },
+    {
+      "class_number": "41103814",
+      "name": "소용돌이식진탕기",
+      "years": 11
+    },
+    {
+      "class_number": "41103817",
+      "name": "실험실용반응기",
+      "years": 12
+    },
+    {
+      "class_number": "41103901",
+      "name": "미량원심분리기",
+      "years": 12
+    },
+    {
+      "class_number": "41103902",
+      "name": "미량냉장원심분리기",
+      "years": 12
+    },
+    {
+      "class_number": "41103903",
+      "name": "탁상형원심분리기",
+      "years": 11
+    },
+    {
+      "class_number": "41103904",
+      "name": "탁상형냉장원심분리기",
+      "years": 11
+    },
+    {
+      "class_number": "41103905",
+      "name": "플로어원심분리기",
+      "years": 10
+    },
+    {
+      "class_number": "41103906",
+      "name": "냉장플로어원심분리기",
+      "years": 11
+    },
+    {
+      "class_number": "41103907",
+      "name": "초고속원심분리기",
+      "years": 9
+    },
+    {
+      "class_number": "41103908",
+      "name": "진공원심분리기",
+      "years": 11
+    },
+    {
+      "class_number": "41103909",
+      "name": "회전자또는고정자",
+      "years": 10
+    },
+    {
+      "class_number": "41104007",
+      "name": "수질시료채취기",
+      "years": 11
+    },
+    {
+      "class_number": "41104008",
+      "name": "견본기체추출장치또는수집장치",
+      "years": 10
+    },
+    {
+      "class_number": "41104021",
+      "name": "분액수집기",
+      "years": 13
+    },
+    {
+      "class_number": "41104022",
+      "name": "시편제작기",
+      "years": 12
+    },
+    {
+      "class_number": "41104098",
+      "name": "시료채취기",
+      "years": 11
+    },
+    {
+      "class_number": "41104118",
+      "name": "표본채취기",
+      "years": 11
+    },
+    {
+      "class_number": "41104120",
+      "name": "침전속도측정용관",
+      "years": 11
+    },
+    {
+      "class_number": "41104202",
+      "name": "탈이온또는탈염장비",
+      "years": 12
+    },
+    {
+      "class_number": "41104206",
+      "name": "초순수제조장치",
+      "years": 12
+    },
+    {
+      "class_number": "41104207",
+      "name": "용수분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41104301",
+      "name": "표준발효실험유닛",
+      "years": 12
+    },
+    {
+      "class_number": "41104401",
+      "name": "중력대류식범용배양기",
+      "years": 13
+    },
+    {
+      "class_number": "41104402",
+      "name": "강제순환식또는기계대류식범용배양기",
+      "years": 10
+    },
+    {
+      "class_number": "41104404",
+      "name": "저온BOD배양기",
+      "years": 11
+    },
+    {
+      "class_number": "41104405",
+      "name": "진탕배양기",
+      "years": 12
+    },
+    {
+      "class_number": "41104498",
+      "name": "이산화탄소배양기",
+      "years": 12
+    },
+    {
+      "class_number": "41104505",
+      "name": "실험용석영오븐단지",
+      "years": 10
+    },
+    {
+      "class_number": "41104507",
+      "name": "마이크로웨이브오븐",
+      "years": 10
+    },
+    {
+      "class_number": "41104509",
+      "name": "진공오븐",
+      "years": 11
+    },
+    {
+      "class_number": "41104510",
+      "name": "건조캐비닛또는오븐",
+      "years": 12
+    },
+    {
+      "class_number": "41104511",
+      "name": "교잡반응기또는배양기",
+      "years": 11
+    },
+    {
+      "class_number": "41104601",
+      "name": "실험용박스로",
+      "years": 13
+    },
+    {
+      "class_number": "41104602",
+      "name": "프로그래머블박스로",
+      "years": 11
+    },
+    {
+      "class_number": "41104613",
+      "name": "고온가압로",
+      "years": 11
+    },
+    {
+      "class_number": "41104701",
+      "name": "동결건조기또는리오필라이저",
+      "years": 12
+    },
+    {
+      "class_number": "41104801",
+      "name": "플라스크또는증류기유닛",
+      "years": 11
+    },
+    {
+      "class_number": "41104802",
+      "name": "이단계증류기",
+      "years": 12
+    },
+    {
+      "class_number": "41104803",
+      "name": "실험용증발기",
+      "years": 12
+    },
+    {
+      "class_number": "41104806",
+      "name": "실험용추출기",
+      "years": 11
+    },
+    {
+      "class_number": "41104807",
+      "name": "지방추출기",
+      "years": 9
+    },
+    {
+      "class_number": "41104808",
+      "name": "조섬유추출기",
+      "years": 9
+    },
+    {
+      "class_number": "41104814",
+      "name": "실험용열교환응축기",
+      "years": 13
+    },
+    {
+      "class_number": "41104815",
+      "name": "킬달질소분해장치",
+      "years": 11
+    },
+    {
+      "class_number": "41104816",
+      "name": "진공또는원심농축기",
+      "years": 12
+    },
+    {
+      "class_number": "41104819",
+      "name": "세포모음장치",
+      "years": 11
+    },
+    {
+      "class_number": "41104896",
+      "name": "용출시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41104911",
+      "name": "실험용공기여과시스템",
+      "years": 9
+    },
+    {
+      "class_number": "41104914",
+      "name": "보틀탑필터또는여과컵",
+      "years": 12
+    },
+    {
+      "class_number": "41105002",
+      "name": "실험실용분급기기",
+      "years": 11
+    },
+    {
+      "class_number": "41105101",
+      "name": "실험용진공펌프",
+      "years": 12
+    },
+    {
+      "class_number": "41105102",
+      "name": "연동펌프",
+      "years": 13
+    },
+    {
+      "class_number": "41105106",
+      "name": "크로마토그래피펌프",
+      "years": 10
+    },
+    {
+      "class_number": "41105314",
+      "name": "겔도큐멘테이션시스템",
+      "years": 11
+    },
+    {
+      "class_number": "41105316",
+      "name": "자외선작업함",
+      "years": 12
+    },
+    {
+      "class_number": "41105399",
+      "name": "전기영동장치",
+      "years": 13
+    },
+    {
+      "class_number": "41105505",
+      "name": "고효율시료검색시스템",
+      "years": 8
+    },
+    {
+      "class_number": "41105517",
+      "name": "식물세포핵산추출도구",
+      "years": 9
+    },
+    {
+      "class_number": "41105521",
+      "name": "유전자검출기",
+      "years": 10
+    },
+    {
+      "class_number": "41105903",
+      "name": "상보적디옥시리보핵산합성도구",
+      "years": 12
+    },
+    {
+      "class_number": "41106307",
+      "name": "중합효소연쇄반응(PCR)최적화제품",
+      "years": 12
+    },
+    {
+      "class_number": "41106701",
+      "name": "엽면적계",
+      "years": 12
+    },
+    {
+      "class_number": "41106702",
+      "name": "광합성측정장치",
+      "years": 11
+    },
+    {
+      "class_number": "41106703",
+      "name": "식물생장계",
+      "years": 12
+    },
+    {
+      "class_number": "41106704",
+      "name": "엽록소측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41106705",
+      "name": "식물생장조절실",
+      "years": 10
+    },
+    {
+      "class_number": "41111502",
+      "name": "실험용저울",
+      "years": 13
+    },
+    {
+      "class_number": "41111503",
+      "name": "기계식중량계",
+      "years": 12
+    },
+    {
+      "class_number": "41111505",
+      "name": "눈금중량계또는눈금저울",
+      "years": 13
+    },
+    {
+      "class_number": "41111506",
+      "name": "동물체중계",
+      "years": 10
+    },
+    {
+      "class_number": "41111507",
+      "name": "벤치스케일",
+      "years": 11
+    },
+    {
+      "class_number": "41111508",
+      "name": "체중계",
+      "years": 9
+    },
+    {
+      "class_number": "41111511",
+      "name": "트럭및철도용중량계",
+      "years": 10
+    },
+    {
+      "class_number": "41111513",
+      "name": "수분측정용저울",
+      "years": 9
+    },
+    {
+      "class_number": "41111516",
+      "name": "중량측정기기액세서리",
+      "years": 9
+    },
+    {
+      "class_number": "41111517",
+      "name": "분석저울",
+      "years": 12
+    },
+    {
+      "class_number": "41111519",
+      "name": "크레인저울",
+      "years": 12
+    },
+    {
+      "class_number": "41111526",
+      "name": "자동선별용저울",
+      "years": 11
+    },
+    {
+      "class_number": "41111601",
+      "name": "마이크로미터",
+      "years": 12
+    },
+    {
+      "class_number": "41111605",
+      "name": "스트레인게이지",
+      "years": 11
+    },
+    {
+      "class_number": "41111613",
+      "name": "거리측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41111614",
+      "name": "높이게이지",
+      "years": 11
+    },
+    {
+      "class_number": "41111615",
+      "name": "레이저측정장치",
+      "years": 13
+    },
+    {
+      "class_number": "41111618",
+      "name": "게이지블록세트",
+      "years": 13
+    },
+    {
+      "class_number": "41111623",
+      "name": "두께측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41111669",
+      "name": "두께게이지",
+      "years": 11
+    },
+    {
+      "class_number": "41111678",
+      "name": "만능측장기",
+      "years": 12
+    },
+    {
+      "class_number": "41111703",
+      "name": "실체현미경",
+      "years": 13
+    },
+    {
+      "class_number": "41111704",
+      "name": "현미경용조명장치",
+      "years": 11
+    },
+    {
+      "class_number": "41111706",
+      "name": "현미경용사진부착장치",
+      "years": 12
+    },
+    {
+      "class_number": "41111707",
+      "name": "형상투영기",
+      "years": 10
+    },
+    {
+      "class_number": "41111711",
+      "name": "전자현미경",
+      "years": 11
+    },
+    {
+      "class_number": "41111712",
+      "name": "역상현미경",
+      "years": 9
+    },
+    {
+      "class_number": "41111713",
+      "name": "확대경",
+      "years": 10
+    },
+    {
+      "class_number": "41111715",
+      "name": "망원경",
+      "years": 11
+    },
+    {
+      "class_number": "41111716",
+      "name": "내시경검사장치",
+      "years": 9
+    },
+    {
+      "class_number": "41111717",
+      "name": "쌍안경",
+      "years": 9
+    },
+    {
+      "class_number": "41111718",
+      "name": "금속현미경",
+      "years": 12
+    },
+    {
+      "class_number": "41111720",
+      "name": "주사전자현미경(SEM)",
+      "years": 12
+    },
+    {
+      "class_number": "41111721",
+      "name": "투과전자현미경(TEM)",
+      "years": 9
+    },
+    {
+      "class_number": "41111722",
+      "name": "형광현미경",
+      "years": 11
+    },
+    {
+      "class_number": "41111723",
+      "name": "주사광학,스피닝디스크또는레이저주사현미경",
+      "years": 9
+    },
+    {
+      "class_number": "41111724",
+      "name": "주사탐침현미경",
+      "years": 8
+    },
+    {
+      "class_number": "41111725",
+      "name": "편광현미경",
+      "years": 12
+    },
+    {
+      "class_number": "41111727",
+      "name": "투사현미경",
+      "years": 13
+    },
+    {
+      "class_number": "41111735",
+      "name": "자동현미경제물대",
+      "years": 9
+    },
+    {
+      "class_number": "41111741",
+      "name": "현미경미분간섭차장치",
+      "years": 9
+    },
+    {
+      "class_number": "41111744",
+      "name": "현미경용마이크로미터",
+      "years": 12
+    },
+    {
+      "class_number": "41111745",
+      "name": "현미경용미세조작기",
+      "years": 11
+    },
+    {
+      "class_number": "41111747",
+      "name": "산업용내시경",
+      "years": 10
+    },
+    {
+      "class_number": "41111749",
+      "name": "위상차현미경",
+      "years": 10
+    },
+    {
+      "class_number": "41111798",
+      "name": "멀티미디어영상현미경",
+      "years": 10
+    },
+    {
+      "class_number": "41111804",
+      "name": "초음파검사장치",
+      "years": 13
+    },
+    {
+      "class_number": "41111808",
+      "name": "엑스레이뢴트겐사진검사장치",
+      "years": 9
+    },
+    {
+      "class_number": "41111815",
+      "name": "철근탐지기",
+      "years": 12
+    },
+    {
+      "class_number": "41111816",
+      "name": "변위측정기",
+      "years": 13
+    },
+    {
+      "class_number": "41111817",
+      "name": "식미검정기",
+      "years": 8
+    },
+    {
+      "class_number": "41111905",
+      "name": "전자탐침봉",
+      "years": 10
+    },
+    {
+      "class_number": "41111908",
+      "name": "그래프기록계",
+      "years": 13
+    },
+    {
+      "class_number": "41111910",
+      "name": "멀티펜기록계",
+      "years": 10
+    },
+    {
+      "class_number": "41111912",
+      "name": "생리현상기록계",
+      "years": 13
+    },
+    {
+      "class_number": "41111916",
+      "name": "비접촉센서",
+      "years": 9
+    },
+    {
+      "class_number": "41111920",
+      "name": "3차원측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41111921",
+      "name": "속도감지기",
+      "years": 8
+    },
+    {
+      "class_number": "41111926",
+      "name": "근접감지기",
+      "years": 7
+    },
+    {
+      "class_number": "41111938",
+      "name": "레벨센서및트랜스미터",
+      "years": 8
+    },
+    {
+      "class_number": "41111939",
+      "name": "음향탐지기",
+      "years": 11
+    },
+    {
+      "class_number": "41111942",
+      "name": "불투명도,분진또는가시도센서",
+      "years": 12
+    },
+    {
+      "class_number": "41111970",
+      "name": "온도감지기",
+      "years": 10
+    },
+    {
+      "class_number": "41111973",
+      "name": "미립자계수기",
+      "years": 9
+    },
+    {
+      "class_number": "41111975",
+      "name": "자기탐지기",
+      "years": 9
+    },
+    {
+      "class_number": "41112105",
+      "name": "온도트랜스미터",
+      "years": 8
+    },
+    {
+      "class_number": "41112108",
+      "name": "로드셀",
+      "years": 11
+    },
+    {
+      "class_number": "41112113",
+      "name": "기계적에너지변환기",
+      "years": 12
+    },
+    {
+      "class_number": "41112114",
+      "name": "온습도트랜스미터",
+      "years": 10
+    },
+    {
+      "class_number": "41112197",
+      "name": "선박육분력측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41112201",
+      "name": "열량계",
+      "years": 12
+    },
+    {
+      "class_number": "41112202",
+      "name": "열추적장치",
+      "years": 10
+    },
+    {
+      "class_number": "41112204",
+      "name": "고온계",
+      "years": 10
+    },
+    {
+      "class_number": "41112205",
+      "name": "온도조절기",
+      "years": 11
+    },
+    {
+      "class_number": "41112207",
+      "name": "자동기록온도계",
+      "years": 10
+    },
+    {
+      "class_number": "41112210",
+      "name": "원격온도계",
+      "years": 10
+    },
+    {
+      "class_number": "41112213",
+      "name": "휴대용온도계",
+      "years": 9
+    },
+    {
+      "class_number": "41112228",
+      "name": "연소효율측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41112233",
+      "name": "녹는점측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41112234",
+      "name": "열류계",
+      "years": 9
+    },
+    {
+      "class_number": "41112301",
+      "name": "습도계",
+      "years": 8
+    },
+    {
+      "class_number": "41112302",
+      "name": "건습계",
+      "years": 11
+    },
+    {
+      "class_number": "41112303",
+      "name": "온습도측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41112304",
+      "name": "수분계",
+      "years": 11
+    },
+    {
+      "class_number": "41112401",
+      "name": "깊이측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41112404",
+      "name": "압력조정기",
+      "years": 8
+    },
+    {
+      "class_number": "41112406",
+      "name": "진공측정기",
+      "years": 13
+    },
+    {
+      "class_number": "41112407",
+      "name": "수위관리및조절기구",
+      "years": 10
+    },
+    {
+      "class_number": "41112410",
+      "name": "압력트랜스미터",
+      "years": 10
+    },
+    {
+      "class_number": "41112411",
+      "name": "압력조절기",
+      "years": 11
+    },
+    {
+      "class_number": "41112414",
+      "name": "압력검교정장비",
+      "years": 8
+    },
+    {
+      "class_number": "41112416",
+      "name": "내압시험기",
+      "years": 9
+    },
+    {
+      "class_number": "41112418",
+      "name": "모세관압측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41112422",
+      "name": "수압시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41112498",
+      "name": "프로세스제어반",
+      "years": 11
+    },
+    {
+      "class_number": "41112501",
+      "name": "유량계",
+      "years": 10
+    },
+    {
+      "class_number": "41112502",
+      "name": "레오미터",
+      "years": 9
+    },
+    {
+      "class_number": "41112508",
+      "name": "가스미터",
+      "years": 10
+    },
+    {
+      "class_number": "41112701",
+      "name": "곡물분석기",
+      "years": 9
+    },
+    {
+      "class_number": "41112702",
+      "name": "종자계수기",
+      "years": 10
+    },
+    {
+      "class_number": "41112801",
+      "name": "속도계",
+      "years": 11
+    },
+    {
+      "class_number": "41112802",
+      "name": "회전계",
+      "years": 12
+    },
+    {
+      "class_number": "41112901",
+      "name": "방향탐지용콤파스",
+      "years": 10
+    },
+    {
+      "class_number": "41112902",
+      "name": "무선통신항해용장비",
+      "years": 11
+    },
+    {
+      "class_number": "41112903",
+      "name": "육분의",
+      "years": 12
+    },
+    {
+      "class_number": "41112906",
+      "name": "전파표지",
+      "years": 10
+    },
+    {
+      "class_number": "41113009",
+      "name": "열차별분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41113024",
+      "name": "액체비중계",
+      "years": 10
+    },
+    {
+      "class_number": "41113027",
+      "name": "삼투압측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41113029",
+      "name": "전기분해반응분석측정장치",
+      "years": 8
+    },
+    {
+      "class_number": "41113031",
+      "name": "당도계",
+      "years": 11
+    },
+    {
+      "class_number": "41113037",
+      "name": "마이크로플레이트리더",
+      "years": 10
+    },
+    {
+      "class_number": "41113040",
+      "name": "콜로니카운터",
+      "years": 11
+    },
+    {
+      "class_number": "41113041",
+      "name": "원소분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41113042",
+      "name": "우유분석기",
+      "years": 9
+    },
+    {
+      "class_number": "41113046",
+      "name": "점착시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41113048",
+      "name": "견뢰도시험기",
+      "years": 12
+    },
+    {
+      "class_number": "41113049",
+      "name": "연소분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41113051",
+      "name": "산화환원측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41113057",
+      "name": "오니농도측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41113091",
+      "name": "반응속도측정장치",
+      "years": 11
+    },
+    {
+      "class_number": "41113099",
+      "name": "건축자재방출오염물질측정장치",
+      "years": 11
+    },
+    {
+      "class_number": "41113101",
+      "name": "배기가스분석기",
+      "years": 13
+    },
+    {
+      "class_number": "41113104",
+      "name": "인화성가스측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41113105",
+      "name": "탄화수소분석및탐지기",
+      "years": 11
+    },
+    {
+      "class_number": "41113108",
+      "name": "산화질소분석기",
+      "years": 10
+    },
+    {
+      "class_number": "41113110",
+      "name": "산소분석기",
+      "years": 10
+    },
+    {
+      "class_number": "41113111",
+      "name": "오존분석기",
+      "years": 10
+    },
+    {
+      "class_number": "41113113",
+      "name": "산화황분석기및탐지기",
+      "years": 11
+    },
+    {
+      "class_number": "41113114",
+      "name": "열전도율분석기",
+      "years": 13
+    },
+    {
+      "class_number": "41113117",
+      "name": "단일가스검출기",
+      "years": 10
+    },
+    {
+      "class_number": "41113118",
+      "name": "다중가스검출기",
+      "years": 11
+    },
+    {
+      "class_number": "41113120",
+      "name": "일산화탄소측정기",
+      "years": 9
+    },
+    {
+      "class_number": "41113124",
+      "name": "물질대사가스분석기",
+      "years": 10
+    },
+    {
+      "class_number": "41113199",
+      "name": "대기오염측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41113301",
+      "name": "산또는염기분석기",
+      "years": 12
+    },
+    {
+      "class_number": "41113308",
+      "name": "전해질분석기",
+      "years": 10
+    },
+    {
+      "class_number": "41113315",
+      "name": "유기탄소측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41113319",
+      "name": "수질분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41113322",
+      "name": "질소,질산염또는아질산염분석기",
+      "years": 12
+    },
+    {
+      "class_number": "41113326",
+      "name": "도료입도측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41113327",
+      "name": "필름애플리게이터",
+      "years": 11
+    },
+    {
+      "class_number": "41113328",
+      "name": "수은분석기",
+      "years": 10
+    },
+    {
+      "class_number": "41113331",
+      "name": "동결융해시험장치",
+      "years": 10
+    },
+    {
+      "class_number": "41113333",
+      "name": "계면동전위측정장치",
+      "years": 10
+    },
+    {
+      "class_number": "41113338",
+      "name": "BOD측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41113339",
+      "name": "COD측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41113380",
+      "name": "비표면적측정장치",
+      "years": 9
+    },
+    {
+      "class_number": "41113399",
+      "name": "유동화실험장치",
+      "years": 11
+    },
+    {
+      "class_number": "41113405",
+      "name": "감마선계수기",
+      "years": 11
+    },
+    {
+      "class_number": "41113601",
+      "name": "전류계",
+      "years": 13
+    },
+    {
+      "class_number": "41113603",
+      "name": "실험용브리지회로",
+      "years": 12
+    },
+    {
+      "class_number": "41113612",
+      "name": "접지저항측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41113614",
+      "name": "전자기장측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41113619",
+      "name": "검류계",
+      "years": 11
+    },
+    {
+      "class_number": "41113621",
+      "name": "임피던스측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41113623",
+      "name": "절연저항측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41113624",
+      "name": "절연시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41113630",
+      "name": "멀티미터",
+      "years": 11
+    },
+    {
+      "class_number": "41113631",
+      "name": "저항계",
+      "years": 12
+    },
+    {
+      "class_number": "41113632",
+      "name": "오실로그래프",
+      "years": 11
+    },
+    {
+      "class_number": "41113633",
+      "name": "전위차계",
+      "years": 13
+    },
+    {
+      "class_number": "41113637",
+      "name": "전압또는전류측정기",
+      "years": 13
+    },
+    {
+      "class_number": "41113638",
+      "name": "오실로스코프",
+      "years": 13
+    },
+    {
+      "class_number": "41113639",
+      "name": "가속도계",
+      "years": 9
+    },
+    {
+      "class_number": "41113640",
+      "name": "유효전력계",
+      "years": 12
+    },
+    {
+      "class_number": "41113642",
+      "name": "회로검사장치",
+      "years": 13
+    },
+    {
+      "class_number": "41113643",
+      "name": "수요전력계또는기록계",
+      "years": 11
+    },
+    {
+      "class_number": "41113646",
+      "name": "온도교정기또는시뮬레이터",
+      "years": 12
+    },
+    {
+      "class_number": "41113655",
+      "name": "발전기시험장치",
+      "years": 11
+    },
+    {
+      "class_number": "41113656",
+      "name": "서보시험장치",
+      "years": 12
+    },
+    {
+      "class_number": "41113661",
+      "name": "전압조정기시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41113671",
+      "name": "콘덴서시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41113672",
+      "name": "계전기시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41113674",
+      "name": "저항시험장치",
+      "years": 12
+    },
+    {
+      "class_number": "41113675",
+      "name": "전류분류기",
+      "years": 10
+    },
+    {
+      "class_number": "41113677",
+      "name": "내전압시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41113682",
+      "name": "전력시험기",
+      "years": 12
+    },
+    {
+      "class_number": "41113686",
+      "name": "클램프테스터",
+      "years": 9
+    },
+    {
+      "class_number": "41113689",
+      "name": "종합계측기",
+      "years": 11
+    },
+    {
+      "class_number": "41113692",
+      "name": "전압전류계교정장치",
+      "years": 10
+    },
+    {
+      "class_number": "41113693",
+      "name": "정전기측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41113695",
+      "name": "펄스측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41113697",
+      "name": "변환기시험장치",
+      "years": 12
+    },
+    {
+      "class_number": "41113698",
+      "name": "제어기시험장치",
+      "years": 12
+    },
+    {
+      "class_number": "41113699",
+      "name": "전동기시험장치",
+      "years": 12
+    },
+    {
+      "class_number": "41113702",
+      "name": "비교측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41113704",
+      "name": "집적회로검사기",
+      "years": 12
+    },
+    {
+      "class_number": "41113705",
+      "name": "논리상태검사기",
+      "years": 10
+    },
+    {
+      "class_number": "41113706",
+      "name": "반도체검사기",
+      "years": 11
+    },
+    {
+      "class_number": "41113708",
+      "name": "전력계",
+      "years": 9
+    },
+    {
+      "class_number": "41113709",
+      "name": "변조측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41113710",
+      "name": "레벨미터",
+      "years": 12
+    },
+    {
+      "class_number": "41113711",
+      "name": "통신망분석장치",
+      "years": 11
+    },
+    {
+      "class_number": "41113718",
+      "name": "프로토콜분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41113720",
+      "name": "전송량측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41113721",
+      "name": "영상신호측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41113722",
+      "name": "전자파장해시험기",
+      "years": 8
+    },
+    {
+      "class_number": "41113723",
+      "name": "무선장비시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41113725",
+      "name": "광파워미터",
+      "years": 9
+    },
+    {
+      "class_number": "41113728",
+      "name": "전자파무반사환경조성실",
+      "years": 9
+    },
+    {
+      "class_number": "41113729",
+      "name": "증폭기출력계",
+      "years": 11
+    },
+    {
+      "class_number": "41113730",
+      "name": "텔레비전시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41113732",
+      "name": "증폭기시험기",
+      "years": 12
+    },
+    {
+      "class_number": "41113733",
+      "name": "안테나시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41113735",
+      "name": "극초단파기기시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41113737",
+      "name": "잡음측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41113738",
+      "name": "통신선로유지보수용시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41113739",
+      "name": "전자파내성시험기(EMS)",
+      "years": 10
+    },
+    {
+      "class_number": "41113777",
+      "name": "통신교육용모의장치",
+      "years": 9
+    },
+    {
+      "class_number": "41113783",
+      "name": "변복조분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41113794",
+      "name": "수신측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41113797",
+      "name": "광섬유실험장치",
+      "years": 7
+    },
+    {
+      "class_number": "41113803",
+      "name": "전자기의지구물리도구",
+      "years": 9
+    },
+    {
+      "class_number": "41113808",
+      "name": "중력계",
+      "years": 12
+    },
+    {
+      "class_number": "41113809",
+      "name": "지질탐지기",
+      "years": 10
+    },
+    {
+      "class_number": "41113811",
+      "name": "지내력시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41113812",
+      "name": "지반마찰시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41113816",
+      "name": "압밀시험기",
+      "years": 12
+    },
+    {
+      "class_number": "41113817",
+      "name": "토질액성한계시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41113818",
+      "name": "평판재하시험기",
+      "years": 12
+    },
+    {
+      "class_number": "41113819",
+      "name": "토양분석기",
+      "years": 12
+    },
+    {
+      "class_number": "41113821",
+      "name": "토질관입시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41113822",
+      "name": "흙지지력비시험기",
+      "years": 12
+    },
+    {
+      "class_number": "41113824",
+      "name": "토질투수시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41113827",
+      "name": "일축압축시험기",
+      "years": 8
+    },
+    {
+      "class_number": "41113899",
+      "name": "탄성파탐사기",
+      "years": 11
+    },
+    {
+      "class_number": "41113902",
+      "name": "용해또는분해검사기",
+      "years": 11
+    },
+    {
+      "class_number": "41113903",
+      "name": "입자측정장치",
+      "years": 11
+    },
+    {
+      "class_number": "41113904",
+      "name": "경도측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41113905",
+      "name": "투과성시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41113909",
+      "name": "토양샘플채취장치",
+      "years": 11
+    },
+    {
+      "class_number": "41113996",
+      "name": "채니기",
+      "years": 9
+    },
+    {
+      "class_number": "41114001",
+      "name": "경사계",
+      "years": 10
+    },
+    {
+      "class_number": "41114106",
+      "name": "지진기록장치또는지진계",
+      "years": 9
+    },
+    {
+      "class_number": "41114107",
+      "name": "지진계",
+      "years": 9
+    },
+    {
+      "class_number": "41114204",
+      "name": "경위의",
+      "years": 11
+    },
+    {
+      "class_number": "41114212",
+      "name": "사진판독확대경",
+      "years": 12
+    },
+    {
+      "class_number": "41114213",
+      "name": "정밀좌표측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41114215",
+      "name": "측고기",
+      "years": 11
+    },
+    {
+      "class_number": "41114220",
+      "name": "전경의",
+      "years": 12
+    },
+    {
+      "class_number": "41114294",
+      "name": "구적계",
+      "years": 12
+    },
+    {
+      "class_number": "41114401",
+      "name": "풍속계",
+      "years": 11
+    },
+    {
+      "class_number": "41114402",
+      "name": "기압계",
+      "years": 9
+    },
+    {
+      "class_number": "41114404",
+      "name": "라디오존데기구",
+      "years": 10
+    },
+    {
+      "class_number": "41114405",
+      "name": "강우량기록계",
+      "years": 8
+    },
+    {
+      "class_number": "41114406",
+      "name": "강우또는증발지표관측장비",
+      "years": 9
+    },
+    {
+      "class_number": "41114407",
+      "name": "태양복사열지표측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41114409",
+      "name": "풍속지표측정장치",
+      "years": 8
+    },
+    {
+      "class_number": "41114410",
+      "name": "기상관측장비",
+      "years": 9
+    },
+    {
+      "class_number": "41114412",
+      "name": "기상수직분포측정장치",
+      "years": 11
+    },
+    {
+      "class_number": "41114414",
+      "name": "기상위성수신장비",
+      "years": 10
+    },
+    {
+      "class_number": "41114415",
+      "name": "낙뢰분석장비",
+      "years": 11
+    },
+    {
+      "class_number": "41114417",
+      "name": "기상관측부이",
+      "years": 7
+    },
+    {
+      "class_number": "41114418",
+      "name": "기상위성수신분석장치",
+      "years": 11
+    },
+    {
+      "class_number": "41114419",
+      "name": "저층난류경보장비",
+      "years": 9
+    },
+    {
+      "class_number": "41114423",
+      "name": "자동기상관측장비종합검진기",
+      "years": 9
+    },
+    {
+      "class_number": "41114427",
+      "name": "풍향계",
+      "years": 10
+    },
+    {
+      "class_number": "41114496",
+      "name": "해양측정기기",
+      "years": 7
+    },
+    {
+      "class_number": "41114498",
+      "name": "인공강우장비",
+      "years": 8
+    },
+    {
+      "class_number": "41114501",
+      "name": "동력계",
+      "years": 12
+    },
+    {
+      "class_number": "41114502",
+      "name": "탄력계",
+      "years": 10
+    },
+    {
+      "class_number": "41114503",
+      "name": "신장계",
+      "years": 10
+    },
+    {
+      "class_number": "41114505",
+      "name": "진원도측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41114508",
+      "name": "표면검사장치",
+      "years": 9
+    },
+    {
+      "class_number": "41114510",
+      "name": "토크게이지",
+      "years": 11
+    },
+    {
+      "class_number": "41114511",
+      "name": "유연도시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41114514",
+      "name": "비틀림진동측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41114516",
+      "name": "절삭력측정장치",
+      "years": 12
+    },
+    {
+      "class_number": "41114519",
+      "name": "예인전차시스템",
+      "years": 10
+    },
+    {
+      "class_number": "41114521",
+      "name": "공기압축기시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41114524",
+      "name": "유압(油壓)시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41114528",
+      "name": "선박동요측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41114530",
+      "name": "접착강도시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41114562",
+      "name": "물성시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41114569",
+      "name": "소음및진동정밀분석시스템",
+      "years": 12
+    },
+    {
+      "class_number": "41114580",
+      "name": "공압실린더시험장치",
+      "years": 10
+    },
+    {
+      "class_number": "41114586",
+      "name": "노화시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41114592",
+      "name": "안정도시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41114601",
+      "name": "마모시험기",
+      "years": 13
+    },
+    {
+      "class_number": "41114602",
+      "name": "압축시험기",
+      "years": 13
+    },
+    {
+      "class_number": "41114603",
+      "name": "콘크리트또는시멘트시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41114604",
+      "name": "부식시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41114605",
+      "name": "틈새또는부식검출기",
+      "years": 10
+    },
+    {
+      "class_number": "41114606",
+      "name": "크리프시험기",
+      "years": 9
+    },
+    {
+      "class_number": "41114608",
+      "name": "피로시험기",
+      "years": 13
+    },
+    {
+      "class_number": "41114611",
+      "name": "경도검사기",
+      "years": 13
+    },
+    {
+      "class_number": "41114612",
+      "name": "충격식검사기",
+      "years": 13
+    },
+    {
+      "class_number": "41114614",
+      "name": "금속검사기",
+      "years": 12
+    },
+    {
+      "class_number": "41114618",
+      "name": "표면거칠기측정장치",
+      "years": 10
+    },
+    {
+      "class_number": "41114619",
+      "name": "전단력검사기",
+      "years": 12
+    },
+    {
+      "class_number": "41114621",
+      "name": "장력검사기",
+      "years": 13
+    },
+    {
+      "class_number": "41114622",
+      "name": "비틀림검사장비",
+      "years": 11
+    },
+    {
+      "class_number": "41114623",
+      "name": "굴곡성또는횡성검사기",
+      "years": 11
+    },
+    {
+      "class_number": "41114624",
+      "name": "진동성검사기",
+      "years": 13
+    },
+    {
+      "class_number": "41114629",
+      "name": "가열변형시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41114630",
+      "name": "열충격시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41114631",
+      "name": "응력시험기",
+      "years": 13
+    },
+    {
+      "class_number": "41114632",
+      "name": "인장강도시험기",
+      "years": 13
+    },
+    {
+      "class_number": "41114633",
+      "name": "열팽창시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41114634",
+      "name": "에릭슨시험기",
+      "years": 12
+    },
+    {
+      "class_number": "41114636",
+      "name": "폴리머사출성형측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41114637",
+      "name": "빔실험장치",
+      "years": 10
+    },
+    {
+      "class_number": "41114638",
+      "name": "하중시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41114640",
+      "name": "포장도로평탄성측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41114644",
+      "name": "공기량측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41114648",
+      "name": "유동성시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41114650",
+      "name": "몰드",
+      "years": 10
+    },
+    {
+      "class_number": "41114672",
+      "name": "아스팔트시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41114674",
+      "name": "만능재료시험기",
+      "years": 13
+    },
+    {
+      "class_number": "41114709",
+      "name": "실검사기",
+      "years": 9
+    },
+    {
+      "class_number": "41114715",
+      "name": "섬유또는종이공기투과도시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41114722",
+      "name": "인열강도(引裂强度)시험기",
+      "years": 12
+    },
+    {
+      "class_number": "41114723",
+      "name": "파열강도(破裂强度)시험기",
+      "years": 12
+    },
+    {
+      "class_number": "41115102",
+      "name": "측각기",
+      "years": 9
+    },
+    {
+      "class_number": "41115201",
+      "name": "전파탐지시스템",
+      "years": 9
+    },
+    {
+      "class_number": "41115203",
+      "name": "기상레이더",
+      "years": 10
+    },
+    {
+      "class_number": "41115303",
+      "name": "주파수분석기",
+      "years": 13
+    },
+    {
+      "class_number": "41115304",
+      "name": "주파수카운터",
+      "years": 12
+    },
+    {
+      "class_number": "41115306",
+      "name": "간섭계",
+      "years": 11
+    },
+    {
+      "class_number": "41115307",
+      "name": "레이저발생기",
+      "years": 12
+    },
+    {
+      "class_number": "41115309",
+      "name": "조도계",
+      "years": 13
+    },
+    {
+      "class_number": "41115311",
+      "name": "광도계",
+      "years": 13
+    },
+    {
+      "class_number": "41115313",
+      "name": "휴대용굴절계",
+      "years": 12
+    },
+    {
+      "class_number": "41115314",
+      "name": "편광계",
+      "years": 13
+    },
+    {
+      "class_number": "41115315",
+      "name": "편광기",
+      "years": 12
+    },
+    {
+      "class_number": "41115316",
+      "name": "반사계",
+      "years": 9
+    },
+    {
+      "class_number": "41115317",
+      "name": "스트로보스코프",
+      "years": 10
+    },
+    {
+      "class_number": "41115318",
+      "name": "비색계",
+      "years": 13
+    },
+    {
+      "class_number": "41115320",
+      "name": "신호발생기",
+      "years": 12
+    },
+    {
+      "class_number": "41115323",
+      "name": "함수발생기",
+      "years": 12
+    },
+    {
+      "class_number": "41115327",
+      "name": "광전측정기기",
+      "years": 9
+    },
+    {
+      "class_number": "41115328",
+      "name": "파형합성기",
+      "years": 10
+    },
+    {
+      "class_number": "41115329",
+      "name": "전파측정장치",
+      "years": 9
+    },
+    {
+      "class_number": "41115330",
+      "name": "불투명측정기",
+      "years": 9
+    },
+    {
+      "class_number": "41115331",
+      "name": "광택도측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41115332",
+      "name": "광파장측정기",
+      "years": 10
+    },
+    {
+      "class_number": "41115333",
+      "name": "광자수측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41115334",
+      "name": "백색도측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41115335",
+      "name": "벡터스코프",
+      "years": 11
+    },
+    {
+      "class_number": "41115336",
+      "name": "실험실용자외선등",
+      "years": 10
+    },
+    {
+      "class_number": "41115337",
+      "name": "파형측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41115338",
+      "name": "휘도측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41115339",
+      "name": "일립소미터",
+      "years": 10
+    },
+    {
+      "class_number": "41115385",
+      "name": "형광사검출기",
+      "years": 9
+    },
+    {
+      "class_number": "41115401",
+      "name": "형광분광분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41115403",
+      "name": "분광계",
+      "years": 12
+    },
+    {
+      "class_number": "41115404",
+      "name": "질량분석기",
+      "years": 10
+    },
+    {
+      "class_number": "41115406",
+      "name": "분광광도계",
+      "years": 12
+    },
+    {
+      "class_number": "41115407",
+      "name": "원자흡광분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41115408",
+      "name": "적외선분광기",
+      "years": 11
+    },
+    {
+      "class_number": "41115409",
+      "name": "핵자기공명분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41115411",
+      "name": "유도결합플라즈마(ICP)분광계",
+      "years": 10
+    },
+    {
+      "class_number": "41115412",
+      "name": "분광복사계",
+      "years": 10
+    },
+    {
+      "class_number": "41115413",
+      "name": "세포분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41115414",
+      "name": "방사선분광분석기(방사선핵종분석기)",
+      "years": 11
+    },
+    {
+      "class_number": "41115415",
+      "name": "전자분광분석기(ESCA)",
+      "years": 8
+    },
+    {
+      "class_number": "41115416",
+      "name": "전자스핀공명분석기",
+      "years": 11
+    },
+    {
+      "class_number": "41115501",
+      "name": "소나",
+      "years": 10
+    },
+    {
+      "class_number": "41115503",
+      "name": "음향측정기기및데시벨미터",
+      "years": 11
+    },
+    {
+      "class_number": "41115507",
+      "name": "음성특성시험기",
+      "years": 11
+    },
+    {
+      "class_number": "41115513",
+      "name": "음향발생장치",
+      "years": 9
+    },
+    {
+      "class_number": "41115515",
+      "name": "하이드로폰",
+      "years": 9
+    },
+    {
+      "class_number": "41115602",
+      "name": "전위차적정기",
+      "years": 12
+    },
+    {
+      "class_number": "41115603",
+      "name": "pH측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41115608",
+      "name": "이온선택전극",
+      "years": 10
+    },
+    {
+      "class_number": "41115609",
+      "name": "전도도측정기",
+      "years": 12
+    },
+    {
+      "class_number": "41115611",
+      "name": "용존산소량측정기",
+      "years": 11
+    },
+    {
+      "class_number": "41115613",
+      "name": "염분검출기",
+      "years": 11
+    },
+    {
+      "class_number": "41115615",
+      "name": "수소이온농도조절기",
+      "years": 11
+    },
+    {
+      "class_number": "41115701",
+      "name": "크로마토그래피디텍터",
+      "years": 12
+    },
+    {
+      "class_number": "41115703",
+      "name": "기체크로마토그래프",
+      "years": 11
+    },
+    {
+      "class_number": "41115705",
+      "name": "액체크로마토그래프",
+      "years": 11
+    },
+    {
+      "class_number": "41115715",
+      "name": "실험실용주입기",
+      "years": 11
+    },
+    {
+      "class_number": "41115811",
+      "name": "DNA서열분석기",
+      "years": 10
+    },
+    {
+      "class_number": "41115821",
+      "name": "미생물분석기",
+      "years": 10
+    },
+    {
+      "class_number": "41115823",
+      "name": "단백질분석기",
+      "years": 12
+    },
+    {
+      "class_number": "41115832",
+      "name": "항생물질검사기",
+      "years": 10
+    },
+    {
+      "class_number": "41116107",
+      "name": "화학품질관리,측정기또는표준",
+      "years": 9
+    },
+    {
+      "class_number": "41116303",
+      "name": "방화도시험기",
+      "years": 10
+    },
+    {
+      "class_number": "41119905",
+      "name": "의료용분리방식임상화학자동분석장치",
+      "years": 9
+    },
+    {
+      "class_number": "41119909",
+      "name": "혈액가스분석기",
+      "years": 9
+    },
+    {
+      "class_number": "41119914",
+      "name": "혈액응고시간분석기",
+      "years": 9
+    },
+    {
+      "class_number": "41119917",
+      "name": "의료용분광광도계",
+      "years": 7
+    },
+    {
+      "class_number": "41119928",
+      "name": "의료용효소분석기",
+      "years": 12
+    },
+    {
+      "class_number": "41119933",
+      "name": "혈액상자동분석장치",
+      "years": 11
+    },
+    {
+      "class_number": "41119937",
+      "name": "자동염색기구",
+      "years": 10
+    },
+    {
+      "class_number": "41119940",
+      "name": "요화학분석기",
+      "years": 10
+    },
+    {
+      "class_number": "41119953",
+      "name": "표본가공기",
+      "years": 7
+    },
+    {
+      "class_number": "41119956",
+      "name": "의료용세포·조직배양기",
+      "years": 9
+    },
+    {
+      "class_number": "41121502",
+      "name": "실험실용희석기",
+      "years": 9
+    },
+    {
+      "class_number": "41121504",
+      "name": "수동식단채널공기치환형피페터",
+      "years": 11
+    },
+    {
+      "class_number": "41121509",
+      "name": "파스퇴르식또는트랜스퍼피펫",
+      "years": 12
+    },
+    {
+      "class_number": "41121516",
+      "name": "디스펜서",
+      "years": 12
+    },
+    {
+      "class_number": "41121808",
+      "name": "실험용뷰렛",
+      "years": 11
+    },
+    {
+      "class_number": "41121811",
+      "name": "실험용미량화학키트",
+      "years": 12
+    },
+    {
+      "class_number": "41122203",
+      "name": "금속도가니",
+      "years": 13
+    },
+    {
+      "class_number": "41122805",
+      "name": "건조용랙",
+      "years": 10
+    },
+    {
+      "class_number": "41123001",
+      "name": "단지형데시케이터",
+      "years": 11
+    },
+    {
+      "class_number": "41123002",
+      "name": "캐비닛형데시케이터",
+      "years": 10
+    },
+    {
+      "class_number": "41123004",
+      "name": "진공데시케이터",
+      "years": 8
+    },
+    {
+      "class_number": "42121592",
+      "name": "정액보존용기",
+      "years": 12
+    },
+    {
+      "class_number": "42141801",
+      "name": "복합전기치료유닛",
+      "years": 8
+    },
+    {
+      "class_number": "42141804",
+      "name": "갈바닉또는감응전류자극기",
+      "years": 9
+    },
+    {
+      "class_number": "42142404",
+      "name": "의료용석션또는진공장치",
+      "years": 10
+    },
+    {
+      "class_number": "42142802",
+      "name": "혈관압박의복또는지지물",
+      "years": 9
+    },
+    {
+      "class_number": "42143502",
+      "name": "비세척장치또는액세서리",
+      "years": 10
+    },
+    {
+      "class_number": "42151501",
+      "name": "심미치과용광중합기또는액세서리",
+      "years": 9
+    },
+    {
+      "class_number": "42151704",
+      "name": "치과용테이블또는액세서리",
+      "years": 11
+    },
+    {
+      "class_number": "42152008",
+      "name": "치과용방사선기기",
+      "years": 11
+    },
+    {
+      "class_number": "42152701",
+      "name": "치과용교합기또는액세서리",
+      "years": 11
+    },
+    {
+      "class_number": "42161632",
+      "name": "혈액투석장치",
+      "years": 8
+    },
+    {
+      "class_number": "42171611",
+      "name": "응급처치용들것또는액세서리",
+      "years": 8
+    },
+    {
+      "class_number": "42171802",
+      "name": "응급의료용후두경키트",
+      "years": 8
+    },
+    {
+      "class_number": "42172001",
+      "name": "응급의료용처치키트",
+      "years": 8
+    },
+    {
+      "class_number": "42172013",
+      "name": "응급의료용후송키트",
+      "years": 10
+    },
+    {
+      "class_number": "42172101",
+      "name": "심장충격기",
+      "years": 6
+    },
+    {
+      "class_number": "42181602",
+      "name": "전자혈압계",
+      "years": 9
+    },
+    {
+      "class_number": "42181605",
+      "name": "혈압계용커프또는공기주머니",
+      "years": 9
+    },
+    {
+      "class_number": "42181701",
+      "name": "심전도기",
+      "years": 11
+    },
+    {
+      "class_number": "42181712",
+      "name": "심전도장치분석기",
+      "years": 9
+    },
+    {
+      "class_number": "42181720",
+      "name": "부하심전도장치",
+      "years": 10
+    },
+    {
+      "class_number": "42181722",
+      "name": "맥파분석기",
+      "years": 10
+    },
+    {
+      "class_number": "42181795",
+      "name": "심박수계또는맥박수계",
+      "years": 8
+    },
+    {
+      "class_number": "42181801",
+      "name": "산소포화도측정기유닛",
+      "years": 8
+    },
+    {
+      "class_number": "42181904",
+      "name": "멀티파라미터바이탈사인장치또는액세서리",
+      "years": 10
+    },
+    {
+      "class_number": "42182005",
+      "name": "검안경,이경또는검안검이경세트",
+      "years": 10
+    },
+    {
+      "class_number": "42182299",
+      "name": "적외선체온계",
+      "years": 4
+    },
+    {
+      "class_number": "42182310",
+      "name": "근전도기",
+      "years": 8
+    },
+    {
+      "class_number": "42182314",
+      "name": "의료용바이오피드백장치",
+      "years": 10
+    },
+    {
+      "class_number": "42182401",
+      "name": "청력계또는액세서리",
+      "years": 9
+    },
+    {
+      "class_number": "42182705",
+      "name": "체성분분석기",
+      "years": 11
+    },
+    {
+      "class_number": "42182803",
+      "name": "범용병상또는테이블체중계",
+      "years": 10
+    },
+    {
+      "class_number": "42183015",
+      "name": "안과용세극등",
+      "years": 8
+    },
+    {
+      "class_number": "42183029",
+      "name": "종합굴절검사기",
+      "years": 9
+    },
+    {
+      "class_number": "42191602",
+      "name": "수술실조명또는액세서리",
+      "years": 9
+    },
+    {
+      "class_number": "42191807",
+      "name": "범용간호침상또는액세서리",
+      "years": 9
+    },
+    {
+      "class_number": "42191907",
+      "name": "의료기구보관용캐비닛또는장",
+      "years": 10
+    },
+    {
+      "class_number": "42192001",
+      "name": "범용검진또는시술용테이블",
+      "years": 9
+    },
+    {
+      "class_number": "42192201",
+      "name": "환자운반차또는액세서리",
+      "years": 10
+    },
+    {
+      "class_number": "42192209",
+      "name": "휠체어경사로",
+      "years": 10
+    },
+    {
+      "class_number": "42192210",
+      "name": "휠체어",
+      "years": 10
+    },
+    {
+      "class_number": "42192404",
+      "name": "의료용카트또는액세서리",
+      "years": 10
+    },
+    {
+      "class_number": "42192602",
+      "name": "약,알약분배기또는액세서리",
+      "years": 8
+    },
+    {
+      "class_number": "42199098",
+      "name": "혈액냉동고",
+      "years": 11
+    },
+    {
+      "class_number": "42199099",
+      "name": "혈액.약품냉장고",
+      "years": 10
+    },
+    {
+      "class_number": "42201601",
+      "name": "MRI고정설치용장치",
+      "years": 8
+    },
+    {
+      "class_number": "42201712",
+      "name": "일반진단의료용초음파장치,도플러장치,펄스반사장치또는 초음파검사장치",
+      "years": 11
+    },
+    {
+      "class_number": "42201799",
+      "name": "초음파뇌조영장치",
+      "years": 10
+    },
+    {
+      "class_number": "42201804",
+      "name": "의료용C암방사선기기",
+      "years": 9
+    },
+    {
+      "class_number": "42201817",
+      "name": "방사선골밀도측정기",
+      "years": 9
+    },
+    {
+      "class_number": "42201898",
+      "name": "이동형엑스선촬영장치",
+      "years": 11
+    },
+    {
+      "class_number": "42201899",
+      "name": "디지털진단용엑스선촬영장치",
+      "years": 10
+    },
+    {
+      "class_number": "42201903",
+      "name": "의료용방사선필름판독기",
+      "years": 10
+    },
+    {
+      "class_number": "42203301",
+      "name": "무고정틀정위방사선치료장치",
+      "years": 9
+    },
+    {
+      "class_number": "42203702",
+      "name": "의료영상용습식암실또는명실현상기",
+      "years": 10
+    },
+    {
+      "class_number": "42203705",
+      "name": "의료영상건식레이저프린터또는영상표시기",
+      "years": 9
+    },
+    {
+      "class_number": "42211503",
+      "name": "자세교정기",
+      "years": 8
+    },
+    {
+      "class_number": "42211702",
+      "name": "장애인용점자장치",
+      "years": 9
+    },
+    {
+      "class_number": "42211705",
+      "name": "장애인용보청기",
+      "years": 5
+    },
+    {
+      "class_number": "42211797",
+      "name": "약시인용확대장치",
+      "years": 9
+    },
+    {
+      "class_number": "42222001",
+      "name": "범용정맥주입펌프",
+      "years": 10
+    },
+    {
+      "class_number": "42251502",
+      "name": "인지수동기민성지각감각평가또는검사제품",
+      "years": 11
+    },
+    {
+      "class_number": "42251603",
+      "name": "지속수동운동(CPM)장치또는액세서리",
+      "years": 8
+    },
+    {
+      "class_number": "42251605",
+      "name": "재활또는치료용페달운동",
+      "years": 10
+    },
+    {
+      "class_number": "42251616",
+      "name": "재활또는치료용전기진동기",
+      "years": 8
+    },
+    {
+      "class_number": "42251698",
+      "name": "범용전기진동기",
+      "years": 8
+    },
+    {
+      "class_number": "42261509",
+      "name": "부검용해부키트",
+      "years": 9
+    },
+    {
+      "class_number": "42261806",
+      "name": "시신냉동고",
+      "years": 8
+    },
+    {
+      "class_number": "42271602",
+      "name": "호흡측정기,그액세서리또는용품",
+      "years": 10
+    },
+    {
+      "class_number": "42271605",
+      "name": "폐기능계량기",
+      "years": 10
+    },
+    {
+      "class_number": "42271612",
+      "name": "폐가스분석기또는감시기",
+      "years": 8
+    },
+    {
+      "class_number": "42271703",
+      "name": "산소혼합기",
+      "years": 8
+    },
+    {
+      "class_number": "42272209",
+      "name": "인공호흡기또는호흡회로",
+      "years": 10
+    },
+    {
+      "class_number": "42272501",
+      "name": "가스마취기",
+      "years": 8
+    },
+    {
+      "class_number": "42281501",
+      "name": "화학멸균기또는가스멸균기",
+      "years": 9
+    },
+    {
+      "class_number": "42281503",
+      "name": "필터멸균기",
+      "years": 9
+    },
+    {
+      "class_number": "42281508",
+      "name": "고압증기멸균기또는소독기",
+      "years": 11
+    },
+    {
+      "class_number": "42281531",
+      "name": "의료용자외선소독기",
+      "years": 9
+    },
+    {
+      "class_number": "42281596",
+      "name": "고압멸균기",
+      "years": 12
+    },
+    {
+      "class_number": "42281712",
+      "name": "초음파세척기",
+      "years": 12
+    },
+    {
+      "class_number": "42291601",
+      "name": "레이저수술용메스,나이프또는나이프핸들",
+      "years": 8
+    },
+    {
+      "class_number": "42291612",
+      "name": "수술용골겸자",
+      "years": 8
+    },
+    {
+      "class_number": "42295104",
+      "name": "전기수술,전기소작기기,액세서리또는관련제품",
+      "years": 7
+    },
+    {
+      "class_number": "42295112",
+      "name": "수술실용시술대,액세서리또는관련제품",
+      "years": 10
+    },
+    {
+      "class_number": "42301502",
+      "name": "의학교육또는실습용마네킹",
+      "years": 10
+    },
+    {
+      "class_number": "42301504",
+      "name": "의학교육또는실습키트",
+      "years": 10
+    },
+    {
+      "class_number": "43191501",
+      "name": "휴대전화기",
+      "years": 4
+    },
+    {
+      "class_number": "43191504",
+      "name": "유선전화기",
+      "years": 8
+    },
+    {
+      "class_number": "43191508",
+      "name": "디지털전화기",
+      "years": 9
+    },
+    {
+      "class_number": "43191510",
+      "name": "양방향라디오",
+      "years": 9
+    },
+    {
+      "class_number": "43191511",
+      "name": "IP전화기",
+      "years": 7
+    },
+    {
+      "class_number": "43191513",
+      "name": "화상전화기",
+      "years": 6
+    },
+    {
+      "class_number": "43191514",
+      "name": "위성전화기",
+      "years": 8
+    },
+    {
+      "class_number": "43191516",
+      "name": "키폰주장치",
+      "years": 11
+    },
+    {
+      "class_number": "43191633",
+      "name": "키폰전화기",
+      "years": 8
+    },
+    {
+      "class_number": "43191634",
+      "name": "키폰주장치용확장보드",
+      "years": 8
+    },
+    {
+      "class_number": "43201402",
+      "name": "메모리모듈카드",
+      "years": 7
+    },
+    {
+      "class_number": "43201404",
+      "name": "네트워크인터페이스카드",
+      "years": 8
+    },
+    {
+      "class_number": "43201407",
+      "name": "주변기기제어카드",
+      "years": 5
+    },
+    {
+      "class_number": "43201414",
+      "name": "하드디스크보안장치",
+      "years": 7
+    },
+    {
+      "class_number": "43201416",
+      "name": "데이터수집보드",
+      "years": 8
+    },
+    {
+      "class_number": "43201417",
+      "name": "멀티미디어용통합형보드",
+      "years": 8
+    },
+    {
+      "class_number": "43201503",
+      "name": "중앙처리장치",
+      "years": 8
+    },
+    {
+      "class_number": "43201513",
+      "name": "주기판마더보드",
+      "years": 8
+    },
+    {
+      "class_number": "43201531",
+      "name": "비디오캡처보드",
+      "years": 8
+    },
+    {
+      "class_number": "43201537",
+      "name": "프린트서버",
+      "years": 8
+    },
+    {
+      "class_number": "43201540",
+      "name": "채널변환기",
+      "years": 10
+    },
+    {
+      "class_number": "43201552",
+      "name": "하드웨어전화통신어댑터",
+      "years": 7
+    },
+    {
+      "class_number": "43201553",
+      "name": "송수신기및미디어컨버터",
+      "years": 8
+    },
+    {
+      "class_number": "43201557",
+      "name": "레이드컨트롤러",
+      "years": 7
+    },
+    {
+      "class_number": "43201614",
+      "name": "콘솔익스텐더",
+      "years": 8
+    },
+    {
+      "class_number": "43201801",
+      "name": "플로피디스크드라이브",
+      "years": 8
+    },
+    {
+      "class_number": "43201802",
+      "name": "하드디스크어레이",
+      "years": 6
+    },
+    {
+      "class_number": "43201803",
+      "name": "하드디스크드라이브",
+      "years": 6
+    },
+    {
+      "class_number": "43201807",
+      "name": "테이프드라이브",
+      "years": 8
+    },
+    {
+      "class_number": "43201814",
+      "name": "전자미디어또는데이터복사기",
+      "years": 7
+    },
+    {
+      "class_number": "43201817",
+      "name": "CD드라이브",
+      "years": 7
+    },
+    {
+      "class_number": "43201818",
+      "name": "DVD드라이브",
+      "years": 8
+    },
+    {
+      "class_number": "43201826",
+      "name": "광디스크어레이",
+      "years": 6
+    },
+    {
+      "class_number": "43201827",
+      "name": "휴대용하드디스크저장장치",
+      "years": 5
+    },
+    {
+      "class_number": "43201830",
+      "name": "SSD저장장치",
+      "years": 6
+    },
+    {
+      "class_number": "43201832",
+      "name": "주크박스",
+      "years": 8
+    },
+    {
+      "class_number": "43201833",
+      "name": "디지털아날로그변환기",
+      "years": 10
+    },
+    {
+      "class_number": "43201903",
+      "name": "테이프드라이브라이브러리",
+      "years": 6
+    },
+    {
+      "class_number": "43201999",
+      "name": "하드디스크파기장치",
+      "years": 6
+    },
+    {
+      "class_number": "43202002",
+      "name": "공테이프",
+      "years": 6
+    },
+    {
+      "class_number": "43202005",
+      "name": "플래시메모리저장장치",
+      "years": 7
+    },
+    {
+      "class_number": "43211501",
+      "name": "컴퓨터서버",
+      "years": 6
+    },
+    {
+      "class_number": "43211503",
+      "name": "노트북컴퓨터",
+      "years": 6
+    },
+    {
+      "class_number": "43211504",
+      "name": "PDA또는오거나이저",
+      "years": 8
+    },
+    {
+      "class_number": "43211505",
+      "name": "POS터미널",
+      "years": 6
+    },
+    {
+      "class_number": "43211506",
+      "name": "신클라이언트컴퓨터",
+      "years": 7
+    },
+    {
+      "class_number": "43211507",
+      "name": "데스크톱컴퓨터",
+      "years": 5
+    },
+    {
+      "class_number": "43211509",
+      "name": "태블릿컴퓨터",
+      "years": 5
+    },
+    {
+      "class_number": "43211510",
+      "name": "메인프레임콘솔또는단순단말기",
+      "years": 9
+    },
+    {
+      "class_number": "43211512",
+      "name": "메인프레임컴퓨터",
+      "years": 6
+    },
+    {
+      "class_number": "43211514",
+      "name": "컴퓨터키오스크",
+      "years": 6
+    },
+    {
+      "class_number": "43211593",
+      "name": "일체형컴퓨터",
+      "years": 6
+    },
+    {
+      "class_number": "43211594",
+      "name": "특수목적컴퓨터",
+      "years": 5
+    },
+    {
+      "class_number": "43211595",
+      "name": "멀티스크린컴퓨터",
+      "years": 6
+    },
+    {
+      "class_number": "43211596",
+      "name": "베어본컴퓨터",
+      "years": 5
+    },
+    {
+      "class_number": "43211598",
+      "name": "아날로그컴퓨터",
+      "years": 5
+    },
+    {
+      "class_number": "43211606",
+      "name": "멀티미디어키트",
+      "years": 7
+    },
+    {
+      "class_number": "43211608",
+      "name": "엔코더디코더장비",
+      "years": 10
+    },
+    {
+      "class_number": "43211699",
+      "name": "신호처리기",
+      "years": 8
+    },
+    {
+      "class_number": "43211702",
+      "name": "자기띠판독기및부호기",
+      "years": 8
+    },
+    {
+      "class_number": "43211706",
+      "name": "키보드",
+      "years": 6
+    },
+    {
+      "class_number": "43211710",
+      "name": "무선주파수식별장치",
+      "years": 8
+    },
+    {
+      "class_number": "43211711",
+      "name": "스캐너",
+      "years": 6
+    },
+    {
+      "class_number": "43211712",
+      "name": "그래픽태블릿",
+      "years": 7
+    },
+    {
+      "class_number": "43211713",
+      "name": "터치패드",
+      "years": 6
+    },
+    {
+      "class_number": "43211714",
+      "name": "생체인식장비",
+      "years": 8
+    },
+    {
+      "class_number": "43211717",
+      "name": "광학문자판독장치",
+      "years": 10
+    },
+    {
+      "class_number": "43211723",
+      "name": "전자투표또는개표기",
+      "years": 8
+    },
+    {
+      "class_number": "43211728",
+      "name": "스마트카드단말기",
+      "years": 8
+    },
+    {
+      "class_number": "43211729",
+      "name": "광학마크판독기",
+      "years": 10
+    },
+    {
+      "class_number": "43211797",
+      "name": "도서관리시스템",
+      "years": 10
+    },
+    {
+      "class_number": "43211798",
+      "name": "자료수집장치",
+      "years": 10
+    },
+    {
+      "class_number": "43211799",
+      "name": "화상분석시스템",
+      "years": 8
+    },
+    {
+      "class_number": "43211901",
+      "name": "CRT모니터",
+      "years": 7
+    },
+    {
+      "class_number": "43211902",
+      "name": "LCD패널또는모니터",
+      "years": 5
+    },
+    {
+      "class_number": "43211903",
+      "name": "터치스크린모니터",
+      "years": 7
+    },
+    {
+      "class_number": "43211906",
+      "name": "문자디스플레이",
+      "years": 6
+    },
+    {
+      "class_number": "43212102",
+      "name": "도트매트릭스프린터",
+      "years": 7
+    },
+    {
+      "class_number": "43212104",
+      "name": "잉크젯프린터",
+      "years": 5
+    },
+    {
+      "class_number": "43212105",
+      "name": "레이저프린터",
+      "years": 6
+    },
+    {
+      "class_number": "43212107",
+      "name": "플로터프린터",
+      "years": 8
+    },
+    {
+      "class_number": "43212110",
+      "name": "다기능프린터",
+      "years": 6
+    },
+    {
+      "class_number": "43212114",
+      "name": "디지털이미지프린터",
+      "years": 7
+    },
+    {
+      "class_number": "43212115",
+      "name": "바코드프린터",
+      "years": 6
+    },
+    {
+      "class_number": "43212116",
+      "name": "무선인식태그발행기",
+      "years": 7
+    },
+    {
+      "class_number": "43212199",
+      "name": "프린터제어기",
+      "years": 7
+    },
+    {
+      "class_number": "43221501",
+      "name": "자동안내장치",
+      "years": 9
+    },
+    {
+      "class_number": "43221504",
+      "name": "구내교환시스템(PBX)",
+      "years": 11
+    },
+    {
+      "class_number": "43221521",
+      "name": "원격접속장치",
+      "years": 9
+    },
+    {
+      "class_number": "43221525",
+      "name": "인터콤시스템",
+      "years": 8
+    },
+    {
+      "class_number": "43221527",
+      "name": "도청방지기",
+      "years": 8
+    },
+    {
+      "class_number": "43221706",
+      "name": "라디오안테나",
+      "years": 10
+    },
+    {
+      "class_number": "43221711",
+      "name": "위성접속장비",
+      "years": 7
+    },
+    {
+      "class_number": "43221721",
+      "name": "무선데이터통신장비",
+      "years": 9
+    },
+    {
+      "class_number": "43221727",
+      "name": "안테나주변기기",
+      "years": 10
+    },
+    {
+      "class_number": "43221728",
+      "name": "레이돔",
+      "years": 9
+    },
+    {
+      "class_number": "43221729",
+      "name": "휴대용안테나",
+      "years": 9
+    },
+    {
+      "class_number": "43221731",
+      "name": "수중통신장비",
+      "years": 8
+    },
+    {
+      "class_number": "43221788",
+      "name": "분배기",
+      "years": 7
+    },
+    {
+      "class_number": "43221797",
+      "name": "유선송신기또는수신기",
+      "years": 7
+    },
+    {
+      "class_number": "43221810",
+      "name": "광다중화장치",
+      "years": 6
+    },
+    {
+      "class_number": "43221896",
+      "name": "광송신기또는수신기",
+      "years": 5
+    },
+    {
+      "class_number": "43221897",
+      "name": "적외선통신장비",
+      "years": 10
+    },
+    {
+      "class_number": "43222501",
+      "name": "방화벽장치",
+      "years": 5
+    },
+    {
+      "class_number": "43222605",
+      "name": "네트워크게이트웨이",
+      "years": 6
+    },
+    {
+      "class_number": "43222607",
+      "name": "캐시엔진장비",
+      "years": 6
+    },
+    {
+      "class_number": "43222609",
+      "name": "네트워크라우터",
+      "years": 8
+    },
+    {
+      "class_number": "43222610",
+      "name": "네트워크서비스집중장치또는허브",
+      "years": 7
+    },
+    {
+      "class_number": "43222611",
+      "name": "네트워크채널또는데이터서비스유닛",
+      "years": 7
+    },
+    {
+      "class_number": "43222612",
+      "name": "네트워크스위치",
+      "years": 6
+    },
+    {
+      "class_number": "43222615",
+      "name": "SAN스위치",
+      "years": 6
+    },
+    {
+      "class_number": "43222619",
+      "name": "비디오네트워킹장비",
+      "years": 5
+    },
+    {
+      "class_number": "43222622",
+      "name": "서버로드밸런서",
+      "years": 5
+    },
+    {
+      "class_number": "43222628",
+      "name": "모뎀",
+      "years": 6
+    },
+    {
+      "class_number": "43222640",
+      "name": "무선랜액세스포인트",
+      "years": 8
+    },
+    {
+      "class_number": "43222642",
+      "name": "라우팅스위쳐",
+      "years": 8
+    },
+    {
+      "class_number": "43222643",
+      "name": "케이블네트워크테스터",
+      "years": 9
+    },
+    {
+      "class_number": "43222644",
+      "name": "네트워크트래픽제어장치",
+      "years": 5
+    },
+    {
+      "class_number": "43222695",
+      "name": "다중통신장비",
+      "years": 9
+    },
+    {
+      "class_number": "43222696",
+      "name": "동보장치",
+      "years": 8
+    },
+    {
+      "class_number": "43222704",
+      "name": "전신교환기",
+      "years": 8
+    },
+    {
+      "class_number": "43222805",
+      "name": "구내교환장비",
+      "years": 11
+    },
+    {
+      "class_number": "43222817",
+      "name": "통신용중계기",
+      "years": 9
+    },
+    {
+      "class_number": "43222818",
+      "name": "배선반",
+      "years": 9
+    },
+    {
+      "class_number": "43222822",
+      "name": "시분할다중화장치",
+      "years": 8
+    },
+    {
+      "class_number": "43222826",
+      "name": "반송단국장치",
+      "years": 11
+    },
+    {
+      "class_number": "43222827",
+      "name": "다중장치",
+      "years": 8
+    },
+    {
+      "class_number": "43222903",
+      "name": "통신용탑",
+      "years": 10
+    },
+    {
+      "class_number": "43223308",
+      "name": "네트워크시스템장비용랙",
+      "years": 9
+    },
+    {
+      "class_number": "43232614",
+      "name": "캐드캠시스템",
+      "years": 7
+    },
+    {
+      "class_number": "44101501",
+      "name": "복사기",
+      "years": 6
+    },
+    {
+      "class_number": "44101503",
+      "name": "다기능복사기",
+      "years": 6
+    },
+    {
+      "class_number": "44101510",
+      "name": "기상FAX",
+      "years": 6
+    },
+    {
+      "class_number": "44101599",
+      "name": "팩스기기",
+      "years": 7
+    },
+    {
+      "class_number": "44101601",
+      "name": "종이절단기및보조용품",
+      "years": 11
+    },
+    {
+      "class_number": "44101602",
+      "name": "종이펀칭기또는바인딩기",
+      "years": 11
+    },
+    {
+      "class_number": "44101603",
+      "name": "문서세단기및보조용품",
+      "years": 12
+    },
+    {
+      "class_number": "44101703",
+      "name": "듀플렉서장치",
+      "years": 6
+    },
+    {
+      "class_number": "44101705",
+      "name": "사무기기트레이또는지급장치",
+      "years": 8
+    },
+    {
+      "class_number": "44101716",
+      "name": "천공기",
+      "years": 10
+    },
+    {
+      "class_number": "44101730",
+      "name": "문서자동분류장치",
+      "years": 7
+    },
+    {
+      "class_number": "44101902",
+      "name": "수표발행기",
+      "years": 12
+    },
+    {
+      "class_number": "44102103",
+      "name": "우편물봉합기",
+      "years": 9
+    },
+    {
+      "class_number": "44102105",
+      "name": "수인인명인쇄기",
+      "years": 8
+    },
+    {
+      "class_number": "44102304",
+      "name": "봉인기계",
+      "years": 8
+    },
+    {
+      "class_number": "44102306",
+      "name": "결속기계",
+      "years": 10
+    },
+    {
+      "class_number": "44102403",
+      "name": "카드인쇄기",
+      "years": 8
+    },
+    {
+      "class_number": "44102405",
+      "name": "표지출력기계",
+      "years": 9
+    },
+    {
+      "class_number": "44102501",
+      "name": "지폐계수기",
+      "years": 10
+    },
+    {
+      "class_number": "44102602",
+      "name": "타자기",
+      "years": 9
+    },
+    {
+      "class_number": "44102604",
+      "name": "속기기계",
+      "years": 6
+    },
+    {
+      "class_number": "44102801",
+      "name": "래미네이터",
+      "years": 10
+    },
+    {
+      "class_number": "44102805",
+      "name": "제본천공기",
+      "years": 10
+    },
+    {
+      "class_number": "44111502",
+      "name": "서류정리케이스",
+      "years": 9
+    },
+    {
+      "class_number": "44111512",
+      "name": "책꽂이",
+      "years": 9
+    },
+    {
+      "class_number": "44111515",
+      "name": "서류상자또는서류함",
+      "years": 9
+    },
+    {
+      "class_number": "44111816",
+      "name": "도화기",
+      "years": 12
+    },
+    {
+      "class_number": "44111891",
+      "name": "제도판",
+      "years": 11
+    },
+    {
+      "class_number": "44111893",
+      "name": "면적계",
+      "years": 11
+    },
+    {
+      "class_number": "44111895",
+      "name": "제도기",
+      "years": 11
+    },
+    {
+      "class_number": "44111901",
+      "name": "일정기록판및액세서리",
+      "years": 11
+    },
+    {
+      "class_number": "44111902",
+      "name": "전자복사칠판및액세서리",
+      "years": 9
+    },
+    {
+      "class_number": "44111905",
+      "name": "화이트보드",
+      "years": 10
+    },
+    {
+      "class_number": "44111906",
+      "name": "칠판또는액세서리",
+      "years": 10
+    },
+    {
+      "class_number": "44111907",
+      "name": "게시판또는액세서리",
+      "years": 9
+    },
+    {
+      "class_number": "44111911",
+      "name": "인터랙티브화이트보드및액세서리",
+      "years": 8
+    },
+    {
+      "class_number": "44121511",
+      "name": "우편함",
+      "years": 11
+    },
+    {
+      "class_number": "44121611",
+      "name": "제지용펀치",
+      "years": 11
+    },
+    {
+      "class_number": "44121623",
+      "name": "기계식편지개봉기",
+      "years": 7
+    },
+    {
+      "class_number": "45101502",
+      "name": "오프셋인쇄기",
+      "years": 11
+    },
+    {
+      "class_number": "45101504",
+      "name": "평판인쇄기",
+      "years": 12
+    },
+    {
+      "class_number": "45101506",
+      "name": "스크린인쇄기",
+      "years": 11
+    },
+    {
+      "class_number": "45101507",
+      "name": "인쇄기",
+      "years": 11
+    },
+    {
+      "class_number": "45101802",
+      "name": "제본용재단기",
+      "years": 11
+    },
+    {
+      "class_number": "45101804",
+      "name": "제본기",
+      "years": 11
+    },
+    {
+      "class_number": "45101806",
+      "name": "정합기",
+      "years": 13
+    },
+    {
+      "class_number": "45101902",
+      "name": "제판기",
+      "years": 12
+    },
+    {
+      "class_number": "45111603",
+      "name": "영사용스크린",
+      "years": 10
+    },
+    {
+      "class_number": "45111604",
+      "name": "슬라이드용프로젝터",
+      "years": 11
+    },
+    {
+      "class_number": "45111607",
+      "name": "오버헤드프로젝터",
+      "years": 11
+    },
+    {
+      "class_number": "45111608",
+      "name": "영화용영사기",
+      "years": 12
+    },
+    {
+      "class_number": "45111610",
+      "name": "실물환등기",
+      "years": 12
+    },
+    {
+      "class_number": "45111616",
+      "name": "비디오프로젝터",
+      "years": 9
+    },
+    {
+      "class_number": "45111620",
+      "name": "슬라이드복사기",
+      "years": 10
+    },
+    {
+      "class_number": "45111697",
+      "name": "영사대",
+      "years": 10
+    },
+    {
+      "class_number": "45111705",
+      "name": "구내방송장치",
+      "years": 12
+    },
+    {
+      "class_number": "45111706",
+      "name": "오디오믹서,증폭기결합",
+      "years": 9
+    },
+    {
+      "class_number": "45111707",
+      "name": "오디오장비커넥터및스테이지박스",
+      "years": 9
+    },
+    {
+      "class_number": "45111712",
+      "name": "테이프복사기",
+      "years": 8
+    },
+    {
+      "class_number": "45111713",
+      "name": "음향분배증폭기",
+      "years": 10
+    },
+    {
+      "class_number": "45111714",
+      "name": "오디오AD변환기",
+      "years": 9
+    },
+    {
+      "class_number": "45111716",
+      "name": "디지털오디오편집기",
+      "years": 8
+    },
+    {
+      "class_number": "45111721",
+      "name": "릴테잎녹음기",
+      "years": 11
+    },
+    {
+      "class_number": "45111722",
+      "name": "카세트덱",
+      "years": 11
+    },
+    {
+      "class_number": "45111723",
+      "name": "하드디스크레코더",
+      "years": 7
+    },
+    {
+      "class_number": "45111765",
+      "name": "스피커제어유닛",
+      "years": 10
+    },
+    {
+      "class_number": "45111766",
+      "name": "구내방송제어기기",
+      "years": 10
+    },
+    {
+      "class_number": "45111767",
+      "name": "리모트앰프",
+      "years": 11
+    },
+    {
+      "class_number": "45111775",
+      "name": "음향합성기",
+      "years": 10
+    },
+    {
+      "class_number": "45111784",
+      "name": "오디오모니터",
+      "years": 9
+    },
+    {
+      "class_number": "45111802",
+      "name": "텔레비전거치대",
+      "years": 7
+    },
+    {
+      "class_number": "45111803",
+      "name": "스캔컨버터",
+      "years": 7
+    },
+    {
+      "class_number": "45111805",
+      "name": "비디오편집기",
+      "years": 11
+    },
+    {
+      "class_number": "45111810",
+      "name": "실물화상기",
+      "years": 10
+    },
+    {
+      "class_number": "45111811",
+      "name": "영상모니터",
+      "years": 8
+    },
+    {
+      "class_number": "45111814",
+      "name": "디지털영상효과기",
+      "years": 9
+    },
+    {
+      "class_number": "45111815",
+      "name": "오디오비디오콘솔",
+      "years": 8
+    },
+    {
+      "class_number": "45111816",
+      "name": "로고발생기",
+      "years": 8
+    },
+    {
+      "class_number": "45111817",
+      "name": "방송용문자발생기",
+      "years": 9
+    },
+    {
+      "class_number": "45111819",
+      "name": "비디오믹서",
+      "years": 9
+    },
+    {
+      "class_number": "45111820",
+      "name": "비디오프로세싱앰프",
+      "years": 8
+    },
+    {
+      "class_number": "45111821",
+      "name": "동기신호발생기",
+      "years": 8
+    },
+    {
+      "class_number": "45111826",
+      "name": "MPEG엔코더",
+      "years": 8
+    },
+    {
+      "class_number": "45111828",
+      "name": "프롬프터",
+      "years": 6
+    },
+    {
+      "class_number": "45111893",
+      "name": "영상정보디스플레이장치",
+      "years": 7
+    },
+    {
+      "class_number": "45111902",
+      "name": "영상회의시스템",
+      "years": 6
+    },
+    {
+      "class_number": "45112002",
+      "name": "마이크로필름리더프린터",
+      "years": 6
+    },
+    {
+      "class_number": "45112099",
+      "name": "디지털식필름판독기",
+      "years": 11
+    },
+    {
+      "class_number": "45121501",
+      "name": "스틸카메라",
+      "years": 11
+    },
+    {
+      "class_number": "45121504",
+      "name": "디지털카메라",
+      "years": 8
+    },
+    {
+      "class_number": "45121505",
+      "name": "영화촬영용카메라",
+      "years": 12
+    },
+    {
+      "class_number": "45121510",
+      "name": "항공카메라",
+      "years": 9
+    },
+    {
+      "class_number": "45121511",
+      "name": "고속카메라",
+      "years": 8
+    },
+    {
+      "class_number": "45121512",
+      "name": "수중카메라",
+      "years": 7
+    },
+    {
+      "class_number": "45121514",
+      "name": "복사용카메라",
+      "years": 9
+    },
+    {
+      "class_number": "45121516",
+      "name": "디지털캠코더또는비디오카메라",
+      "years": 9
+    },
+    {
+      "class_number": "45121520",
+      "name": "웹카메라",
+      "years": 6
+    },
+    {
+      "class_number": "45121522",
+      "name": "적외선카메라",
+      "years": 9
+    },
+    {
+      "class_number": "45121523",
+      "name": "천체사진기",
+      "years": 9
+    },
+    {
+      "class_number": "45121595",
+      "name": "디지털이미지촬영기",
+      "years": 9
+    },
+    {
+      "class_number": "45121601",
+      "name": "카메라플래시또는광원",
+      "years": 10
+    },
+    {
+      "class_number": "45121602",
+      "name": "카메라삼각대",
+      "years": 9
+    },
+    {
+      "class_number": "45121603",
+      "name": "카메라용렌즈또는카메라용필터",
+      "years": 9
+    },
+    {
+      "class_number": "45121607",
+      "name": "카메라설치대또는지지대",
+      "years": 10
+    },
+    {
+      "class_number": "45121608",
+      "name": "카메라조립부품",
+      "years": 10
+    },
+    {
+      "class_number": "45121609",
+      "name": "카메라받침대",
+      "years": 9
+    },
+    {
+      "class_number": "45121612",
+      "name": "카메라테이블",
+      "years": 10
+    },
+    {
+      "class_number": "45121613",
+      "name": "카메라덮개또는커버",
+      "years": 9
+    },
+    {
+      "class_number": "45121623",
+      "name": "카메라컨트롤러",
+      "years": 9
+    },
+    {
+      "class_number": "45121697",
+      "name": "반사경",
+      "years": 9
+    },
+    {
+      "class_number": "45121701",
+      "name": "필름건조기",
+      "years": 10
+    },
+    {
+      "class_number": "45121704",
+      "name": "필름편집기",
+      "years": 10
+    },
+    {
+      "class_number": "45121705",
+      "name": "사진확대기",
+      "years": 11
+    },
+    {
+      "class_number": "45121709",
+      "name": "자동필름현상기",
+      "years": 10
+    },
+    {
+      "class_number": "45121714",
+      "name": "필름리더",
+      "years": 6
+    },
+    {
+      "class_number": "45121801",
+      "name": "마이크로필름카메라",
+      "years": 11
+    },
+    {
+      "class_number": "45131701",
+      "name": "슬라이드트레이",
+      "years": 9
+    },
+    {
+      "class_number": "45141693",
+      "name": "인화기구",
+      "years": 10
+    },
+    {
+      "class_number": "46111702",
+      "name": "적외선탐지기",
+      "years": 7
+    },
+    {
+      "class_number": "46111703",
+      "name": "적외선방사기",
+      "years": 10
+    },
+    {
+      "class_number": "46111705",
+      "name": "적외선망원경",
+      "years": 8
+    },
+    {
+      "class_number": "46151501",
+      "name": "바리케이드",
+      "years": 9
+    },
+    {
+      "class_number": "46151503",
+      "name": "방패",
+      "years": 8
+    },
+    {
+      "class_number": "46151604",
+      "name": "음주측정기",
+      "years": 6
+    },
+    {
+      "class_number": "46151605",
+      "name": "무기또는폭발물탐지기",
+      "years": 10
+    },
+    {
+      "class_number": "46151609",
+      "name": "신분증판독기",
+      "years": 9
+    },
+    {
+      "class_number": "46151699",
+      "name": "컴퓨터순찰관리시스템",
+      "years": 6
+    },
+    {
+      "class_number": "46151706",
+      "name": "잠재지문프린트키트",
+      "years": 8
+    },
+    {
+      "class_number": "46151711",
+      "name": "족흔적채취기",
+      "years": 9
+    },
+    {
+      "class_number": "46151715",
+      "name": "지문인식장비",
+      "years": 7
+    },
+    {
+      "class_number": "46151716",
+      "name": "거짓말탐지기",
+      "years": 9
+    },
+    {
+      "class_number": "46151797",
+      "name": "수사용감식기구",
+      "years": 9
+    },
+    {
+      "class_number": "46161503",
+      "name": "선박신호장비",
+      "years": 5
+    },
+    {
+      "class_number": "46161504",
+      "name": "교통신호등",
+      "years": 7
+    },
+    {
+      "class_number": "46161516",
+      "name": "차량번호판독기",
+      "years": 6
+    },
+    {
+      "class_number": "46161526",
+      "name": "보행자감지기",
+      "years": 9
+    },
+    {
+      "class_number": "46161579",
+      "name": "교통관제시스템",
+      "years": 7
+    },
+    {
+      "class_number": "46161581",
+      "name": "교통량측정기",
+      "years": 8
+    },
+    {
+      "class_number": "46161588",
+      "name": "선박신호조명",
+      "years": 6
+    },
+    {
+      "class_number": "46161702",
+      "name": "구조용에어백",
+      "years": 10
+    },
+    {
+      "class_number": "46161705",
+      "name": "유압구조장비세트",
+      "years": 8
+    },
+    {
+      "class_number": "46161706",
+      "name": "에어텐트",
+      "years": 9
+    },
+    {
+      "class_number": "46161708",
+      "name": "구조망",
+      "years": 7
+    },
+    {
+      "class_number": "46161793",
+      "name": "구조용조명등",
+      "years": 6
+    },
+    {
+      "class_number": "46171506",
+      "name": "금고",
+      "years": 10
+    },
+    {
+      "class_number": "46171603",
+      "name": "시간기록계",
+      "years": 10
+    },
+    {
+      "class_number": "46171604",
+      "name": "경보장치",
+      "years": 8
+    },
+    {
+      "class_number": "46171610",
+      "name": "보안용카메라",
+      "years": 6
+    },
+    {
+      "class_number": "46171612",
+      "name": "비디오모니터",
+      "years": 6
+    },
+    {
+      "class_number": "46171613",
+      "name": "가스경보기",
+      "years": 8
+    },
+    {
+      "class_number": "46171616",
+      "name": "레이더탐지기",
+      "years": 7
+    },
+    {
+      "class_number": "46171619",
+      "name": "출입통제시스템",
+      "years": 8
+    },
+    {
+      "class_number": "46171621",
+      "name": "감시용녹화기또는녹음기",
+      "years": 6
+    },
+    {
+      "class_number": "46171622",
+      "name": "영상감시장치",
+      "years": 6
+    },
+    {
+      "class_number": "46171624",
+      "name": "엑스레이화물검색기",
+      "years": 8
+    },
+    {
+      "class_number": "46171625",
+      "name": "무선국운영감시기",
+      "years": 9
+    },
+    {
+      "class_number": "46171626",
+      "name": "야간투시경",
+      "years": 9
+    },
+    {
+      "class_number": "46171630",
+      "name": "수위고저용경보기",
+      "years": 7
+    },
+    {
+      "class_number": "46171634",
+      "name": "탐지지",
+      "years": 8
+    },
+    {
+      "class_number": "46171635",
+      "name": "화학작용제탐지기",
+      "years": 9
+    },
+    {
+      "class_number": "46171636",
+      "name": "모사전송기용보안장비",
+      "years": 7
+    },
+    {
+      "class_number": "46171669",
+      "name": "비대면방역장비",
+      "years": 8
+    },
+    {
+      "class_number": "46171673",
+      "name": "영상분배기",
+      "years": 5
+    },
+    {
+      "class_number": "46171678",
+      "name": "감청장비",
+      "years": 8
+    },
+    {
+      "class_number": "46171681",
+      "name": "도난방지기",
+      "years": 7
+    },
+    {
+      "class_number": "46171685",
+      "name": "무인교통감시장치",
+      "years": 6
+    },
+    {
+      "class_number": "46171687",
+      "name": "보안용금속탐지기",
+      "years": 8
+    },
+    {
+      "class_number": "46171694",
+      "name": "영상신호보상기",
+      "years": 7
+    },
+    {
+      "class_number": "46181502",
+      "name": "방탄조끼",
+      "years": 8
+    },
+    {
+      "class_number": "46181509",
+      "name": "유해물질방어의류",
+      "years": 6
+    },
+    {
+      "class_number": "46181518",
+      "name": "방열복",
+      "years": 8
+    },
+    {
+      "class_number": "46181528",
+      "name": "안전용덧옷",
+      "years": 6
+    },
+    {
+      "class_number": "46181704",
+      "name": "안전헬멧",
+      "years": 4
+    },
+    {
+      "class_number": "46182003",
+      "name": "가스마스크",
+      "years": 6
+    },
+    {
+      "class_number": "46182004",
+      "name": "산소호흡기또는보조용품",
+      "years": 7
+    },
+    {
+      "class_number": "46182099",
+      "name": "방독면,정화장치누출시험기",
+      "years": 6
+    },
+    {
+      "class_number": "46182401",
+      "name": "오염제거기",
+      "years": 9
+    },
+    {
+      "class_number": "46182497",
+      "name": "책소독기",
+      "years": 7
+    },
+    {
+      "class_number": "46182599",
+      "name": "호신장비",
+      "years": 6
+    },
+    {
+      "class_number": "46191502",
+      "name": "열감지기",
+      "years": 6
+    },
+    {
+      "class_number": "46191510",
+      "name": "열상관측장비",
+      "years": 8
+    },
+    {
+      "class_number": "46191601",
+      "name": "소화용기구",
+      "years": 8
+    },
+    {
+      "class_number": "46191607",
+      "name": "소방용호흡기구",
+      "years": 6
+    },
+    {
+      "class_number": "46191612",
+      "name": "등짐펌프",
+      "years": 8
+    },
+    {
+      "class_number": "46191616",
+      "name": "헬리콥타용소화물통",
+      "years": 7
+    },
+    {
+      "class_number": "46191621",
+      "name": "소화장비보관함",
+      "years": 4
+    },
+    {
+      "class_number": "46191683",
+      "name": "소방용펌프",
+      "years": 7
+    },
+    {
+      "class_number": "46201001",
+      "name": "구조실습용마네킹",
+      "years": 7
+    },
+    {
+      "class_number": "47101505",
+      "name": "염소처리장비",
+      "years": 5
+    },
+    {
+      "class_number": "47101511",
+      "name": "이온교환장치",
+      "years": 11
+    },
+    {
+      "class_number": "47101512",
+      "name": "혼합기및교반기",
+      "years": 11
+    },
+    {
+      "class_number": "47101513",
+      "name": "산소발생기",
+      "years": 8
+    },
+    {
+      "class_number": "47101514",
+      "name": "소형정수장치",
+      "years": 10
+    },
+    {
+      "class_number": "47101516",
+      "name": "탁도계",
+      "years": 12
+    },
+    {
+      "class_number": "47101517",
+      "name": "자외선살균기",
+      "years": 9
+    },
+    {
+      "class_number": "47101521",
+      "name": "한외여과장치",
+      "years": 10
+    },
+    {
+      "class_number": "47101525",
+      "name": "탈수및배수장치",
+      "years": 11
+    },
+    {
+      "class_number": "47101529",
+      "name": "소각로",
+      "years": 10
+    },
+    {
+      "class_number": "47101536",
+      "name": "슬러지수집기",
+      "years": 13
+    },
+    {
+      "class_number": "47111502",
+      "name": "업소용세탁기",
+      "years": 9
+    },
+    {
+      "class_number": "47111503",
+      "name": "세탁물건조기",
+      "years": 7
+    },
+    {
+      "class_number": "47111597",
+      "name": "세탁물탈수기",
+      "years": 8
+    },
+    {
+      "class_number": "47111599",
+      "name": "스포팅기",
+      "years": 7
+    },
+    {
+      "class_number": "47121602",
+      "name": "진공청소기",
+      "years": 7
+    },
+    {
+      "class_number": "47121603",
+      "name": "바닥광택기",
+      "years": 5
+    },
+    {
+      "class_number": "47121604",
+      "name": "건습식진공청소기",
+      "years": 7
+    },
+    {
+      "class_number": "47121605",
+      "name": "습식바닥청소기",
+      "years": 8
+    },
+    {
+      "class_number": "47121610",
+      "name": "바닥청소기",
+      "years": 5
+    },
+    {
+      "class_number": "47121612",
+      "name": "건식바닥청소기",
+      "years": 7
+    },
+    {
+      "class_number": "47121697",
+      "name": "우산빗물제거기",
+      "years": 7
+    },
+    {
+      "class_number": "47121702",
+      "name": "쓰레기통또는쓰레기통라이너",
+      "years": 9
+    },
+    {
+      "class_number": "47121805",
+      "name": "압력또는증기청소기",
+      "years": 8
+    },
+    {
+      "class_number": "47131707",
+      "name": "핸드드라이어",
+      "years": 9
+    },
+    {
+      "class_number": "48101505",
+      "name": "상업용커피메이커및아이스티메이커",
+      "years": 6
+    },
+    {
+      "class_number": "48101509",
+      "name": "상업용튀김요리기구",
+      "years": 8
+    },
+    {
+      "class_number": "48101510",
+      "name": "상업용식품온장고",
+      "years": 8
+    },
+    {
+      "class_number": "48101511",
+      "name": "상업용그리들",
+      "years": 8
+    },
+    {
+      "class_number": "48101517",
+      "name": "상업용오븐",
+      "years": 8
+    },
+    {
+      "class_number": "48101521",
+      "name": "상업용레인지",
+      "years": 9
+    },
+    {
+      "class_number": "48101524",
+      "name": "상업용찜통",
+      "years": 7
+    },
+    {
+      "class_number": "48101529",
+      "name": "압력조리기구또는압력튀김기",
+      "years": 7
+    },
+    {
+      "class_number": "48101530",
+      "name": "상업용밥솥",
+      "years": 8
+    },
+    {
+      "class_number": "48101546",
+      "name": "탕약기계",
+      "years": 7
+    },
+    {
+      "class_number": "48101595",
+      "name": "만능조리기",
+      "years": 8
+    },
+    {
+      "class_number": "48101601",
+      "name": "상업용혼합기",
+      "years": 9
+    },
+    {
+      "class_number": "48101607",
+      "name": "상업용주서기",
+      "years": 8
+    },
+    {
+      "class_number": "48101608",
+      "name": "상업용믹서기",
+      "years": 7
+    },
+    {
+      "class_number": "48101610",
+      "name": "상업용필러",
+      "years": 9
+    },
+    {
+      "class_number": "48101615",
+      "name": "상업용식기세척기",
+      "years": 8
+    },
+    {
+      "class_number": "48101710",
+      "name": "음수기",
+      "years": 6
+    },
+    {
+      "class_number": "48101711",
+      "name": "냉온수기",
+      "years": 7
+    },
+    {
+      "class_number": "48101714",
+      "name": "온수제조기",
+      "years": 6
+    },
+    {
+      "class_number": "48101799",
+      "name": "정수기",
+      "years": 7
+    },
+    {
+      "class_number": "48101809",
+      "name": "상업용곰솥또는국솥",
+      "years": 7
+    },
+    {
+      "class_number": "48101818",
+      "name": "주방기구소독기",
+      "years": 6
+    },
+    {
+      "class_number": "48101819",
+      "name": "손소독기",
+      "years": 5
+    },
+    {
+      "class_number": "48101894",
+      "name": "음식쓰레기처리대",
+      "years": 9
+    },
+    {
+      "class_number": "48101896",
+      "name": "상업용주방후드",
+      "years": 9
+    },
+    {
+      "class_number": "48101898",
+      "name": "살균수제조장치",
+      "years": 8
+    },
+    {
+      "class_number": "48101915",
+      "name": "상업용서빙트레이",
+      "years": 11
+    },
+    {
+      "class_number": "48102095",
+      "name": "상업용조리대",
+      "years": 9
+    },
+    {
+      "class_number": "48102096",
+      "name": "상업용싱크대",
+      "years": 10
+    },
+    {
+      "class_number": "48102097",
+      "name": "배식대",
+      "years": 8
+    },
+    {
+      "class_number": "48102098",
+      "name": "식기및컵회수차",
+      "years": 8
+    },
+    {
+      "class_number": "48102099",
+      "name": "주방기기용받침대",
+      "years": 10
+    },
+    {
+      "class_number": "48102103",
+      "name": "냉장진열장",
+      "years": 12
+    },
+    {
+      "class_number": "48102199",
+      "name": "냉동시스템",
+      "years": 10
+    },
+    {
+      "class_number": "48111001",
+      "name": "컵음료자판기",
+      "years": 11
+    },
+    {
+      "class_number": "48111109",
+      "name": "자동구두광택기",
+      "years": 6
+    },
+    {
+      "class_number": "48111301",
+      "name": "티켓발급기",
+      "years": 10
+    },
+    {
+      "class_number": "48111391",
+      "name": "대기자호출시스템",
+      "years": 8
+    },
+    {
+      "class_number": "49121503",
+      "name": "텐트",
+      "years": 10
+    },
+    {
+      "class_number": "49121603",
+      "name": "캠핑용간이침대",
+      "years": 8
+    },
+    {
+      "class_number": "49141501",
+      "name": "부력조절기",
+      "years": 6
+    },
+    {
+      "class_number": "49141506",
+      "name": "습식잠수복",
+      "years": 6
+    },
+    {
+      "class_number": "49141508",
+      "name": "구명총",
+      "years": 8
+    },
+    {
+      "class_number": "49141510",
+      "name": "잠수기",
+      "years": 5
+    },
+    {
+      "class_number": "49141605",
+      "name": "서프보드",
+      "years": 8
+    },
+    {
+      "class_number": "49141699",
+      "name": "수상오토바이",
+      "years": 6
+    },
+    {
+      "class_number": "49151502",
+      "name": "스키",
+      "years": 10
+    },
+    {
+      "class_number": "49161508",
+      "name": "투구기",
+      "years": 10
+    },
+    {
+      "class_number": "49171501",
+      "name": "체조용바또는빔",
+      "years": 10
+    },
+    {
+      "class_number": "49171508",
+      "name": "구름판",
+      "years": 10
+    },
+    {
+      "class_number": "49181501",
+      "name": "당구대",
+      "years": 9
+    },
+    {
+      "class_number": "49181507",
+      "name": "탁구대",
+      "years": 10
+    },
+    {
+      "class_number": "49181698",
+      "name": "사격총",
+      "years": 7
+    },
+    {
+      "class_number": "49201501",
+      "name": "트레드밀",
+      "years": 9
+    },
+    {
+      "class_number": "49201502",
+      "name": "스태퍼",
+      "years": 9
+    },
+    {
+      "class_number": "49201504",
+      "name": "로잉머신",
+      "years": 11
+    },
+    {
+      "class_number": "49201517",
+      "name": "거꾸리",
+      "years": 9
+    },
+    {
+      "class_number": "49201596",
+      "name": "워킹머신",
+      "years": 8
+    },
+    {
+      "class_number": "49201602",
+      "name": "바벨",
+      "years": 12
+    },
+    {
+      "class_number": "49201603",
+      "name": "하체근력강화기",
+      "years": 9
+    },
+    {
+      "class_number": "49201604",
+      "name": "체력단련기구진열대",
+      "years": 9
+    },
+    {
+      "class_number": "49201605",
+      "name": "상체근력강화기",
+      "years": 8
+    },
+    {
+      "class_number": "49201611",
+      "name": "종합운동기구",
+      "years": 11
+    },
+    {
+      "class_number": "49201697",
+      "name": "야외운동기구",
+      "years": 5
+    },
+    {
+      "class_number": "49211603",
+      "name": "골프클럽",
+      "years": 9
+    },
+    {
+      "class_number": "49211609",
+      "name": "골프퍼팅연습장치",
+      "years": 10
+    },
+    {
+      "class_number": "49211807",
+      "name": "체육측정용도구",
+      "years": 9
+    },
+    {
+      "class_number": "49211808",
+      "name": "지방측정용도구",
+      "years": 10
+    },
+    {
+      "class_number": "49211809",
+      "name": "신체측정용도구",
+      "years": 10
+    },
+    {
+      "class_number": "49211811",
+      "name": "에르고미터",
+      "years": 10
+    },
+    {
+      "class_number": "49211812",
+      "name": "몸통굴절측정기",
+      "years": 10
+    },
+    {
+      "class_number": "49211814",
+      "name": "피로도측정기",
+      "years": 9
+    },
+    {
+      "class_number": "49211815",
+      "name": "전신반응측정기",
+      "years": 11
+    },
+    {
+      "class_number": "49211817",
+      "name": "근력측정기",
+      "years": 9
+    },
+    {
+      "class_number": "49211819",
+      "name": "동작분석기",
+      "years": 10
+    },
+    {
+      "class_number": "49211823",
+      "name": "인체측정기",
+      "years": 11
+    },
+    {
+      "class_number": "49211831",
+      "name": "윗몸일으키기측정기",
+      "years": 9
+    },
+    {
+      "class_number": "49211833",
+      "name": "심폐지구력측정기",
+      "years": 7
+    },
+    {
+      "class_number": "49211890",
+      "name": "종합체력진단장비",
+      "years": 8
+    },
+    {
+      "class_number": "49221502",
+      "name": "골대",
+      "years": 12
+    },
+    {
+      "class_number": "49221503",
+      "name": "헤드기어를제외한안전용품",
+      "years": 7
+    },
+    {
+      "class_number": "49221506",
+      "name": "운동용매트또는패딩",
+      "years": 9
+    },
+    {
+      "class_number": "49221518",
+      "name": "네트용지주",
+      "years": 11
+    },
+    {
+      "class_number": "49221521",
+      "name": "운동기구운반차",
+      "years": 7
+    },
+    {
+      "class_number": "49221582",
+      "name": "기타운동경기용구",
+      "years": 10
+    },
+    {
+      "class_number": "49221584",
+      "name": "농구대",
+      "years": 12
+    },
+    {
+      "class_number": "49241511",
+      "name": "퍼걸러",
+      "years": 9
+    },
+    {
+      "class_number": "52131501",
+      "name": "커튼",
+      "years": 5
+    },
+    {
+      "class_number": "52131602",
+      "name": "롤업셰이드",
+      "years": 4
+    },
+    {
+      "class_number": "52141502",
+      "name": "가정용전자레인지",
+      "years": 7
+    },
+    {
+      "class_number": "52141503",
+      "name": "가정용음식물쓰레기처리기",
+      "years": 7
+    },
+    {
+      "class_number": "52141504",
+      "name": "가정용레인지",
+      "years": 7
+    },
+    {
+      "class_number": "52141505",
+      "name": "가정용식기세척기",
+      "years": 8
+    },
+    {
+      "class_number": "52141525",
+      "name": "가정용전기레인지",
+      "years": 7
+    },
+    {
+      "class_number": "52141553",
+      "name": "전기밥솥",
+      "years": 7
+    },
+    {
+      "class_number": "52141554",
+      "name": "김치냉장고",
+      "years": 9
+    },
+    {
+      "class_number": "52141601",
+      "name": "가정용세탁기",
+      "years": 7
+    },
+    {
+      "class_number": "52141604",
+      "name": "신발건조기",
+      "years": 7
+    },
+    {
+      "class_number": "52141612",
+      "name": "세탁용탈수기",
+      "years": 7
+    },
+    {
+      "class_number": "52141614",
+      "name": "세탁건조기",
+      "years": 7
+    },
+    {
+      "class_number": "52141801",
+      "name": "가정용재봉기",
+      "years": 13
+    },
+    {
+      "class_number": "52141804",
+      "name": "선풍기",
+      "years": 6
+    },
+    {
+      "class_number": "52151650",
+      "name": "가정용싱크대",
+      "years": 10
+    },
+    {
+      "class_number": "52152202",
+      "name": "식기건조대",
+      "years": 11
+    },
+    {
+      "class_number": "52152204",
+      "name": "가정용조리대",
+      "years": 8
+    },
+    {
+      "class_number": "52161505",
+      "name": "텔레비전",
+      "years": 9
+    },
+    {
+      "class_number": "52161509",
+      "name": "휴대용음향기기",
+      "years": 8
+    },
+    {
+      "class_number": "52161510",
+      "name": "홈스테레오시스템또는홈시어터시스템",
+      "years": 9
+    },
+    {
+      "class_number": "52161512",
+      "name": "스피커",
+      "years": 10
+    },
+    {
+      "class_number": "52161513",
+      "name": "일체형텔레비전비디오카세트레코더",
+      "years": 11
+    },
+    {
+      "class_number": "52161514",
+      "name": "헤드폰",
+      "years": 5
+    },
+    {
+      "class_number": "52161515",
+      "name": "콤팩트디스크재생또는녹음기",
+      "years": 9
+    },
+    {
+      "class_number": "52161517",
+      "name": "이퀄라이저",
+      "years": 8
+    },
+    {
+      "class_number": "52161518",
+      "name": "GPS수신기",
+      "years": 9
+    },
+    {
+      "class_number": "52161520",
+      "name": "마이크로폰",
+      "years": 10
+    },
+    {
+      "class_number": "52161521",
+      "name": "멀티미디어수신기",
+      "years": 10
+    },
+    {
+      "class_number": "52161522",
+      "name": "고주파스캐너",
+      "years": 12
+    },
+    {
+      "class_number": "52161526",
+      "name": "위성수신기",
+      "years": 8
+    },
+    {
+      "class_number": "52161529",
+      "name": "비디오카세트플레이어또는레코더",
+      "years": 12
+    },
+    {
+      "class_number": "52161532",
+      "name": "음악반주기",
+      "years": 8
+    },
+    {
+      "class_number": "52161533",
+      "name": "메가폰",
+      "years": 8
+    },
+    {
+      "class_number": "52161535",
+      "name": "디지털보이스레코더",
+      "years": 7
+    },
+    {
+      "class_number": "52161536",
+      "name": "MD플레이어또는레코더",
+      "years": 8
+    },
+    {
+      "class_number": "52161537",
+      "name": "자기저장매체삭제기",
+      "years": 9
+    },
+    {
+      "class_number": "52161539",
+      "name": "일체형DVD,비디오,CD플레이어",
+      "years": 7
+    },
+    {
+      "class_number": "52161540",
+      "name": "비디오스위쳐",
+      "years": 8
+    },
+    {
+      "class_number": "52161543",
+      "name": "휴대용MP3플레이어",
+      "years": 7
+    },
+    {
+      "class_number": "52161545",
+      "name": "디지털비디오레코더",
+      "years": 7
+    },
+    {
+      "class_number": "52161547",
+      "name": "오디오앰프",
+      "years": 10
+    },
+    {
+      "class_number": "52161550",
+      "name": "개인용비디오녹화기PVR",
+      "years": 8
+    },
+    {
+      "class_number": "52161551",
+      "name": "무선마이크장치",
+      "years": 9
+    },
+    {
+      "class_number": "52161555",
+      "name": "포터블멀티미디어플레이어",
+      "years": 5
+    },
+    {
+      "class_number": "52161611",
+      "name": "마이크스탠드",
+      "years": 8
+    },
+    {
+      "class_number": "53131702",
+      "name": "마사지기",
+      "years": 7
+    },
+    {
+      "class_number": "55121718",
+      "name": "안내판",
+      "years": 8
+    },
+    {
+      "class_number": "55121903",
+      "name": "전광판",
+      "years": 9
+    },
+    {
+      "class_number": "55121904",
+      "name": "광고판",
+      "years": 9
+    },
+    {
+      "class_number": "55121908",
+      "name": "간판대또는스탠드",
+      "years": 10
+    },
+    {
+      "class_number": "56101502",
+      "name": "소파",
+      "years": 8
+    },
+    {
+      "class_number": "56101507",
+      "name": "책장",
+      "years": 9
+    },
+    {
+      "class_number": "56101508",
+      "name": "매트리스",
+      "years": 7
+    },
+    {
+      "class_number": "56101515",
+      "name": "침대",
+      "years": 9
+    },
+    {
+      "class_number": "56101516",
+      "name": "장롱",
+      "years": 11
+    },
+    {
+      "class_number": "56101519",
+      "name": "응접탁자",
+      "years": 10
+    },
+    {
+      "class_number": "56101520",
+      "name": "로커",
+      "years": 10
+    },
+    {
+      "class_number": "56101529",
+      "name": "잡지꽂이",
+      "years": 10
+    },
+    {
+      "class_number": "56101530",
+      "name": "캐비닛",
+      "years": 7
+    },
+    {
+      "class_number": "56101531",
+      "name": "신발장",
+      "years": 8
+    },
+    {
+      "class_number": "56101537",
+      "name": "화장대",
+      "years": 9
+    },
+    {
+      "class_number": "56101538",
+      "name": "찬장",
+      "years": 10
+    },
+    {
+      "class_number": "56101542",
+      "name": "접이식의자",
+      "years": 9
+    },
+    {
+      "class_number": "56101543",
+      "name": "식탁",
+      "years": 8
+    },
+    {
+      "class_number": "56101544",
+      "name": "거울",
+      "years": 9
+    },
+    {
+      "class_number": "56101588",
+      "name": "텔레비전보관장및받침대",
+      "years": 10
+    },
+    {
+      "class_number": "56101592",
+      "name": "청소도구함",
+      "years": 10
+    },
+    {
+      "class_number": "56101597",
+      "name": "서랍형수납장",
+      "years": 8
+    },
+    {
+      "class_number": "56101601",
+      "name": "파라솔",
+      "years": 6
+    },
+    {
+      "class_number": "56101603",
+      "name": "옥외용탁자",
+      "years": 9
+    },
+    {
+      "class_number": "56101605",
+      "name": "옥외용벤치",
+      "years": 9
+    },
+    {
+      "class_number": "56101606",
+      "name": "화분대",
+      "years": 9
+    },
+    {
+      "class_number": "56101701",
+      "name": "크레덴자",
+      "years": 11
+    },
+    {
+      "class_number": "56101702",
+      "name": "파일링캐비닛또는액세서리",
+      "years": 11
+    },
+    {
+      "class_number": "56101703",
+      "name": "책상",
+      "years": 9
+    },
+    {
+      "class_number": "56101705",
+      "name": "유리진열장",
+      "years": 9
+    },
+    {
+      "class_number": "56101706",
+      "name": "회의용탁자",
+      "years": 10
+    },
+    {
+      "class_number": "56101708",
+      "name": "이동형파일서랍",
+      "years": 9
+    },
+    {
+      "class_number": "56101715",
+      "name": "우편물분류함또는정리함",
+      "years": 11
+    },
+    {
+      "class_number": "56101791",
+      "name": "신문걸이대",
+      "years": 13
+    },
+    {
+      "class_number": "56101793",
+      "name": "보조책상",
+      "years": 9
+    },
+    {
+      "class_number": "56101795",
+      "name": "거치형높이조절책상",
+      "years": 9
+    },
+    {
+      "class_number": "56111601",
+      "name": "패널시스템용칸막이",
+      "years": 8
+    },
+    {
+      "class_number": "56111902",
+      "name": "산업용작업대",
+      "years": 12
+    },
+    {
+      "class_number": "56111997",
+      "name": "이발용의자",
+      "years": 11
+    },
+    {
+      "class_number": "56112101",
+      "name": "강당,경기장용의자또는특수목적의자",
+      "years": 10
+    },
+    {
+      "class_number": "56112102",
+      "name": "작업용의자",
+      "years": 7
+    },
+    {
+      "class_number": "56112105",
+      "name": "라운지용의자",
+      "years": 9
+    },
+    {
+      "class_number": "56112106",
+      "name": "스툴의자",
+      "years": 10
+    },
+    {
+      "class_number": "56112108",
+      "name": "책상용콤비의자",
+      "years": 11
+    },
+    {
+      "class_number": "56112109",
+      "name": "벤치",
+      "years": 10
+    },
+    {
+      "class_number": "56121001",
+      "name": "책운반기",
+      "years": 10
+    },
+    {
+      "class_number": "56121002",
+      "name": "카운터",
+      "years": 10
+    },
+    {
+      "class_number": "56121004",
+      "name": "카드함",
+      "years": 10
+    },
+    {
+      "class_number": "56121007",
+      "name": "공용테이블",
+      "years": 10
+    },
+    {
+      "class_number": "56121009",
+      "name": "경사진열람대",
+      "years": 11
+    },
+    {
+      "class_number": "56121011",
+      "name": "도서관CD또는카세트진열대",
+      "years": 10
+    },
+    {
+      "class_number": "56121099",
+      "name": "이동식서가",
+      "years": 10
+    },
+    {
+      "class_number": "56121402",
+      "name": "이동식스툴테이블",
+      "years": 9
+    },
+    {
+      "class_number": "56121501",
+      "name": "실습대",
+      "years": 12
+    },
+    {
+      "class_number": "56121505",
+      "name": "수강용탁자",
+      "years": 9
+    },
+    {
+      "class_number": "56121507",
+      "name": "칸막이형열람대",
+      "years": 10
+    },
+    {
+      "class_number": "56121508",
+      "name": "컴퓨터책상",
+      "years": 9
+    },
+    {
+      "class_number": "56121597",
+      "name": "교단",
+      "years": 10
+    },
+    {
+      "class_number": "56121598",
+      "name": "교탁",
+      "years": 11
+    },
+    {
+      "class_number": "56121699",
+      "name": "유아용탁자",
+      "years": 11
+    },
+    {
+      "class_number": "56121798",
+      "name": "칠판보조장",
+      "years": 8
+    },
+    {
+      "class_number": "56121804",
+      "name": "강연대",
+      "years": 10
+    },
+    {
+      "class_number": "56121902",
+      "name": "전시용진열대",
+      "years": 11
+    },
+    {
+      "class_number": "56121903",
+      "name": "수장고용수납장",
+      "years": 10
+    },
+    {
+      "class_number": "56122001",
+      "name": "실험대",
+      "years": 12
+    },
+    {
+      "class_number": "56122002",
+      "name": "실험실용보관장또는보조용품",
+      "years": 12
+    },
+    {
+      "class_number": "56122004",
+      "name": "실험실용싱크대",
+      "years": 10
+    },
+    {
+      "class_number": "60102798",
+      "name": "지각운동학습기구",
+      "years": 8
+    },
+    {
+      "class_number": "60103799",
+      "name": "어학실습실기자재",
+      "years": 10
+    },
+    {
+      "class_number": "60103915",
+      "name": "해부키트또는용품",
+      "years": 10
+    },
+    {
+      "class_number": "60104489",
+      "name": "자연대류및복사실험장치",
+      "years": 12
+    },
+    {
+      "class_number": "60104509",
+      "name": "연료전지",
+      "years": 8
+    },
+    {
+      "class_number": "60104604",
+      "name": "경사로실험장치",
+      "years": 9
+    },
+    {
+      "class_number": "60104605",
+      "name": "마찰실험장치",
+      "years": 12
+    },
+    {
+      "class_number": "60104607",
+      "name": "진자기",
+      "years": 12
+    },
+    {
+      "class_number": "60104615",
+      "name": "역학활주대",
+      "years": 12
+    },
+    {
+      "class_number": "60104691",
+      "name": "힘의평형실험장치",
+      "years": 11
+    },
+    {
+      "class_number": "60104699",
+      "name": "역학실험장치",
+      "years": 13
+    },
+    {
+      "class_number": "60104718",
+      "name": "원심펌프실험장치",
+      "years": 11
+    },
+    {
+      "class_number": "60104721",
+      "name": "관성능률실험장치",
+      "years": 11
+    },
+    {
+      "class_number": "60104775",
+      "name": "열펌프실험장치",
+      "years": 10
+    },
+    {
+      "class_number": "60104777",
+      "name": "냉동기실험장치",
+      "years": 11
+    },
+    {
+      "class_number": "60104780",
+      "name": "공기조화실험장치",
+      "years": 11
+    },
+    {
+      "class_number": "60104787",
+      "name": "유압제어실험장치",
+      "years": 11
+    },
+    {
+      "class_number": "60104796",
+      "name": "기초물리실험장치",
+      "years": 9
+    },
+    {
+      "class_number": "60104798",
+      "name": "신재생에너지실험장치",
+      "years": 11
+    },
+    {
+      "class_number": "60104807",
+      "name": "공명장치",
+      "years": 10
+    },
+    {
+      "class_number": "60104809",
+      "name": "파동장치",
+      "years": 12
+    },
+    {
+      "class_number": "60104810",
+      "name": "분광기",
+      "years": 12
+    },
+    {
+      "class_number": "60104811",
+      "name": "스펙트럼차트",
+      "years": 9
+    },
+    {
+      "class_number": "60104815",
+      "name": "반사및굴절장치",
+      "years": 10
+    },
+    {
+      "class_number": "60104817",
+      "name": "수파투영장치",
+      "years": 10
+    },
+    {
+      "class_number": "60104824",
+      "name": "파동광학실험장치",
+      "years": 12
+    },
+    {
+      "class_number": "60104825",
+      "name": "홀로그래피시험장치",
+      "years": 11
+    },
+    {
+      "class_number": "60104903",
+      "name": "정전기키트",
+      "years": 10
+    },
+    {
+      "class_number": "60104905",
+      "name": "전기데모용보드",
+      "years": 9
+    },
+    {
+      "class_number": "60104907",
+      "name": "휴대용발전기",
+      "years": 7
+    },
+    {
+      "class_number": "60104908",
+      "name": "전자기장치",
+      "years": 11
+    },
+    {
+      "class_number": "60104909",
+      "name": "자기장치",
+      "years": 11
+    },
+    {
+      "class_number": "60104910",
+      "name": "전자석",
+      "years": 9
+    },
+    {
+      "class_number": "60104923",
+      "name": "방전자",
+      "years": 6
+    },
+    {
+      "class_number": "60104924",
+      "name": "패러데이(Faraday)의법칙실험장치",
+      "years": 9
+    },
+    {
+      "class_number": "60104926",
+      "name": "홀(Hall)효과실험장치",
+      "years": 9
+    },
+    {
+      "class_number": "60104988",
+      "name": "전기자시험장치",
+      "years": 12
+    },
+    {
+      "class_number": "60104994",
+      "name": "전동기/발전기원리실험장치",
+      "years": 10
+    },
+    {
+      "class_number": "60105099",
+      "name": "핵물리학실험도구",
+      "years": 7
+    },
+    {
+      "class_number": "60105910",
+      "name": "유아시뮬레이터및보조품",
+      "years": 10
+    },
+    {
+      "class_number": "60106101",
+      "name": "자동차교육관련자료",
+      "years": 10
+    },
+    {
+      "class_number": "60106104",
+      "name": "전기전자교육자료",
+      "years": 11
+    },
+    {
+      "class_number": "60106208",
+      "name": "의료교육자료",
+      "years": 11
+    },
+    {
+      "class_number": "60106299",
+      "name": "공정제어실험장치",
+      "years": 11
+    },
+    {
+      "class_number": "60106402",
+      "name": "전자공학교육용품",
+      "years": 12
+    },
+    {
+      "class_number": "60106498",
+      "name": "회로실험장치",
+      "years": 12
+    },
+    {
+      "class_number": "60106499",
+      "name": "컴퓨터실험장치",
+      "years": 11
+    },
+    {
+      "class_number": "60106608",
+      "name": "협응동작반응검사기",
+      "years": 10
+    },
+    {
+      "class_number": "60109399",
+      "name": "멀티미디어학습시스템",
+      "years": 10
+    },
+    {
+      "class_number": "60109797",
+      "name": "모의소총",
+      "years": 10
+    },
+    {
+      "class_number": "60109798",
+      "name": "사격장비",
+      "years": 8
+    },
+    {
+      "class_number": "60109899",
+      "name": "실물모형및전시물",
+      "years": 6
+    },
+    {
+      "class_number": "60109999",
+      "name": "교육훈련장비",
+      "years": 12
+    },
+    {
+      "class_number": "60111106",
+      "name": "다용도게시판세트",
+      "years": 10
+    },
+    {
+      "class_number": "60121402",
+      "name": "우드섹션액자(額子)",
+      "years": 10
+    },
+    {
+      "class_number": "60124306",
+      "name": "도예용물레",
+      "years": 11
+    },
+    {
+      "class_number": "60131001",
+      "name": "피아노",
+      "years": 13
+    },
+    {
+      "class_number": "60131003",
+      "name": "오르간",
+      "years": 13
+    },
+    {
+      "class_number": "60131006",
+      "name": "신시사이저",
+      "years": 12
+    },
+    {
+      "class_number": "60131099",
+      "name": "디지털피아노",
+      "years": 12
+    },
+    {
+      "class_number": "60131101",
+      "name": "트럼펫",
+      "years": 10
+    },
+    {
+      "class_number": "60131102",
+      "name": "트럼본",
+      "years": 10
+    },
+    {
+      "class_number": "60131104",
+      "name": "색소폰",
+      "years": 10
+    },
+    {
+      "class_number": "60131108",
+      "name": "프렌치호른",
+      "years": 9
+    },
+    {
+      "class_number": "60131114",
+      "name": "튜바",
+      "years": 9
+    },
+    {
+      "class_number": "60131201",
+      "name": "클라리넷",
+      "years": 10
+    },
+    {
+      "class_number": "60131211",
+      "name": "대금(大芩)",
+      "years": 8
+    },
+    {
+      "class_number": "60131303",
+      "name": "기타(Guitar)",
+      "years": 9
+    },
+    {
+      "class_number": "60131310",
+      "name": "가야금",
+      "years": 10
+    },
+    {
+      "class_number": "60131311",
+      "name": "거문고",
+      "years": 10
+    },
+    {
+      "class_number": "60131312",
+      "name": "아쟁(牙箏)",
+      "years": 10
+    },
+    {
+      "class_number": "60131319",
+      "name": "해금(奚金)",
+      "years": 8
+    },
+    {
+      "class_number": "60131322",
+      "name": "양금(洋琴)",
+      "years": 9
+    },
+    {
+      "class_number": "60131397",
+      "name": "콘트라베이스",
+      "years": 9
+    },
+    {
+      "class_number": "60131405",
+      "name": "서양북",
+      "years": 10
+    },
+    {
+      "class_number": "60131406",
+      "name": "실로폰",
+      "years": 9
+    },
+    {
+      "class_number": "60131411",
+      "name": "북",
+      "years": 8
+    },
+    {
+      "class_number": "60131444",
+      "name": "팀파니",
+      "years": 9
+    },
+    {
+      "class_number": "60131448",
+      "name": "마림바",
+      "years": 10
+    },
+    {
+      "class_number": "60131699",
+      "name": "드럼세트",
+      "years": 9
+    },
+    {
+      "class_number": "60141104",
+      "name": "비디오게임기",
+      "years": 7
+    },
+    {
+      "class_number": "60141195",
+      "name": "가상현실(VR)장치",
+      "years": 7
+    },
+    {
+      "class_number": "25101501",
+      "name": "미니버스",
+      "years": 9,
+      "group": "vehicle",
+      "note": "※ 차량의 내용연수는 주행거리 20만km를 초과하여 운행한 차량은 1년, 주행거리 30만km를 초과하여 운행한 차량은 2년을 단축하여 적용할 수 있다."
+    },
+    {
+      "class_number": "25101502",
+      "name": "버스",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101503",
+      "name": "승용자동차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101505",
+      "name": "미니밴또는밴",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101507",
+      "name": "스포츠유틸리티차량",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101509",
+      "name": "전기승용자동차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101513",
+      "name": "수소승용자동차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101514",
+      "name": "수소스포츠유틸리티차량",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101515",
+      "name": "수소미니밴또는밴",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101516",
+      "name": "수소버스",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101517",
+      "name": "수소미니버스",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101518",
+      "name": "전기스포츠유틸리티차량",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101519",
+      "name": "전기미니밴또는밴",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101520",
+      "name": "전기버스",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101521",
+      "name": "전기미니버스",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101601",
+      "name": "덤프트럭",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101611",
+      "name": "화물트럭",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101616",
+      "name": "수소덤프트럭",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101617",
+      "name": "수소화물트럭",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101618",
+      "name": "전기덤프트럭",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101698",
+      "name": "전기화물트럭",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101703",
+      "name": "구급차",
+      "years": 7,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101789",
+      "name": "소방펌프차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101790",
+      "name": "소방물탱크차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101791",
+      "name": "소방화학차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101792",
+      "name": "소방사다리차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101793",
+      "name": "구조공작차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101801",
+      "name": "모터사이클",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101802",
+      "name": "스쿠터",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101898",
+      "name": "전기이륜차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101901",
+      "name": "농업용트랙터",
+      "years": 12,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101904",
+      "name": "골프카트",
+      "years": 10,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101918",
+      "name": "저속전기자동차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101924",
+      "name": "가드레일청소차",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101926",
+      "name": "제설차",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101963",
+      "name": "노면청소차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101975",
+      "name": "중계차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101976",
+      "name": "진압차",
+      "years": 10,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101977",
+      "name": "크레인붙이트럭",
+      "years": 10,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101980",
+      "name": "다목적운반차",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101981",
+      "name": "분무기탑재차",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101984",
+      "name": "도로관리용차량",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101986",
+      "name": "견인트럭",
+      "years": 8,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101990",
+      "name": "쓰레기수거용트럭",
+      "years": 9,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101991",
+      "name": "유개트럭",
+      "years": 10,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101992",
+      "name": "유조트럭",
+      "years": 10,
+      "group": "vehicle"
+    },
+    {
+      "class_number": "25101994",
+      "name": "탱크트럭",
+      "years": 10,
+      "group": "vehicle"
+    }
+  ]
+}

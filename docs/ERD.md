@@ -112,7 +112,7 @@ erDiagram
 | tags | string[] | |
 | imageUrl | string? | |
 | purchaseDate | string? | ISO date (UI: 도입일) |
-| usefulLifeYears | number? | 내용연한(년). 만료 예정일 = purchaseDate + years |
+| usefulLifeYears | number? | 내용연한(년). 만료 예정일 = purchaseDate + years. 조달청 시드(`app/data/pps_useful_life.json`)는 제안만, 수락 전에는 쓰지 않음 |
 | budgetProgram | string? | 구입 사업명 (자유 입력) |
 | budgetYear | number? | YYYY |
 | notes | string? | |
