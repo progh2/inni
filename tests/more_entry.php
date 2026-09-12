@@ -29,6 +29,7 @@ check(str_contains($more, "App::url('items')"), '재료·품목 목록 must link
 check(substr_count($more, "App::url('items')") === 1, 'More must not duplicate the items browse link');
 check(str_contains($more, '기자재 현황'), 'More menu must expose 기자재 현황');
 check(str_contains($more, "App::url('assets')"), '기자재 현황 must link to assets');
+check(substr_count($more, "App::url('assets')") === 1, 'More must not duplicate the assets board link');
 check(!str_contains($more, "App::url('search')"), 'More must not replace the search tab');
 
 check(preg_match("/\\\$tabs = \\[\\s*\\['home', '홈'\\],\\s*\\['search', '찾기'\\],\\s*\\['scan', '스캔'\\],\\s*\\['rooms', '실'\\],\\s*\\['more', '더보기'\\],\\s*\\];/", $layout) === 1, 'Bottom nav stays 홈/찾기/스캔/실/더보기');
@@ -50,10 +51,11 @@ check(str_contains($itemsTpl, '<h1>품목 목록</h1>'), 'items/index.php keeps 
 check(str_contains($itemsTpl, 'name="type"') && str_contains($itemsTpl, 'name="low_stock"'), 'items/index.php keeps type and low-stock filters');
 check(!str_contains($itemsTpl, '타입·재고 필터는 곧 제공됩니다'), 'items/index.php must not be reverted to the #31 stub');
 
-check(str_contains($assetCtl, 'function index'), 'AssetController has a GET index stub');
-check(str_contains($assetCtl, "View::render('assets/index')"), 'Asset stub renders assets/index');
-check(str_contains($assetsTpl, '<h1>기자재 현황</h1>'), 'Asset stub has the status title');
-check(str_contains($assetsTpl, 'class="muted"'), 'Asset stub has a one-line notice');
-check(!preg_match('/<(form|table|select)\\b/', $assetsTpl), 'Asset stub must not ship board/filter UI');
+check(str_contains($assetCtl, 'function index'), 'AssetController has a GET index');
+check(str_contains($assetCtl, 'AssetBoard::list'), 'Asset index is the #30 board, not the #31 stub');
+check(str_contains($assetCtl, "View::render('assets/index'"), 'Board renders assets/index');
+check(str_contains($assetsTpl, '<h1>기자재 현황</h1>'), 'assets/index.php keeps the status title');
+check(!str_contains($assetsTpl, '상태·실·연체 필터는 곧 제공됩니다'), 'assets/index.php must not be reverted to the #31 stub');
+check(str_contains($assetsTpl, 'name="status"') && str_contains($assetsTpl, 'name="room"') && str_contains($assetsTpl, 'name="overdue"'), 'board replaced the stub with status/room/overdue filters');
 
 echo "PASS: {$checks} more-entry checks\n";

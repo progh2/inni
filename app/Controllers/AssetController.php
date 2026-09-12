@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Inni\Controllers;
 
+use Inni\Alert;
 use Inni\App;
 use Inni\Asset;
+use Inni\AssetBoard;
 use Inni\Auth;
 use Inni\Csrf;
 use Inni\Database;
@@ -17,11 +19,18 @@ use Inni\View;
 
 final class AssetController
 {
-    /** GET stub — 현황 보드·필터는 #30에서 채운다. */
     public function index(): void
     {
         Auth::requireLogin();
-        View::render('assets/index');
+        $pdo = Database::pdo();
+        Alert::refreshOverdue($pdo);
+
+        $filters = AssetBoard::filtersFromRequest($_GET);
+        $assets = AssetBoard::list($pdo, $filters);
+        $rooms = AssetBoard::rooms($pdo);
+        $summary = AssetBoard::summary($pdo);
+
+        View::render('assets/index', compact('assets', 'rooms', 'filters', 'summary'));
     }
 
     public function show(): void
