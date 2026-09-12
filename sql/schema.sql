@@ -115,6 +115,20 @@ CREATE TABLE IF NOT EXISTS activity_logs (
   created_at TEXT NOT NULL
 );
 
+-- One cancel per usage-issue log. Restores quantity; history stays in activity_logs.
+CREATE TABLE IF NOT EXISTS stock_issue_cancels (
+  id TEXT PRIMARY KEY,
+  issue_log_id TEXT NOT NULL UNIQUE,
+  catalog_item_id TEXT NOT NULL REFERENCES catalog_items(id),
+  lot_id TEXT NOT NULL,
+  location_id TEXT NOT NULL REFERENCES locations(id),
+  quantity REAL NOT NULL,
+  reason TEXT NOT NULL,
+  actor_id TEXT,
+  actor_name TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS reports (
   id TEXT PRIMARY KEY,
   target_type TEXT NOT NULL CHECK(target_type IN ('room','asset')),
@@ -142,3 +156,4 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_loans_one_open_asset
   WHERE asset_id IS NOT NULL AND status IN ('active','overdue');
 CREATE INDEX IF NOT EXISTS idx_logs_entity ON activity_logs(entity_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
+CREATE INDEX IF NOT EXISTS idx_stock_issue_cancels_item ON stock_issue_cancels(catalog_item_id, created_at);

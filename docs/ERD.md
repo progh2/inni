@@ -17,6 +17,7 @@ erDiagram
   UserProfile ||--o{ Loan : borrows
   Asset ||--o{ Loan : of
   CatalogItem ||--o{ Loan : of_consumable
+  CatalogItem ||--o{ StockIssueCancel : cancel_of_issue
   UserProfile ||--o{ ActivityLog : acts
   Asset ||--o{ ActivityLog : about
   CatalogItem ||--o{ ActivityLog : about
@@ -138,10 +139,25 @@ Unique: `(catalogItemId, locationId)`
 | createdAt | timestamp | |
 | createdBy | string | uid |
 
+### `stock_issue_cancels/{id}`
+사용 출고(`activity_logs.action=issue`) 1건당 취소 0~1건. UNIQUE(`issue_log_id`). owner/manager만 처리.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| issueLogId | string | 원 출고 activity_logs.id |
+| catalogItemId | string | |
+| lotId | string | 복원할 stock_lots.id |
+| locationId | string | |
+| quantity | number | 복원 수량(양수) |
+| reason | string | 취소 사유 |
+| actorUid | string? | |
+| actorName | string | |
+| createdAt | timestamp | |
+
 ### `activityLogs/{id}`
 | Field | Type | Notes |
 |-------|------|-------|
-| action | string | `create` `update` `loan` `return` `move` `adjust_stock` `retire` `report` … |
+| action | string | `create` `update` `loan` `return` `move` `issue` `restock` `cancel_issue` `retire` `report` … |
 | entityType | `asset` \| `catalog` \| `location` \| `loan` \| `report` | |
 | entityId | string | |
 | actorUid | string | |
@@ -184,6 +200,7 @@ Unique: `(catalogItemId, locationId)`
 - `loans`: status + dueAt, borrowerUid + status, assetId + status
 - `stockLots`: locationId, catalogItemId
 - `activityLogs`: entityId + createdAt DESC, createdAt DESC
+- `stock_issue_cancels`: catalogItemId + createdAt, issueLogId UNIQUE
 - `locations`: kind + name, parentId + sortOrder
 - `reports`: status + createdAt, targetType + targetId
 
