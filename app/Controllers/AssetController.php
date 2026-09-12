@@ -16,6 +16,13 @@ use Inni\View;
 
 final class AssetController
 {
+    /** GET stub — 현황 보드·필터는 #30에서 채운다. */
+    public function index(): void
+    {
+        Auth::requireLogin();
+        View::render('assets/index');
+    }
+
     public function show(): void
     {
         $user = Auth::requireLogin();

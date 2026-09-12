@@ -218,6 +218,8 @@ check(str_contains($more, "App::url('items')") && str_contains($more, '품목 �
 check(str_contains($more, 'Auth::canWrite($user)') && str_contains($more, 'catalog/csv'), 'more menu gates catalog csv on canWrite');
 check(str_contains($more, 'Auth::canConfigureAlerts($user)') && str_contains($more, 'settings'), 'more menu gates settings on canConfigureAlerts');
 check(str_contains($more, '!empty($aiReady)'), 'more menu hides AI helper when not connected');
+check(str_contains($more, '재료·품목 목록') && str_contains($more, "App::url('items')"), 'more menu links to 재료·품목 목록');
+check(str_contains($more, '기자재 현황') && str_contains($more, "App::url('assets')"), 'more menu links to 기자재 현황');
 
 $settings = (string) file_get_contents($root . '/app/Controllers/SettingsController.php');
 check(str_contains($settings, 'Auth::canConfigureAlerts($user)'), 'telegram settings allow owner/manager');
