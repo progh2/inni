@@ -17,6 +17,13 @@ $tabs = [
     ['rooms', '실'],
     ['more', '더보기'],
 ];
+
+$tabActive = static function (string $tab, string $current): bool {
+    if ($tab === 'home') {
+        return $current === 'home' || $current === '';
+    }
+    return $current === $tab || str_starts_with($current, $tab . '/');
+};
 ?>
 <!DOCTYPE html>
 <html lang="ko">
@@ -41,7 +48,7 @@ $tabs = [
   <div class="layout">
     <nav class="side-nav no-print">
       <?php foreach ($tabs as [$r, $label]): ?>
-        <a class="<?= str_starts_with($current_route, explode('/', $r)[0]) || ($r === 'home' && $current_route === 'home') ? 'active' : '' ?>"
+        <a class="<?= $tabActive($r, $current_route) ? 'active' : '' ?>"
            href="<?= Support::e(App::url($r)) ?>"><?= Support::e($label) ?></a>
       <?php endforeach; ?>
       <a class="ghost" href="<?= Support::e(App::url('items/new')) ?>">+ 빠른 등록</a>
@@ -57,10 +64,7 @@ $tabs = [
 
   <nav class="bottom-nav no-print">
     <?php foreach ($tabs as [$r, $label]): ?>
-      <?php
-        $active = ($r === 'home' && $current_route === 'home')
-          || ($r !== 'home' && str_starts_with($current_route, $r));
-      ?>
+      <?php $active = $tabActive($r, $current_route); ?>
       <?php if ($r === 'scan'): ?>
         <a class="scan-fab <?= $active ? 'active' : '' ?>" href="<?= Support::e(App::url('scan')) ?>"><strong>스캔</strong></a>
       <?php else: ?>

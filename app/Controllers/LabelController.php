@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Inni\Controllers;
 
 use Inni\Auth;
+use Inni\Csrf;
 use Inni\Database;
 use Inni\View;
 
@@ -26,6 +27,7 @@ final class LabelController
     public function print(): void
     {
         Auth::requireLogin();
+        Csrf::requirePost();
         $pdo = Database::pdo();
         $ids = $_POST['asset_ids'] ?? [];
         $locIds = $_POST['location_ids'] ?? [];
