@@ -391,6 +391,7 @@ check(str_contains($home, '재고 부족'), 'home still lists low stock');
 $settingsTpl = (string) file_get_contents($root . '/templates/settings/index.php');
 check(str_contains($settingsTpl, '연결 필요'), 'settings shows connect-needed when token empty');
 check(!preg_match('/name=["\']bot_token/', $settingsTpl), 'settings has no token input');
+check(!preg_match('/name=["\']api_key/', $settingsTpl), 'settings has no AI api_key input');
 
 $gitignore = (string) file_get_contents($root . '/.gitignore');
 check(str_contains($gitignore, 'config.php'), 'config.php stays untracked');

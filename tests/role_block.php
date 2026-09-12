@@ -210,11 +210,14 @@ check(str_contains($catalogCsv, 'Csrf::requirePost()'), 'catalog csv import requ
 $more = (string) file_get_contents($root . '/templates/more/index.php');
 check(str_contains($more, 'Auth::canWrite($user)') && str_contains($more, 'catalog/csv'), 'more menu gates catalog csv on canWrite');
 check(str_contains($more, 'Auth::canConfigureAlerts($user)') && str_contains($more, 'settings'), 'more menu gates settings on canConfigureAlerts');
+check(str_contains($more, '!empty($aiReady)'), 'more menu hides AI helper when not connected');
 
 $settings = (string) file_get_contents($root . '/app/Controllers/SettingsController.php');
 check(str_contains($settings, 'Auth::canConfigureAlerts($user)'), 'telegram settings allow owner/manager');
 check(substr_count($settings, 'Auth::isOwner($user)') >= 3, 'school name and user approval stay owner-only');
 check(str_contains($settings, 'function saveTelegram'), 'settings has telegram save');
+check(str_contains($settings, 'Ai::isReady()'), 'settings exposes AI connection status');
+check(!str_contains($settings, 'function saveAi'), 'settings has no AI key save');
 check(str_contains($settings, 'Auth::isDemoLoginEnabled()'), 'settings uses fail-closed demo_login helper');
 
 $auth = (string) file_get_contents($root . '/app/Auth.php');
@@ -227,12 +230,14 @@ check(str_contains($example, "'demo_login' => true"), 'local example keeps demo_
 check(str_contains($example, 'config.production.example.php'), 'local example points at the production template');
 check(str_contains($example, "'client_id' => ''") && str_contains($example, "'client_secret' => ''"), 'local example has no Google secrets');
 check(str_contains($example, "'bot_token' => ''"), 'local example has no Telegram bot token');
+check(str_contains($example, "'api_key' => ''"), 'local example has no AI api key');
 
 $production = (string) file_get_contents($root . '/config.production.example.php');
 check(str_contains($production, "'demo_login' => false"), 'production example shows demo_login false');
 check(!preg_match('/client_id\'\s*=>\s*\'(?!\')[^\'].+\'/', $production), 'production example must not ship a real client_id');
 check(str_contains($production, "'client_id' => ''") && str_contains($production, "'client_secret' => ''"), 'production example has empty Google secrets');
 check(str_contains($production, "'bot_token' => ''"), 'production example has no Telegram bot token');
+check(str_contains($production, "'api_key' => ''"), 'production example has no AI api key');
 
 $readme = (string) file_get_contents($root . '/README.md');
 check(str_contains($readme, 'config.production.example.php'), 'README documents the production example');

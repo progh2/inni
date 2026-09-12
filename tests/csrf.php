@@ -275,6 +275,8 @@ $settingsForm = (string) file_get_contents($root . '/templates/settings/index.ph
 check(str_contains($settingsForm, 'settings/telegram'), 'settings telegram form posts to settings/telegram');
 check(substr_count($settingsForm, 'Csrf::field()') >= 2, 'school and telegram settings forms include CSRF');
 check(!preg_match('/name=["\']bot_token/', $settingsForm), 'settings must not accept a bot token field');
+check(!preg_match('/name=["\']api_key/', $settingsForm), 'settings must not accept an AI api_key field');
+check(!str_contains($settingsForm, 'settings/ai'), 'settings has no AI write form');
 
 $sessionToken = bin2hex(random_bytes(32));
 $accepted = invokeReturnLoan('POST', [
