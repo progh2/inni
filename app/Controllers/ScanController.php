@@ -6,6 +6,7 @@ namespace Inni\Controllers;
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Csrf;
 use Inni\Database;
 use Inni\View;
 
@@ -20,7 +21,8 @@ final class ScanController
     public function resolve(): void
     {
         Auth::requireLogin();
-        $code = trim((string) ($_POST['code'] ?? $_GET['code'] ?? ''));
+        Csrf::requirePost();
+        $code = trim((string) ($_POST['code'] ?? ''));
         if ($code === '') {
             App::flash('error', '코드를 입력하세요.');
             App::redirect('scan');

@@ -80,16 +80,17 @@ button, input, select, textarea { font: inherit; }
   padding: 0.35rem 0.4rem calc(0.35rem + env(safe-area-inset-bottom));
 }
 .bottom-nav a {
-  flex: 1; text-align: center; font-size: 0.68rem; color: rgba(26,42,40,0.55);
+  flex: 1; min-width: 0; text-align: center; font-size: 0.68rem; color: rgba(26,42,40,0.55);
   display: flex; flex-direction: column; align-items: center; gap: 0.15rem; padding: 0.25rem;
 }
 .bottom-nav a.active { color: var(--accent); }
 .bottom-nav .scan-fab {
-  width: 3.4rem; height: 3.4rem; margin-top: -1.2rem;
+  flex: 0 0 3.4rem; width: 3.4rem; max-width: 3.4rem; height: 3.4rem; margin-top: -1.2rem;
   border-radius: 1.1rem; background: var(--accent); color: #fff !important;
   display: grid; place-items: center; box-shadow: 0 8px 20px rgba(216,90,26,0.35);
   font-size: 0.65rem;
 }
+.bottom-nav .scan-fab.active { outline: 2px solid var(--ink); outline-offset: 2px; }
 .bottom-nav .scan-fab strong { font-size: 0.85rem; }
 
 h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; margin: 0 0 0.4rem; }
@@ -181,10 +182,33 @@ h1 { font-size: clamp(1.5rem, 3vw, 1.9rem); }
 .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
 .section-title { margin: 1.2rem 0 0.5rem; font-size: 1.05rem; }
 
-#qr-reader { border-radius: 1rem; overflow: hidden; border: 1px solid var(--line); }
-#qr-reader video { width: 100% !important; }
+#qr-reader {
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  min-height: 12rem;
+  max-height: min(52dvh, 22rem);
+  background: rgba(26, 42, 40, 0.06);
+}
+#qr-reader video,
+#qr-reader canvas,
+#qr-reader img {
+  width: 100% !important;
+  max-height: min(52dvh, 22rem);
+  object-fit: cover;
+}
+.scan-stage.is-fallback #qr-reader {
+  min-height: 0;
+  max-height: 0;
+  border: 0;
+}
 
 @media print {
-  .no-print { display: none !important; }
-  body { background: #fff; }
+  .no-print, .bottom-nav, .side-nav, .shell-header { display: none !important; }
+  body, .cutting-mat { background: #fff; }
+  .layout { padding: 0; }
+  .label, .sheet .label {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
 }
