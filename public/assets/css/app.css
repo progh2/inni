@@ -151,6 +151,14 @@ h1 { font-size: clamp(1.5rem, 3vw, 1.9rem); }
   border-radius: 0.7rem; padding: 0.7rem 0.8rem; outline: none;
 }
 .field input:focus, .field select:focus, .field textarea:focus { box-shadow: 0 0 0 3px rgba(216,90,26,0.2); }
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 0.65rem;
+}
+.check-row input[type="checkbox"] { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+.check-row label { font-size: 0.92rem; font-weight: 500; color: var(--ink); }
 
 .flash { margin-bottom: 0.85rem; border-radius: 0.75rem; padding: 0.7rem 0.85rem; font-size: 0.9rem; }
 .flash.ok { background: rgba(31,107,74,0.12); color: var(--ok); }

@@ -93,8 +93,10 @@ $disabledOwner = actor('disabled-owner', 'owner', 'disabled');
 
 check(Auth::canWrite($owner) && Auth::canWrite($manager), 'active owner/manager may register');
 check(Auth::canInventory($owner) && Auth::canInventory($manager), 'active owner/manager may run inventory');
+check(Auth::canConfigureAlerts($owner) && Auth::canConfigureAlerts($manager), 'active owner/manager may configure alerts');
 check(!Auth::canWrite($teacher), 'teacher cannot register');
 check(!Auth::canInventory($teacher), 'teacher cannot run inventory');
+check(!Auth::canConfigureAlerts($teacher) && !Auth::canConfigureAlerts($student) && !Auth::canConfigureAlerts($pendingOwner) && !Auth::canConfigureAlerts(null), 'teacher/student/pending cannot configure alerts');
 check(!Auth::canWrite($student), 'student cannot register');
 check(!Auth::canInventory($student) && !Auth::canInventory($pendingOwner) && !Auth::canInventory($disabledOwner) && !Auth::canInventory(null), 'student/pending/disabled cannot run inventory');
 check(!Auth::canWrite($pendingOwner) && !Auth::canWrite($pendingTeacher) && !Auth::canWrite($pendingStudent), 'pending cannot register');
@@ -207,25 +209,30 @@ check(str_contains($catalogCsv, 'function import') && str_contains($catalogCsv, 
 check(str_contains($catalogCsv, 'Csrf::requirePost()'), 'catalog csv import requires POST+CSRF');
 $more = (string) file_get_contents($root . '/templates/more/index.php');
 check(str_contains($more, 'Auth::canWrite($user)') && str_contains($more, 'catalog/csv'), 'more menu gates catalog csv on canWrite');
+check(str_contains($more, 'Auth::canConfigureAlerts($user)') && str_contains($more, 'settings'), 'more menu gates settings on canConfigureAlerts');
 
 $settings = (string) file_get_contents($root . '/app/Controllers/SettingsController.php');
-check(substr_count($settings, 'Auth::isOwner($user)') >= 4, 'settings writes require owner');
+check(str_contains($settings, 'Auth::canConfigureAlerts($user)'), 'telegram settings allow owner/manager');
+check(substr_count($settings, 'Auth::isOwner($user)') >= 3, 'school name and user approval stay owner-only');
+check(str_contains($settings, 'function saveTelegram'), 'settings has telegram save');
 check(str_contains($settings, 'Auth::isDemoLoginEnabled()'), 'settings uses fail-closed demo_login helper');
 
 $auth = (string) file_get_contents($root . '/app/Auth.php');
 check(str_contains($auth, "App::config('demo_login', false)"), 'missing demo_login key is fail-closed');
 check(str_contains($auth, 'isActiveRole($user, [\'owner\', \'manager\'])'), 'canWrite requires active owner/manager');
-check(substr_count($auth, "isActiveRole(\$user, ['owner', 'manager'])") >= 2, 'canInventory uses the same owner/manager gate as canWrite');
+check(substr_count($auth, "isActiveRole(\$user, ['owner', 'manager'])") >= 3, 'canInventory/canConfigureAlerts use the same owner/manager gate as canWrite');
 
 $example = (string) file_get_contents($root . '/config.example.php');
 check(str_contains($example, "'demo_login' => true"), 'local example keeps demo_login true');
 check(str_contains($example, 'config.production.example.php'), 'local example points at the production template');
 check(str_contains($example, "'client_id' => ''") && str_contains($example, "'client_secret' => ''"), 'local example has no Google secrets');
+check(str_contains($example, "'bot_token' => ''"), 'local example has no Telegram bot token');
 
 $production = (string) file_get_contents($root . '/config.production.example.php');
 check(str_contains($production, "'demo_login' => false"), 'production example shows demo_login false');
 check(!preg_match('/client_id\'\s*=>\s*\'(?!\')[^\'].+\'/', $production), 'production example must not ship a real client_id');
 check(str_contains($production, "'client_id' => ''") && str_contains($production, "'client_secret' => ''"), 'production example has empty Google secrets');
+check(str_contains($production, "'bot_token' => ''"), 'production example has no Telegram bot token');
 
 $readme = (string) file_get_contents($root . '/README.md');
 check(str_contains($readme, 'config.production.example.php'), 'README documents the production example');

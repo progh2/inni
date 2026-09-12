@@ -77,6 +77,14 @@ final class Database
              ON stock_issue_cancels(catalog_item_id, created_at)'
         );
         $pdo->exec(
+            'CREATE TABLE IF NOT EXISTS alert_dispatches (
+              event_key TEXT NOT NULL,
+              entity_id TEXT NOT NULL,
+              sent_at TEXT NOT NULL,
+              PRIMARY KEY (event_key, entity_id)
+            )'
+        );
+        $pdo->exec(
             'CREATE TABLE IF NOT EXISTS inventory_checks (
               id TEXT PRIMARY KEY,
               location_id TEXT NOT NULL REFERENCES locations(id),

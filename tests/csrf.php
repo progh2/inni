@@ -228,7 +228,7 @@ $mutations = [
     'app/Controllers/AssetController.php' => ['loan', 'move', 'report', 'photo'],
     'app/Controllers/LoanController.php' => ['returnLoan'],
     'app/Controllers/RoomController.php' => ['save'],
-    'app/Controllers/SettingsController.php' => ['save', 'approve'],
+    'app/Controllers/SettingsController.php' => ['save', 'saveTelegram', 'approve'],
     'app/Controllers/ScanController.php' => ['resolve'],
     'app/Controllers/LabelController.php' => ['print'],
     'app/Controllers/InventoryController.php' => ['start', 'confirm', 'finish'],
@@ -271,6 +271,10 @@ $invShow = (string) file_get_contents($root . '/templates/inventory/show.php')
 check(str_contains($invShow, 'inventory/confirm') && str_contains($invShow, 'Csrf::field()'), 'Inventory confirm reuses scan CSRF POST');
 $show = (string) file_get_contents($root . '/templates/items/show.php');
 check(str_contains($show, 'items/restock') && str_contains($show, 'items/cancel-issue'), 'Item show must include restock and cancel-issue forms');
+$settingsForm = (string) file_get_contents($root . '/templates/settings/index.php');
+check(str_contains($settingsForm, 'settings/telegram'), 'settings telegram form posts to settings/telegram');
+check(substr_count($settingsForm, 'Csrf::field()') >= 2, 'school and telegram settings forms include CSRF');
+check(!preg_match('/name=["\']bot_token/', $settingsForm), 'settings must not accept a bot token field');
 
 $sessionToken = bin2hex(random_bytes(32));
 $accepted = invokeReturnLoan('POST', [

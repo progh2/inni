@@ -24,6 +24,7 @@
 - 출고 취소(owner/manager/teacher): `stock_issue_cancels.issue_log_id` UNIQUE로 이중 취소 실패 폐쇄. 수량 복원과 `cancel_issue` 이력을 같은 트랜잭션으로.
 - 가벼운 실사(owner/manager): 실 선택 → 예상 장비·품목 목록 → #7과 같은 카메라/코드 입력으로 확인 → 종료 시 미확인 목록. 진행 중 세션은 1건. 이어하기·텔레그램·엑셀은 없음.
 - 품목 CSV(owner/manager, `canWrite`): 더보기·설정에서 템플릿/목록 내려받기, POST+CSRF 업로드로 신규·수정. 충돌·오류 행은 건너뛰고 이유를 보여 줌. **CSV UTF-8** (Excel CP949도 읽음). xlsx/에듀파인 파일 동기화/실사 연동/텔레그램은 없음.
+- 알림(owner/manager 설정): 재고 부족(소모품·부품, 수량 < 최소재고)·연체 대여. 홈/대여 목록에서 연체 표시. 텔레그램 봇 푸시는 `config.php`의 `telegram.bot_token`이 있을 때만. 채팅 ID·이벤트 on/off는 설정 화면(POST+CSRF). 토큰 공백은 실패 폐쇄(연결 필요). 같은 품목/대여 중복 발송 없음. 실사 종료·AI·에듀파인은 연동하지 않음.
 
 ## 이번 검증
 
@@ -35,6 +36,7 @@
 - `php tests/role_block.php`: 학생·pending·disabled의 등록·대여·출고·실사 차단, `demo_login` 키 생략 시 off.
 - `php tests/inventory.php`: 실 선택·스캔/코드 확인·미확인 목록·단일 진행 세션·권한·이력 롤백.
 - `php tests/catalog_csv.php`: 품목 CSV 템플릿·내보내기·가져오기, 충돌 건너뜀, 역할, xlsx 거부.
+- `php tests/alerts.php`: 재고 부족·연체 텔레그램(HTTP 스텁), 토큰 공백 실패 폐쇄, 이벤트 off, 중복 방지, 설정 CSRF, owner/manager. 실제 봇 토큰 없음.
 - 임시 앱 복사본·DB에서 HTTP 검증 통과: 로그인, 품목 화면, 정상 출고와 이력, 재고 부족, GET 거부, 잘못된 CSRF 토큰, 학생 권한 차단.
 - 브라우저 시각 검증, 실제 카메라 스캔, Google Cloud Console 실연동(실제 client_id/secret)은 미실시.
 - Google OAuth: 승인된 리디렉션 URI는 `{base_url}/index.php?r=auth/google/callback`로 고정. 로그인·설정에 동일 문자열 표시. `allowed_domains`는 비면 인증된 메일 허용, 값이 있으면 정확 일치 실패 폐쇄. `email_verified` 필수. `php tests/google_oauth.php`가 토큰 교환을 스텁한다.
@@ -48,6 +50,7 @@
 4. ~~품목 수정·재입고, 출고 취소와 취소 이력.~~ issue #9.
 4b. ~~가벼운 실사 MVP.~~ issue #10. 엑셀·알림·AI·이어하기는 별도.
 4c. ~~품목 CSV 임포트/익스포트.~~ issue #11. xlsx·에듀파인 파일 동기화·실사 연동·텔레그램은 별도.
+4d. ~~알림(부족·연체)+텔레그램 봇.~~ issue #12. AI·에듀파인·실사 연동은 별도.
 5. ~~Docker의 설정 파일 생성 권한 및 필요한 PHP 확장 점검.~~ → issue #5 / Compose 경로로 처리.
 6. ~~Google OAuth 리다이렉트 URI·allowed_domains.~~ 키 없이 단위/스텁 검사까지. Console 실스모크는 사람 자격 증명 필요 (issue #6).
 7. ~~demo_login 운영 off 기본·역할 차단 스모크.~~ 로컬/Docker 예시는 `true`, 운영 예시·키 생략은 `false`. 학생·pending·disabled 쓰기는 `canWrite`/`canLoan`/`canReturn` + `tests/role_block.php` (issue #4).

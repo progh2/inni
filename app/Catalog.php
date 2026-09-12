@@ -125,6 +125,7 @@ final class Catalog
             self::rollBackImmediate($pdo);
             throw $e;
         }
+        Alert::notifyLowStock($pdo, $itemId);
     }
 
     private static function parseMinStock(mixed $minStock): ?float

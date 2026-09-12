@@ -6,14 +6,51 @@ use Inni\Csrf;
 use Inni\Support;
 ?>
 <h1>학교 설정</h1>
+<?php if (!empty($canEditSchool)): ?>
 <form class="card" method="post" action="<?= Support::e(App::url('settings/save')) ?>" style="margin-top:1rem">
-  <?= Csrf::field() ?>
+    <?= Csrf::field() ?>
   <div class="field">
     <label>학교명</label>
     <input name="school_name" value="<?= Support::e($school) ?>" required>
   </div>
   <button class="btn btn-primary" type="submit">저장</button>
 </form>
+<?php else: ?>
+<div class="card" style="margin-top:1rem">
+  <p class="muted" style="margin:0">학교명 · <?= Support::e($school) ?>. 학교명·사용자 승인은 관리자만 바꿀 수 있습니다.</p>
+</div>
+<?php endif; ?>
+
+<div class="card">
+  <h2 class="section-title" style="margin-top:0">텔레그램 알림</h2>
+  <?php if (empty($telegramReady)): ?>
+    <p class="flash error" style="margin-top:0">연결 필요. 봇 토큰은 서버 <code>config.php</code>의 <code>telegram.bot_token</code>에만 넣으세요. 비어 있으면 알림을 보내지 않습니다.</p>
+  <?php else: ?>
+    <p class="muted">봇 토큰이 <code>config.php</code>에 있습니다. 토큰은 화면에 표시하지 않습니다.</p>
+  <?php endif; ?>
+  <form method="post" action="<?= Support::e(App::url('settings/telegram')) ?>" style="margin-top:0.85rem">
+     <?= Csrf::field() ?>
+    <div class="field">
+      <label>채팅 ID</label>
+      <input name="chat_id" value="<?= Support::e((string) ($telegramChatId ?? '')) ?>"
+             placeholder="<?= Support::e(($telegramDefaultChat ?? '') !== '' ? (string) $telegramDefaultChat : '예: -100123456 또는 개인 chat id') ?>">
+    </div>
+    <?php if (($telegramChatId ?? '') === '' && ($telegramDefaultChat ?? '') !== ''): ?>
+      <p class="muted">비워 두면 <code>config.php</code>의 <code>default_chat_id</code>를 씁니다.</p>
+    <?php endif; ?>
+    <div class="check-row">
+      <input id="event_low_stock" type="checkbox" name="event_low_stock" value="1"
+             <?= !empty($telegramEvents['low_stock']) ? 'checked' : '' ?>>
+      <label for="event_low_stock">재고 부족</label>
+    </div>
+    <div class="check-row">
+      <input id="event_overdue_loan" type="checkbox" name="event_overdue_loan" value="1"
+             <?= !empty($telegramEvents['overdue_loan']) ? 'checked' : '' ?>>
+      <label for="event_overdue_loan">연체 대여</label>
+    </div>
+    <button class="btn btn-primary" type="submit">알림 설정 저장</button>
+  </form>
+</div>
 
 <div class="card">
   <h2 class="section-title" style="margin-top:0">Google 로그인</h2>

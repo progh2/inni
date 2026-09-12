@@ -5,6 +5,9 @@ use Inni\Support;
 ?>
 <h1>홈</h1>
 <p class="muted">스캔하고, 찾고, 실별로 확인하세요.</p>
+<?php if (!empty($telegramConnectNeeded) && ($lowStock || $activeLoans)): ?>
+  <p class="flash error">알림 연결 필요. 재고 부족·연체 푸시는 설정에서 텔레그램 봇 토큰을 연결한 뒤에 보내집니다.</p>
+<?php endif; ?>
 
 <div class="stats" style="margin:1rem 0">
   <div class="stat"><b><?= (int) $assetCount ?></b>장비</div>
@@ -51,12 +54,13 @@ use Inni\Support;
 <div class="card">
   <h2 class="section-title" style="margin-top:0">재고 부족</h2>
   <?php foreach ($lowStock as $row): ?>
-    <div class="list-row">
+    <a class="list-row" href="<?= Support::e(App::url('items/show', ['id' => $row['id']])) ?>">
       <div>
         <div class="title"><?= Support::e($row['name']) ?></div>
         <div class="meta"><?= Support::e((string) $row['qty']) ?> / 최소 <?= Support::e((string) $row['min_stock']) ?> <?= Support::e($row['unit']) ?></div>
       </div>
-    </div>
+      <span class="badge overdue">부족</span>
+    </a>
   <?php endforeach; ?>
 </div>
 <?php endif; ?>

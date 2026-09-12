@@ -25,10 +25,12 @@ use Inni\Support;
       <div class="title">품목 CSV</div>
     </a>
   <?php endif; ?>
-  <?php if (Auth::isOwner($user)): ?>
+  <?php if (Auth::canConfigureAlerts($user)): ?>
     <a class="list-row" href="<?= Support::e(App::url('settings')) ?>">
       <div class="title">학교 설정</div>
     </a>
+  <?php endif; ?>
+  <?php if (Auth::isOwner($user)): ?>
     <a class="list-row" href="<?= Support::e(App::url('settings/users')) ?>">
       <div class="title">사용자 승인</div>
     </a>
