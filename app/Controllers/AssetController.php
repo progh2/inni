@@ -13,6 +13,7 @@ use Inni\Csrf;
 use Inni\Database;
 use Inni\Loan;
 use Inni\Logger;
+use Inni\PpsUsefulLife;
 use Inni\Support;
 use Inni\Uploader;
 use Inni\View;
@@ -81,7 +82,32 @@ final class AssetController
         $reports->execute([$id]);
         $reports = $reports->fetchAll();
 
-        View::render('assets/show', compact('user', 'asset', 'path', 'locations', 'loan', 'logs', 'reports'));
+        $lifeSuggestions = [];
+        if (Auth::canWrite($user)) {
+            $lifeSuggestions = PpsUsefulLife::suggest((string) ($asset['name'] ?? ''));
+        }
+
+        View::render('assets/show', compact('user', 'asset', 'path', 'locations', 'loan', 'logs', 'reports', 'lifeSuggestions'));
+    }
+
+    public function suggestLife(): void
+    {
+        $user = Auth::requireLogin();
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store');
+        if (!Auth::canWrite($user)) {
+            http_response_code(403);
+            echo json_encode([
+                'error' => '제안 권한이 없습니다.',
+                'suggestions' => [],
+            ], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        echo json_encode(
+            PpsUsefulLife::response($_GET['name'] ?? '', $_GET['class_number'] ?? ''),
+            JSON_UNESCAPED_UNICODE
+        );
     }
 
     public function loan(): void

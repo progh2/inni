@@ -50,6 +50,12 @@ use Inni\Support;
       <input name="useful_life_years" type="number" inputmode="numeric" min="1" max="100" step="1" placeholder="예: 5">
     </div>
   </div>
+  <?php
+    $lifeSuggestNameFrom = 'name';
+    $lifeSuggestName = '';
+    $lifeSuggestions = [];
+    require dirname(__DIR__) . '/partials/life_suggest.php';
+  ?>
   <div class="field">
     <label>에듀파인 번호 (옵션)</label>
     <input name="edufine_number">

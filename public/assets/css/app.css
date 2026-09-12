@@ -192,6 +192,23 @@ h1 { font-size: clamp(1.5rem, 3vw, 1.9rem); }
 }
 .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
 .section-title { margin: 1.2rem 0 0.5rem; font-size: 1.05rem; }
+.life-suggest-box { margin: 0 0 0.85rem; }
+.life-suggest-list {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.life-suggest-list .btn {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  font-weight: 500;
+  flex-wrap: wrap;
+}
+.life-suggest-source { margin: 0.4rem 0 0; }
 
 #qr-reader {
   border-radius: 1rem;

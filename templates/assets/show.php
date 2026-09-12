@@ -121,6 +121,12 @@ $lifeLabel = AssetLife::format(
       </div>
     </div>
     <?php
+      $lifeSuggestNameFrom = '';
+      $lifeSuggestName = (string) ($asset['name'] ?? '');
+      $lifeSuggestions = $lifeSuggestions ?? [];
+      require dirname(__DIR__) . '/partials/life_suggest.php';
+    ?>
+    <?php
       $expiry = AssetLife::expiryDate(
           isset($asset['purchase_date']) ? (string) $asset['purchase_date'] : null,
           $asset['useful_life_years'] ?? null,
