@@ -48,6 +48,16 @@ use Inni\Support;
     <label>제조사</label>
     <input name="manufacturer">
   </div>
+  <div class="grid-2">
+    <div class="field">
+      <label>구입 사업명</label>
+      <input name="budget_program" maxlength="200" placeholder="자유 입력 (선택)">
+    </div>
+    <div class="field">
+      <label>예산 연도</label>
+      <input name="budget_year" type="number" inputmode="numeric" min="1900" max="2100" step="1" placeholder="YYYY">
+    </div>
+  </div>
   <div class="field">
     <label>단위 / 최소재고 (소모품)</label>
     <div style="display:flex;gap:0.5rem">

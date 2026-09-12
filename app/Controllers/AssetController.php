@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Inni\Controllers;
 
 use Inni\App;
+use Inni\Asset;
 use Inni\Auth;
 use Inni\Csrf;
 use Inni\Database;
@@ -22,7 +23,10 @@ final class AssetController
         $pdo = Database::pdo();
         $id = (string) ($_GET['id'] ?? '');
         $stmt = $pdo->prepare(
-            'SELECT a.*, c.type AS item_type, c.manufacturer, l.name AS location_name
+            'SELECT a.*, c.type AS item_type, c.manufacturer,
+                    c.budget_program AS catalog_budget_program,
+                    c.budget_year AS catalog_budget_year,
+                    l.name AS location_name
              FROM assets a
              JOIN catalog_items c ON c.id = a.catalog_item_id
              JOIN locations l ON l.id = a.location_id
@@ -164,6 +168,33 @@ final class AssetController
         ]);
         Logger::write('report', 'report', $id, "고장 신고: {$title}");
         App::flash('ok', '신고가 접수되었습니다.');
+        App::redirect('assets/show', ['id' => $assetId]);
+    }
+
+    public function updateBudget(): void
+    {
+        $user = Auth::requireLogin();
+        if (!Auth::canWrite($user)) {
+            App::flash('error', '수정 권한이 없습니다.');
+            App::redirect('home');
+        }
+        Csrf::requirePost();
+        $assetId = is_string($_POST['asset_id'] ?? null) ? $_POST['asset_id'] : '';
+        try {
+            Asset::updateBudget(
+                Database::pdo(),
+                $user,
+                $assetId,
+                $_POST['budget_program'] ?? null,
+                $_POST['budget_year'] ?? null,
+            );
+            App::flash('ok', '구입 사업예산을 저장했습니다.');
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '구입 사업예산을 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
         App::redirect('assets/show', ['id' => $assetId]);
     }
 

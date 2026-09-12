@@ -90,6 +90,8 @@ erDiagram
 | minStock | number? | consumable/part |
 | edufineNumber | string? | 옵션 |
 | manufacturer | string? | |
+| budgetProgram | string? | 구입 사업명 (자유 입력) |
+| budgetYear | number? | YYYY |
 | imageUrl | string? | |
 | qrCode | string | `CAT:{id}` |
 | favorite | boolean | |
@@ -110,6 +112,8 @@ erDiagram
 | tags | string[] | |
 | imageUrl | string? | |
 | purchaseDate | string? | ISO date |
+| budgetProgram | string? | 구입 사업명 (자유 입력) |
+| budgetYear | number? | YYYY |
 | notes | string? | |
 | qrCode | string | `AST:{id}` 또는 관리번호 |
 | createdAt, updatedAt | timestamp | |
