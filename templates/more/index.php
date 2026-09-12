@@ -15,6 +15,11 @@ use Inni\Support;
   <a class="list-row" href="<?= Support::e(App::url('labels')) ?>">
     <div class="title">라벨 인쇄</div>
   </a>
+  <?php if (Auth::canInventory($user)): ?>
+    <a class="list-row" href="<?= Support::e(App::url('inventory')) ?>">
+      <div class="title">실사</div>
+    </a>
+  <?php endif; ?>
   <?php if (Auth::isOwner($user)): ?>
     <a class="list-row" href="<?= Support::e(App::url('settings')) ?>">
       <div class="title">학교 설정</div>

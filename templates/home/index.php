@@ -18,6 +18,18 @@ use Inni\Support;
   <a class="btn btn-ghost" href="<?= Support::e(App::url('loans')) ?>">대여 현황</a>
 </div>
 
+<?php if (!empty($activeCheck)): ?>
+<div class="card">
+  <a class="list-row" href="<?= Support::e(App::url('inventory/show')) ?>">
+    <div>
+      <div class="title">진행 중 실사 · <?= Support::e($activeCheck['location_name']) ?></div>
+      <div class="meta">스캔으로 확인한 뒤 종료하면 미확인 목록이 나옵니다.</div>
+    </div>
+    <span class="badge active">실사</span>
+  </a>
+</div>
+<?php endif; ?>
+
 <div class="card">
   <h2 class="section-title" style="margin-top:0">진행 중 대여</h2>
   <?php if (!$activeLoans): ?>

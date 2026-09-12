@@ -8,6 +8,7 @@ use Inni\App;
 use Inni\Auth;
 use Inni\Csrf;
 use Inni\Database;
+use Inni\Scan;
 use Inni\View;
 
 final class ScanController
@@ -28,36 +29,15 @@ final class ScanController
             App::redirect('scan');
         }
 
-        $pdo = Database::pdo();
-
-        if (preg_match('/^(AST|CAT|LOC):(.+)$/i', $code, $m)) {
-            $kind = strtoupper($m[1]);
-            $id = $m[2];
-            if ($kind === 'AST') {
-                App::redirect('assets/show', ['id' => $id]);
+        $hit = Scan::lookup(Database::pdo(), $code);
+        if ($hit !== null) {
+            if ($hit['kind'] === 'asset') {
+                App::redirect('assets/show', ['id' => $hit['id']]);
             }
-            if ($kind === 'CAT') {
-                App::redirect('items/show', ['id' => $id]);
+            if ($hit['kind'] === 'catalog') {
+                App::redirect('items/show', ['id' => $hit['id']]);
             }
-            App::redirect('rooms/show', ['id' => $id]);
-        }
-
-        $stmt = $pdo->prepare('SELECT id FROM assets WHERE management_number = ? OR qr_code = ? LIMIT 1');
-        $stmt->execute([$code, $code]);
-        if ($id = $stmt->fetchColumn()) {
-            App::redirect('assets/show', ['id' => $id]);
-        }
-
-        $stmt = $pdo->prepare('SELECT id FROM locations WHERE code = ? OR qr_code = ? LIMIT 1');
-        $stmt->execute([$code, $code]);
-        if ($id = $stmt->fetchColumn()) {
-            App::redirect('rooms/show', ['id' => $id]);
-        }
-
-        $stmt = $pdo->prepare('SELECT id FROM catalog_items WHERE qr_code = ? LIMIT 1');
-        $stmt->execute([$code]);
-        if ($id = $stmt->fetchColumn()) {
-            App::redirect('items/show', ['id' => $id]);
+            App::redirect('rooms/show', ['id' => $hit['id']]);
         }
 
         App::flash('error', '코드를 찾지 못했습니다: ' . $code);

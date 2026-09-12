@@ -92,8 +92,11 @@ $disabledTeacher = actor('disabled-teacher', 'teacher', 'disabled');
 $disabledOwner = actor('disabled-owner', 'owner', 'disabled');
 
 check(Auth::canWrite($owner) && Auth::canWrite($manager), 'active owner/manager may register');
+check(Auth::canInventory($owner) && Auth::canInventory($manager), 'active owner/manager may run inventory');
 check(!Auth::canWrite($teacher), 'teacher cannot register');
+check(!Auth::canInventory($teacher), 'teacher cannot run inventory');
 check(!Auth::canWrite($student), 'student cannot register');
+check(!Auth::canInventory($student) && !Auth::canInventory($pendingOwner) && !Auth::canInventory($disabledOwner) && !Auth::canInventory(null), 'student/pending/disabled cannot run inventory');
 check(!Auth::canWrite($pendingOwner) && !Auth::canWrite($pendingTeacher) && !Auth::canWrite($pendingStudent), 'pending cannot register');
 check(!Auth::canWrite($disabledOwner) && !Auth::canWrite($disabledTeacher) && !Auth::canWrite(null), 'disabled or missing cannot register');
 
@@ -194,6 +197,10 @@ check(str_contains($asset, 'Auth::canWrite($user)') && str_contains($asset, 'fun
 $room = (string) file_get_contents($root . '/app/Controllers/RoomController.php');
 check(str_contains($room, 'Auth::canWrite($user)') && str_contains($room, 'function save'), 'room register requires canWrite');
 
+$inventory = (string) file_get_contents($root . '/app/Controllers/InventoryController.php');
+check(str_contains($inventory, 'Auth::canInventory($user)'), 'inventory controller requires canInventory');
+check(str_contains($inventory, 'function start') && str_contains($inventory, 'function confirm') && str_contains($inventory, 'function finish'), 'inventory has start/confirm/finish');
+
 $settings = (string) file_get_contents($root . '/app/Controllers/SettingsController.php');
 check(substr_count($settings, 'Auth::isOwner($user)') >= 4, 'settings writes require owner');
 check(str_contains($settings, 'Auth::isDemoLoginEnabled()'), 'settings uses fail-closed demo_login helper');
@@ -201,6 +208,7 @@ check(str_contains($settings, 'Auth::isDemoLoginEnabled()'), 'settings uses fail
 $auth = (string) file_get_contents($root . '/app/Auth.php');
 check(str_contains($auth, "App::config('demo_login', false)"), 'missing demo_login key is fail-closed');
 check(str_contains($auth, 'isActiveRole($user, [\'owner\', \'manager\'])'), 'canWrite requires active owner/manager');
+check(substr_count($auth, "isActiveRole(\$user, ['owner', 'manager'])") >= 2, 'canInventory uses the same owner/manager gate as canWrite');
 
 $example = (string) file_get_contents($root . '/config.example.php');
 check(str_contains($example, "'demo_login' => true"), 'local example keeps demo_login true');

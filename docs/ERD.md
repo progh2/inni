@@ -24,6 +24,11 @@ erDiagram
   Location ||--o{ Report : target
   Asset ||--o{ Report : target
   UserProfile ||--o{ Report : reports
+  Location ||--o{ InventoryCheck : of_room
+  UserProfile ||--o{ InventoryCheck : starts
+  InventoryCheck ||--o{ InventoryCheckLine : has
+  Asset ||--o{ InventoryCheckLine : expected
+  CatalogItem ||--o{ InventoryCheckLine : expected
   SchoolSettings ||--o| TelegramConfig : notifies
   SchoolSettings ||--o| AiConfig : assists
 ```
@@ -166,6 +171,33 @@ Unique: `(catalogItemId, locationId)`
 | meta | map | before/after 등 |
 | createdAt | timestamp | |
 
+### `inventory_checks/{id}` (P1 가벼운 실사)
+한 시점에 진행 중(`status=active`) 세션은 1건. 이어하기·텔레그램·엑셀은 범위 밖.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| locationId | string | 선택한 실(`kind=room`) |
+| locationName | string | 시작 시점 실 이름 |
+| status | `active` \| `done` | UNIQUE partial: active 1건 |
+| startedBy | string | owner/manager |
+| startedAt, finishedAt | timestamp | |
+
+### `inventory_check_lines/{id}`
+실 + 하위 위치의 장비·재고 스냅샷. 스캔/코드 입력으로 `confirmedAt`만 채운다(수량 변경 없음).
+
+| Field | Type | Notes |
+|-------|------|-------|
+| checkId | string | |
+| kind | `asset` \| `item` | |
+| assetId | string? | kind=asset |
+| catalogItemId | string? | kind=item |
+| stockLotId | string? | kind=item |
+| locationId | string | 예상 위치 |
+| name, code | string | 표시·스캔 매칭 |
+| expectedQty | number | 장비=1, 품목=로트 수량 |
+| confirmedAt | timestamp? | |
+| confirmedBy | string? | |
+
 ### `reports/{id}` (Phase3 스키마 선반영)
 | Field | Type | Notes |
 |-------|------|-------|
@@ -203,6 +235,8 @@ Unique: `(catalogItemId, locationId)`
 - `stock_issue_cancels`: catalogItemId + createdAt, issueLogId UNIQUE
 - `locations`: kind + name, parentId + sortOrder
 - `reports`: status + createdAt, targetType + targetId
+- `inventory_checks`: status UNIQUE WHERE active
+- `inventory_check_lines`: checkId + confirmedAt, (checkId, assetId) UNIQUE, (checkId, stockLotId) UNIQUE
 
 ## QR payload convention
 

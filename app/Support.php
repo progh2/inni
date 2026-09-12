@@ -74,6 +74,8 @@ final class Support
             'open' => '접수',
             'in_progress' => '처리중',
             'done' => '완료',
+            'confirmed' => '확인',
+            'unchecked' => '미확인',
             default => $status,
         };
     }

@@ -143,6 +143,32 @@ CREATE TABLE IF NOT EXISTS reports (
   updated_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS inventory_checks (
+  id TEXT PRIMARY KEY,
+  location_id TEXT NOT NULL REFERENCES locations(id),
+  location_name TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','done')),
+  started_by TEXT NOT NULL REFERENCES users(id),
+  started_at TEXT NOT NULL,
+  finished_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS inventory_check_lines (
+  id TEXT PRIMARY KEY,
+  check_id TEXT NOT NULL REFERENCES inventory_checks(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL CHECK(kind IN ('asset','item')),
+  asset_id TEXT REFERENCES assets(id),
+  catalog_item_id TEXT REFERENCES catalog_items(id),
+  stock_lot_id TEXT,
+  location_id TEXT NOT NULL REFERENCES locations(id),
+  name TEXT NOT NULL,
+  code TEXT,
+  expected_qty REAL NOT NULL DEFAULT 1,
+  unit TEXT,
+  confirmed_at TEXT,
+  confirmed_by TEXT REFERENCES users(id)
+);
+
 CREATE INDEX IF NOT EXISTS idx_assets_location ON assets(location_id);
 CREATE INDEX IF NOT EXISTS idx_assets_status ON assets(status);
 CREATE INDEX IF NOT EXISTS idx_assets_mgmt ON assets(management_number);
@@ -156,4 +182,15 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_loans_one_open_asset
   WHERE asset_id IS NOT NULL AND status IN ('active','overdue');
 CREATE INDEX IF NOT EXISTS idx_logs_entity ON activity_logs(entity_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_inventory_checks_one_active
+  ON inventory_checks(status)
+  WHERE status = 'active';
+CREATE INDEX IF NOT EXISTS idx_inventory_lines_check
+  ON inventory_check_lines(check_id, confirmed_at);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_inventory_lines_asset
+  ON inventory_check_lines(check_id, asset_id)
+  WHERE asset_id IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_inventory_lines_lot
+  ON inventory_check_lines(check_id, stock_lot_id)
+  WHERE stock_lot_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_stock_issue_cancels_item ON stock_issue_cancels(catalog_item_id, created_at);

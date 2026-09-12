@@ -1,12 +1,22 @@
 <?php
 
 use Inni\App;
+use Inni\Auth;
+use Inni\Csrf;
 use Inni\Support;
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('rooms')) ?>">← 실 목록</a></p>
 <h1><?= Support::e($location['name']) ?></h1>
 <p class="muted"><?= Support::e($path) ?> · <?= Support::e(Support::kindLabel($location['kind'])) ?><?= $location['code'] ? ' · ' . Support::e($location['code']) : '' ?></p>
 <p class="muted">QR: <code><?= Support::e($location['qr_code']) ?></code></p>
+
+<?php if (($location['kind'] ?? '') === 'room' && Auth::canInventory($user ?? Auth::user())): ?>
+<form class="actions" method="post" action="<?= Support::e(App::url('inventory/start')) ?>">
+  <?= Csrf::field() ?>
+  <input type="hidden" name="location_id" value="<?= Support::e($location['id']) ?>">
+  <button class="btn btn-primary" type="submit">이 실 실사</button>
+</form>
+<?php endif; ?>
 
 <?php if (!empty($location['image_path'])): ?>
   <p><img class="thumb" src="<?= Support::e(App::baseUrl() . $location['image_path']) ?>" alt=""></p>

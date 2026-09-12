@@ -6,6 +6,7 @@ namespace Inni\Controllers;
 
 use Inni\Auth;
 use Inni\Database;
+use Inni\Inventory;
 use Inni\Support;
 use Inni\View;
 
@@ -42,8 +43,10 @@ final class HomeController
             'SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 8'
         )->fetchAll();
 
+        $activeCheck = Auth::canInventory($user) ? Inventory::active($pdo) : null;
+
         View::render('home/index', compact(
-            'user', 'activeLoans', 'openReports', 'assetCount', 'roomCount', 'lowStock', 'recent'
+            'user', 'activeLoans', 'openReports', 'assetCount', 'roomCount', 'lowStock', 'recent', 'activeCheck'
         ));
     }
 }
