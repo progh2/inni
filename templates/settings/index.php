@@ -42,3 +42,11 @@ use Inni\Support;
     <p class="flash error" style="margin-top:0.85rem">운영에서는 <code>demo_login =&gt; false</code>로 데모 로그인을 끄세요.</p>
   <?php endif; ?>
 </div>
+
+<div class="card">
+  <h2 class="section-title" style="margin-top:0">품목 CSV</h2>
+  <p class="muted">담당교사(owner/manager)가 품목 대장을 CSV로 받거나 올릴 수 있습니다. xlsx는 지원하지 않습니다. 에듀파인 파일 동기화는 없습니다.</p>
+  <div class="actions">
+    <a class="btn btn-ink" href="<?= Support::e(App::url('catalog/csv')) ?>">품목 CSV</a>
+  </div>
+</div>

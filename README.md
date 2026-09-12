@@ -144,6 +144,7 @@ docker compose start
 - 소모품·부품 상세: 위치별 사용 출고(수량·사유), 출고 이력
 - 라벨 인쇄 (브라우저 QR + 인쇄)  
 - 실사 (담당교사·관리자): 실 선택 → 스캔/코드 확인 → 미확인 목록  
+- 품목 CSV (담당교사·관리자): 템플릿/목록 내려받기, 업로드로 신규·수정. **CSV UTF-8만** (xlsx 없음). 충돌 행은 건너뛰고 보고. 에듀파인 파일 동기화·실사 연동 없음  
 - 설정·사용자 승인
 
 ## 라이선스
@@ -170,6 +171,7 @@ php tests/google_oauth.php
 php tests/role_block.php
 php tests/scan_labels.php
 php tests/inventory.php
+php tests/catalog_csv.php
 ```
 
-메모리 DB로 수량 검증, 재고 부족, 권한, 품목·위치 일치, 출고·재입고·출고 취소 이력 및 저장 실패 시 롤백을 확인합니다. `catalog.php`는 품목 수정 권한과 필드 검증을 봅니다. CSRF 검사는 유효 토큰 허용, 잘못된 토큰 거부, 반납·재입고·출고 취소 경로 GET 거부를 임시 SQLite로 확인합니다. `bootstrap_owner`는 데모 시드 사용자를 건너뛰고 첫 Google 계정을 owner로 두는 초기화 규칙을 확인합니다. 대여·반납 검사는 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위를 확인합니다. `google_oauth`는 리디렉션 URI 조합, `allowed_domains` 실패 폐쇄, 빈/불완전 클라이언트 안내를 실제 Google 키 없이(토큰 교환 스텁) 확인합니다. `role_block`은 학생·pending·disabled의 대여·출고·등록·실사 차단과 `demo_login` 키 생략 시 off를 확인합니다. `inventory.php`는 실 선택·스캔 확인·미확인 목록·단일 진행 세션·권한을 확인합니다. 실제 재고 데이터는 변경하지 않습니다.
+메모리 DB로 수량 검증, 재고 부족, 권한, 품목·위치 일치, 출고·재입고·출고 취소 이력 및 저장 실패 시 롤백을 확인합니다. `catalog.php`는 품목 수정 권한과 필드 검증을 봅니다. CSRF 검사는 유효 토큰 허용, 잘못된 토큰 거부, 반납·재입고·출고 취소 경로 GET 거부를 임시 SQLite로 확인합니다. `bootstrap_owner`는 데모 시드 사용자를 건너뛰고 첫 Google 계정을 owner로 두는 초기화 규칙을 확인합니다. 대여·반납 검사는 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위를 확인합니다. `google_oauth`는 리디렉션 URI 조합, `allowed_domains` 실패 폐쇄, 빈/불완전 클라이언트 안내를 실제 Google 키 없이(토큰 교환 스텁) 확인합니다. `role_block`은 학생·pending·disabled의 대여·출고·등록·실사 차단과 `demo_login` 키 생략 시 off를 확인합니다. `inventory.php`는 실 선택·스캔 확인·미확인 목록·단일 진행 세션·권한을 확인합니다. `catalog_csv.php`는 템플릿·내보내기·가져오기(신규/수정), 충돌 행 건너뜀, owner/manager 권한, xlsx 거부, UTF-8 BOM/CP949를 확인합니다. 실제 재고 데이터는 변경하지 않습니다.
