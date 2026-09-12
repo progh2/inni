@@ -438,9 +438,13 @@ final class CatalogCsv
     private static function createRow(PDO $pdo, array $actor, array $row): void
     {
         $name = trim((string) ($row['name'] ?? ''));
-        $type = self::normalizeType((string) ($row['type'] ?? ''));
-        if ($name === '' || $type === null) {
+        $typeIn = trim((string) ($row['type'] ?? ''));
+        if ($name === '' || $typeIn === '') {
             throw new InvalidArgumentException('신규 행은 품명과 유형이 필요합니다.');
+        }
+        $type = self::normalizeType($typeIn);
+        if ($type === null) {
+            throw new InvalidArgumentException('유형은 장비/비품/소모품/부품만 사용할 수 있습니다.');
         }
 
         $locationName = trim((string) ($row['location_name'] ?? ''));

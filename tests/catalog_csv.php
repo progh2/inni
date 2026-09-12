@@ -95,6 +95,7 @@ $skipped = CatalogCsv::import($pdo, $owner, $skipCsv, 'skip.csv');
 check($skipped['created'] === 0 && $skipped['updated'] === 0 && $skipped['skipped'] === 7, 'Conflict rows should be skipped: ' . json_encode($skipped));
 $reasons = array_column($skipped['skipped_rows'], 'reason');
 check(in_array('유형은 바꿀 수 없습니다.', $reasons, true), 'Type change should be reported');
+check(in_array('유형은 장비/비품/소모품/부품만 사용할 수 있습니다.', $reasons, true), 'Invalid type should be reported');
 check(in_array('품목 ID를 찾을 수 없습니다.', $reasons, true), 'Missing id should be reported');
 check(in_array('같은 파일에서 품목 ID가 중복됩니다.', $reasons, true), 'Duplicate id should be reported');
 check((bool) array_filter($reasons, static fn (string $r): bool => str_contains($r, '위치를 찾을 수 없습니다')), 'Unknown location should be reported');
