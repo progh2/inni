@@ -6,6 +6,7 @@ namespace Inni;
 
 use Inni\Controllers\AssetController;
 use Inni\Controllers\AuthController;
+use Inni\Controllers\CatalogCsvController;
 use Inni\Controllers\HomeController;
 use Inni\Controllers\InventoryController;
 use Inni\Controllers\ItemController;
@@ -50,6 +51,11 @@ final class Router
             'items/issue' => [ItemController::class, 'issue'],
             'items/restock' => [ItemController::class, 'restock'],
             'items/cancel-issue' => [ItemController::class, 'cancelIssue'],
+
+            'catalog/csv' => [CatalogCsvController::class, 'index'],
+            'catalog/csv/template' => [CatalogCsvController::class, 'template'],
+            'catalog/csv/export' => [CatalogCsvController::class, 'export'],
+            'catalog/csv/import' => [CatalogCsvController::class, 'import'],
 
             'assets/show' => [AssetController::class, 'show'],
             'assets/loan' => [AssetController::class, 'loan'],

@@ -201,6 +201,13 @@ $inventory = (string) file_get_contents($root . '/app/Controllers/InventoryContr
 check(str_contains($inventory, 'Auth::canInventory($user)'), 'inventory controller requires canInventory');
 check(str_contains($inventory, 'function start') && str_contains($inventory, 'function confirm') && str_contains($inventory, 'function finish'), 'inventory has start/confirm/finish');
 
+$catalogCsv = (string) file_get_contents($root . '/app/Controllers/CatalogCsvController.php');
+check(str_contains($catalogCsv, 'Auth::canWrite($user)'), 'catalog csv requires canWrite (owner/manager)');
+check(str_contains($catalogCsv, 'function import') && str_contains($catalogCsv, 'function export') && str_contains($catalogCsv, 'function template'), 'catalog csv has template/export/import');
+check(str_contains($catalogCsv, 'Csrf::requirePost()'), 'catalog csv import requires POST+CSRF');
+$more = (string) file_get_contents($root . '/templates/more/index.php');
+check(str_contains($more, 'Auth::canWrite($user)') && str_contains($more, 'catalog/csv'), 'more menu gates catalog csv on canWrite');
+
 $settings = (string) file_get_contents($root . '/app/Controllers/SettingsController.php');
 check(substr_count($settings, 'Auth::isOwner($user)') >= 4, 'settings writes require owner');
 check(str_contains($settings, 'Auth::isDemoLoginEnabled()'), 'settings uses fail-closed demo_login helper');

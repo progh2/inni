@@ -232,6 +232,7 @@ $mutations = [
     'app/Controllers/ScanController.php' => ['resolve'],
     'app/Controllers/LabelController.php' => ['print'],
     'app/Controllers/InventoryController.php' => ['start', 'confirm', 'finish'],
+    'app/Controllers/CatalogCsvController.php' => ['import'],
 ];
 foreach ($mutations as $file => $methods) {
     $source = file_get_contents($root . '/' . $file);
@@ -255,6 +256,7 @@ $forms = [
     'templates/inventory/index.php' => 'inventory/start',
     'templates/inventory/show.php' => 'inventory/finish',
     'templates/rooms/show.php' => 'inventory/start',
+    'templates/catalog/csv.php' => 'catalog/csv/import',
 ];
 foreach ($forms as $file => $route) {
     $source = file_get_contents($root . '/' . $file);
@@ -623,5 +625,114 @@ $invFinishGet = invokeInventoryAction('finish', 'GET', [
     'csrf_token' => $sessionToken,
 ], $sessionToken, true);
 check($invFinishGet['status'] === 405 && $invFinishGet['active'] === 1, 'GET must be rejected for inventory finish');
+
+function invokeCatalogCsvImport(string $httpMethod, array $post, ?string $sessionToken, ?string $csvBody): array
+{
+    $root = dirname(__DIR__);
+    $tmp = sys_get_temp_dir() . '/inni-csrf-csv-' . bin2hex(random_bytes(4));
+    mkdir($tmp, 0700);
+    $dbPath = $tmp . '/inni.sqlite';
+    $csvPath = $tmp . '/upload.csv';
+    $runner = $tmp . '/run.php';
+    $resultFile = $tmp . '/result.json';
+    if (is_string($csvBody)) {
+        file_put_contents($csvPath, $csvBody);
+    }
+    $payload = [
+        'root' => $root,
+        'db' => $dbPath,
+        'method' => $httpMethod,
+        'post' => $post,
+        'csrf' => $sessionToken,
+        'csv' => is_string($csvBody) ? $csvPath : null,
+        'result' => $resultFile,
+    ];
+    file_put_contents($tmp . '/payload.json', json_encode($payload, JSON_THROW_ON_ERROR));
+    file_put_contents($runner, <<<'PHP'
+<?php
+declare(strict_types=1);
+$p = json_decode(file_get_contents(__DIR__ . '/payload.json'), true, 512, JSON_THROW_ON_ERROR);
+require $p['root'] . '/app/bootstrap.php';
+
+use Inni\App;
+use Inni\Csrf;
+use Inni\Controllers\CatalogCsvController;
+
+$ref = new ReflectionClass(App::class);
+$rootProp = $ref->getProperty('root');
+$rootProp->setAccessible(true);
+$rootProp->setValue(null, $p['root']);
+$configProp = $ref->getProperty('config');
+$configProp->setAccessible(true);
+$configProp->setValue(null, [
+    'app_name' => 'inni',
+    'school_name' => 'csrf-test',
+    'timezone' => 'UTC',
+    'demo_login' => true,
+    'session_name' => 'inni_csrf_csv_test',
+    'base_url' => 'http://localhost',
+    'db_path' => $p['db'],
+]);
+
+$_SERVER['REQUEST_METHOD'] = $p['method'];
+$_POST = $p['post'];
+$_FILES = [];
+$_SESSION = ['user_id' => 'demo-owner'];
+if (is_string($p['csrf'])) {
+    $_SESSION[Csrf::SESSION_KEY] = $p['csrf'];
+}
+if (is_string($p['csv'])) {
+    $_FILES['csv'] = [
+        'name' => 'upload.csv',
+        'type' => 'text/csv',
+        'tmp_name' => $p['csv'],
+        'error' => UPLOAD_ERR_OK,
+        'size' => filesize($p['csv']),
+    ];
+}
+
+register_shutdown_function(static function () use ($p): void {
+    $items = 0;
+    if (is_file($p['db'])) {
+        $pdo = new PDO('sqlite:' . $p['db']);
+        $items = (int) $pdo->query('SELECT COUNT(*) FROM catalog_items')->fetchColumn();
+    }
+    file_put_contents($p['result'], json_encode([
+        'status' => http_response_code(),
+        'items' => $items,
+        'body' => (string) ob_get_contents(),
+    ], JSON_UNESCAPED_UNICODE));
+});
+
+ob_start();
+(new CatalogCsvController())->import();
+PHP);
+
+    exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($runner) . ' 2>' . escapeshellarg($tmp . '/stderr.txt'));
+    $raw = is_file($resultFile) ? (string) file_get_contents($resultFile) : '';
+    $stderr = is_file($tmp . '/stderr.txt') ? (string) file_get_contents($tmp . '/stderr.txt') : '';
+    $decoded = json_decode($raw, true);
+    foreach (glob($tmp . '/*') ?: [] as $file) {
+        @unlink($file);
+    }
+    @rmdir($tmp);
+    if (!is_array($decoded)) {
+        throw new RuntimeException('Catalog CSV harness failed: ' . $raw . $stderr);
+    }
+    return $decoded;
+}
+
+$csvBody = "품명,유형,위치,수량\nCSRF소모품,소모품,전자실습실,3\n";
+$csvGet = invokeCatalogCsvImport('GET', ['csrf_token' => $sessionToken], $sessionToken, $csvBody);
+check($csvGet['status'] === 405, 'GET must be rejected for catalog csv import');
+
+$csvBad = invokeCatalogCsvImport('POST', ['csrf_token' => 'wrong-token'], $sessionToken, $csvBody);
+check($csvBad['status'] === 403, 'Bad CSRF must fail closed without importing catalog csv');
+
+$csvOk = invokeCatalogCsvImport('POST', ['csrf_token' => $sessionToken], $sessionToken, $csvBody);
+check(
+    ($csvOk['status'] === 302 || $csvOk['status'] === 200) && $csvOk['items'] > $csvBad['items'],
+    'Valid CSRF should import a catalog csv row'
+);
 
 echo "PASS: {$checks} csrf checks\n";

@@ -20,6 +20,11 @@ use Inni\Support;
       <div class="title">실사</div>
     </a>
   <?php endif; ?>
+  <?php if (Auth::canWrite($user)): ?>
+    <a class="list-row" href="<?= Support::e(App::url('catalog/csv')) ?>">
+      <div class="title">품목 CSV</div>
+    </a>
+  <?php endif; ?>
   <?php if (Auth::isOwner($user)): ?>
     <a class="list-row" href="<?= Support::e(App::url('settings')) ?>">
       <div class="title">학교 설정</div>
