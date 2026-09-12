@@ -6,6 +6,7 @@ namespace Inni\Controllers;
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Catalog;
 use Inni\Csrf;
 use Inni\Database;
 use Inni\Logger;
@@ -157,7 +158,108 @@ final class ItemController
         $logs->execute([$id]);
         $logs = $logs->fetchAll();
 
-        View::render('items/show', compact('item', 'assets', 'lots', 'logs'));
+        $cancels = [];
+        $cancelStmt = $pdo->prepare(
+            'SELECT * FROM stock_issue_cancels WHERE catalog_item_id = ?'
+        );
+        $cancelStmt->execute([$id]);
+        foreach ($cancelStmt->fetchAll() as $cancel) {
+            $cancels[(string) $cancel['issue_log_id']] = $cancel;
+        }
+
+        $locations = [];
+        $openLocations = [];
+        if (in_array((string) $item['type'], ['fixture', 'consumable', 'part'], true)) {
+            $locations = $pdo->query(
+                'SELECT * FROM locations ORDER BY kind, name'
+            )->fetchAll();
+            $occupied = [];
+            foreach ($lots as $lot) {
+                $occupied[(string) $lot['location_id']] = true;
+            }
+            foreach ($locations as $location) {
+                if (!isset($occupied[(string) $location['id']])) {
+                    $openLocations[] = $location;
+                }
+            }
+        }
+
+        View::render('items/show', compact('item', 'assets', 'lots', 'logs', 'cancels', 'locations', 'openLocations'));
+    }
+
+    public function editForm(): void
+    {
+        $user = Auth::requireLogin();
+        if (!Auth::canWrite($user)) {
+            App::flash('error', '수정 권한이 없습니다.');
+            App::redirect('home');
+        }
+        $id = (string) ($_GET['id'] ?? '');
+        $stmt = Database::pdo()->prepare('SELECT * FROM catalog_items WHERE id = ?');
+        $stmt->execute([$id]);
+        $item = $stmt->fetch();
+        if (!$item) {
+            http_response_code(404);
+            View::render('errors/404', [], 'layouts/bare');
+            return;
+        }
+        View::render('items/edit', compact('item'));
+    }
+
+    public function update(): void
+    {
+        $user = Auth::requireLogin();
+        if (!Auth::canWrite($user)) {
+            App::flash('error', '수정 권한이 없습니다.');
+            App::redirect('home');
+        }
+        Csrf::requirePost();
+
+        $itemId = is_string($_POST['item_id'] ?? null) ? $_POST['item_id'] : '';
+        $name = trim((string) ($_POST['name'] ?? ''));
+        $manufacturer = trim((string) ($_POST['manufacturer'] ?? '')) ?: null;
+        $edufine = trim((string) ($_POST['edufine_number'] ?? '')) ?: null;
+        $unit = trim((string) ($_POST['unit'] ?? 'ea')) ?: 'ea';
+        $minStock = array_key_exists('min_stock', $_POST) ? $_POST['min_stock'] : '';
+        $notes = trim((string) ($_POST['notes'] ?? '')) ?: null;
+        $tags = array_values(array_filter(array_map('trim', explode(',', (string) ($_POST['tags'] ?? '')))));
+        $favorite = !empty($_POST['favorite']);
+
+        $imagePath = null;
+        try {
+            if (!empty($_FILES['photo']['name'])) {
+                $imagePath = Uploader::store($_FILES['photo'], 'items');
+            }
+        } catch (\Throwable $e) {
+            App::flash('error', $e->getMessage());
+            App::redirect('items/edit', ['id' => $itemId]);
+        }
+
+        try {
+            Catalog::update(
+                Database::pdo(),
+                $user,
+                $itemId,
+                $name,
+                $notes,
+                $tags,
+                $unit,
+                $minStock,
+                $edufine,
+                $manufacturer,
+                $imagePath,
+                $favorite,
+            );
+            App::flash('ok', '품목을 수정했습니다.');
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+            App::redirect('items/edit', ['id' => $itemId]);
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '품목을 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+            App::redirect('items/edit', ['id' => $itemId]);
+        }
+        App::redirect('items/show', ['id' => $itemId]);
     }
 
     public function issue(): void
@@ -184,6 +286,65 @@ final class ItemController
         } catch (\Throwable $e) {
             error_log((string) $e);
             App::flash('error', '출고를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
+        App::redirect('items/show', ['id' => $itemId]);
+    }
+
+    public function restock(): void
+    {
+        $user = Auth::requireLogin();
+        Csrf::requirePost();
+        if (!Auth::canWrite($user)) {
+            http_response_code(403);
+            echo '재입고 권한이 없습니다.';
+            return;
+        }
+
+        $itemId = is_string($_POST['item_id'] ?? null) ? $_POST['item_id'] : '';
+        try {
+            Stock::restock(
+                Database::pdo(),
+                $user,
+                $itemId,
+                is_string($_POST['location_id'] ?? null) ? $_POST['location_id'] : '',
+                $_POST['quantity'] ?? null,
+                is_string($_POST['note'] ?? null) ? $_POST['note'] : '',
+            );
+            App::flash('ok', '재입고를 처리했습니다.');
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '재입고를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
+        App::redirect('items/show', ['id' => $itemId]);
+    }
+
+    public function cancelIssue(): void
+    {
+        $user = Auth::requireLogin();
+        Csrf::requirePost();
+        if (!Auth::canLoan($user)) {
+            http_response_code(403);
+            echo '출고 취소 권한이 없습니다.';
+            return;
+        }
+
+        $itemId = is_string($_POST['item_id'] ?? null) ? $_POST['item_id'] : '';
+        try {
+            Stock::cancelIssue(
+                Database::pdo(),
+                $user,
+                $itemId,
+                is_string($_POST['issue_log_id'] ?? null) ? $_POST['issue_log_id'] : '',
+                is_string($_POST['reason'] ?? null) ? $_POST['reason'] : '',
+            );
+            App::flash('ok', '출고를 취소했습니다.');
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '출고 취소를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
         }
         App::redirect('items/show', ['id' => $itemId]);
     }

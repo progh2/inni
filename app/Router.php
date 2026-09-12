@@ -44,7 +44,11 @@ final class Router
             'items/new' => [ItemController::class, 'createForm'],
             'items/save' => [ItemController::class, 'save'],
             'items/show' => [ItemController::class, 'show'],
+            'items/edit' => [ItemController::class, 'editForm'],
+            'items/update' => [ItemController::class, 'update'],
             'items/issue' => [ItemController::class, 'issue'],
+            'items/restock' => [ItemController::class, 'restock'],
+            'items/cancel-issue' => [ItemController::class, 'cancelIssue'],
 
             'assets/show' => [AssetController::class, 'show'],
             'assets/loan' => [AssetController::class, 'loan'],
