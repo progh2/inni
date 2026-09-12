@@ -10,6 +10,101 @@ use Throwable;
 
 final class Catalog
 {
+    /** @var list<string> */
+    public const TYPES = ['equipment', 'fixture', 'consumable', 'part'];
+
+    /**
+     * Browse catalog items without a search term. Type and low-stock filters
+     * are applied in SQL. Invalid type values are ignored (no type filter).
+     *
+     * @param array{type?: mixed, low_stock?: mixed} $filters
+     * @return list<array<string, mixed>>
+     */
+    public static function list(PDO $pdo, array $filters = []): array
+    {
+        $parsed = self::listFilters($filters);
+        $sql = "SELECT c.id, c.name, c.type, c.description, c.tags, c.unit, c.min_stock,
+                       c.manufacturer, c.favorite, c.qr_code,
+                       COALESCE(SUM(s.quantity), 0) AS stock_qty,
+                       (SELECT COUNT(*) FROM assets a WHERE a.catalog_item_id = c.id) AS asset_count
+                FROM catalog_items c
+                LEFT JOIN stock_lots s ON s.catalog_item_id = c.id";
+        $params = [];
+        if ($parsed['type'] !== null) {
+            $sql .= ' WHERE c.type = ?';
+            $params[] = $parsed['type'];
+        }
+        $sql .= ' GROUP BY c.id';
+        if ($parsed['low_stock']) {
+            $sql .= " HAVING c.type IN ('consumable','part')
+                      AND c.min_stock IS NOT NULL
+                      AND COALESCE(SUM(s.quantity), 0) < c.min_stock";
+        }
+        $sql .= ' ORDER BY c.name';
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (!$rows) {
+            return [];
+        }
+        foreach ($rows as &$row) {
+            $row['low_stock'] = self::rowIsLowStock($row) ? 1 : 0;
+        }
+        unset($row);
+        return $rows;
+    }
+
+    /**
+     * @param array<string, mixed> $query
+     * @return array{type: ?string, low_stock: bool}
+     */
+    public static function listFilters(array $query): array
+    {
+        return [
+            'type' => self::normalizeType($query['type'] ?? null),
+            'low_stock' => self::isTruthyFilter($query['low_stock'] ?? null),
+        ];
+    }
+
+    public static function normalizeType(mixed $type): ?string
+    {
+        if (!is_string($type)) {
+            return null;
+        }
+        $type = trim($type);
+        return in_array($type, self::TYPES, true) ? $type : null;
+    }
+
+    public static function isTruthyFilter(mixed $value): bool
+    {
+        if ($value === true || $value === 1 || $value === 1.0) {
+            return true;
+        }
+        if (!is_string($value)) {
+            return false;
+        }
+        $value = strtolower(trim($value));
+        return in_array($value, ['1', 'true', 'on', 'yes'], true);
+    }
+
+    /**
+     * Same rule as Alert::listLowStock: consumable/part with min_stock, qty < min.
+     *
+     * @param array<string, mixed> $row
+     */
+    public static function rowIsLowStock(array $row): bool
+    {
+        $type = (string) ($row['type'] ?? '');
+        if (!in_array($type, ['consumable', 'part'], true)) {
+            return false;
+        }
+        if ($row['min_stock'] === null || $row['min_stock'] === '') {
+            return false;
+        }
+        return (float) ($row['stock_qty'] ?? 0) < (float) $row['min_stock'];
+    }
+
     /**
      * Update catalog fields. Type, QR, and stock quantities stay unchanged.
      *

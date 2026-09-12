@@ -189,8 +189,14 @@ check(str_contains($loginTpl, "App::url('auth/demo', ['as' => 'owner'])"), 'logi
 check(str_contains($loginTpl, "App::url('auth/demo', ['as' => 'teacher'])"), 'login keeps teacher demo button');
 
 $item = (string) file_get_contents($root . '/app/Controllers/ItemController.php');
+check(str_contains($item, 'function index') && str_contains($item, 'Auth::requireLogin()'), 'item browse requires login');
 check(str_contains($item, 'Auth::canWrite($user)') && str_contains($item, 'function save'), 'item register requires canWrite');
 check(str_contains($item, 'Auth::canLoan($user)') && str_contains($item, 'function issue'), 'item issue requires canLoan');
+if (preg_match('/function index\(\): void\s*\{(.*?)\n    public function /s', $item, $indexMatch)) {
+    check(str_contains($indexMatch[1], 'Auth::requireLogin()') && !str_contains($indexMatch[1], 'canWrite'), 'active teacher may browse catalog');
+} else {
+    check(false, 'ItemController::index body not found');
+}
 
 $asset = (string) file_get_contents($root . '/app/Controllers/AssetController.php');
 check(str_contains($asset, 'Auth::canLoan($user)') && str_contains($asset, 'function loan'), 'asset loan requires canLoan');
@@ -208,6 +214,7 @@ check(str_contains($catalogCsv, 'Auth::canWrite($user)'), 'catalog csv requires 
 check(str_contains($catalogCsv, 'function import') && str_contains($catalogCsv, 'function export') && str_contains($catalogCsv, 'function template'), 'catalog csv has template/export/import');
 check(str_contains($catalogCsv, 'Csrf::requirePost()'), 'catalog csv import requires POST+CSRF');
 $more = (string) file_get_contents($root . '/templates/more/index.php');
+check(str_contains($more, "App::url('items')") && str_contains($more, '품목 목록'), 'more menu lists catalog browse for any logged-in role');
 check(str_contains($more, 'Auth::canWrite($user)') && str_contains($more, 'catalog/csv'), 'more menu gates catalog csv on canWrite');
 check(str_contains($more, 'Auth::canConfigureAlerts($user)') && str_contains($more, 'settings'), 'more menu gates settings on canConfigureAlerts');
 check(str_contains($more, '!empty($aiReady)'), 'more menu hides AI helper when not connected');
