@@ -74,6 +74,29 @@ final class Budget
     }
 
     /**
+     * GET list/board filters. Invalid program/year values are ignored.
+     *
+     * @param array<string, mixed> $query
+     * @return array{program: ?string, year: ?int}
+     */
+    public static function queryFilters(array $query): array
+    {
+        $program = null;
+        $year = null;
+        try {
+            $program = self::parseProgram($query['budget_program'] ?? null);
+        } catch (InvalidArgumentException) {
+            $program = null;
+        }
+        try {
+            $year = self::parseYear($query['budget_year'] ?? null);
+        } catch (InvalidArgumentException) {
+            $year = null;
+        }
+        return ['program' => $program, 'year' => $year];
+    }
+
+    /**
      * Optional exact-match SQL for list/board filters (#29/#30).
      *
      * @return array{sql: string, params: list<mixed>}

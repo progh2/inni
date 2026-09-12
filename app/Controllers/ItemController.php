@@ -27,6 +27,8 @@ final class ItemController
             'items' => $items,
             'type' => $filters['type'] ?? '',
             'lowStock' => $filters['low_stock'],
+            'budgetProgram' => $filters['budget_program'] ?? '',
+            'budgetYear' => $filters['budget_year'] ?? '',
         ]);
     }
 

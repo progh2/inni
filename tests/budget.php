@@ -46,6 +46,9 @@ check($filter['params'] === ['방과후', 2026], 'Filter params both');
 $emptyFilter = Budget::filterSql('a', null, null);
 check($emptyFilter['sql'] === '' && $emptyFilter['params'] === [], 'Empty filter is no-op');
 check(str_contains(Budget::likeSql('a'), 'a.budget_program'), 'Search like hook mentions program');
+check(Budget::queryFilters(['budget_program' => ' 방과후 ', 'budget_year' => '2026']) === ['program' => '방과후', 'year' => 2026], 'queryFilters parses');
+check(Budget::queryFilters(['budget_year' => '26', 'budget_program' => str_repeat('가', 201)]) === ['program' => null, 'year' => null], 'queryFilters ignores invalid');
+check(Budget::queryFilters([]) === ['program' => null, 'year' => null], 'queryFilters empty');
 
 reject(static fn () => Budget::parseYear('26'), 'Two-digit year');
 reject(static fn () => Budget::parseYear('abcd'), 'Non-numeric year');

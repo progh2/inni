@@ -14,29 +14,32 @@ final class Catalog
     public const TYPES = ['equipment', 'fixture', 'consumable', 'part'];
 
     /**
-     * Browse catalog items without a search term. Type and low-stock filters
-     * are applied in SQL. Invalid type values are ignored (no type filter).
+     * Browse catalog items without a search term. Type, low-stock, and
+     * purchase-budget filters are applied in SQL. Invalid type/budget values
+     * are ignored (no filter).
      *
-     * TODO(#32): when catalog_items.budget_program (TEXT) and budget_year (YYYY)
-     * exist on the schema, SELECT them and accept matching list filters.
-     * #29 does not add that migration.
-     *
-     * @param array{type?: mixed, low_stock?: mixed} $filters
+     * @param array{type?: mixed, low_stock?: mixed, budget_program?: mixed, budget_year?: mixed} $filters
      * @return list<array<string, mixed>>
      */
     public static function list(PDO $pdo, array $filters = []): array
     {
         $parsed = self::listFilters($filters);
         $sql = "SELECT c.id, c.name, c.type, c.description, c.tags, c.unit, c.min_stock,
-                       c.manufacturer, c.favorite, c.qr_code,
+                       c.manufacturer, c.favorite, c.qr_code, c.budget_program, c.budget_year,
                        COALESCE(SUM(s.quantity), 0) AS stock_qty,
                        (SELECT COUNT(*) FROM assets a WHERE a.catalog_item_id = c.id) AS asset_count
                 FROM catalog_items c
                 LEFT JOIN stock_lots s ON s.catalog_item_id = c.id";
         $params = [];
-        if ($parsed['type'] !== null) {
-            $sql .= ' WHERE c.type = ?';
-            $params[] = $parsed['type'];
+        $budget = Budget::filterSql('c', $parsed['budget_program'], $parsed['budget_year']);
+        if ($parsed['type'] !== null || $budget['sql'] !== '') {
+            $sql .= ' WHERE 1=1';
+            if ($parsed['type'] !== null) {
+                $sql .= ' AND c.type = ?';
+                $params[] = $parsed['type'];
+            }
+            $sql .= $budget['sql'];
+            $params = array_merge($params, $budget['params']);
         }
         $sql .= ' GROUP BY c.id';
         if ($parsed['low_stock']) {
@@ -61,13 +64,16 @@ final class Catalog
 
     /**
      * @param array<string, mixed> $query
-     * @return array{type: ?string, low_stock: bool}
+     * @return array{type: ?string, low_stock: bool, budget_program: ?string, budget_year: ?int}
      */
     public static function listFilters(array $query): array
     {
+        $budget = Budget::queryFilters($query);
         return [
             'type' => self::normalizeType($query['type'] ?? null),
             'low_stock' => self::isTruthyFilter($query['low_stock'] ?? null),
+            'budget_program' => $budget['program'],
+            'budget_year' => $budget['year'],
         ];
     }
 
