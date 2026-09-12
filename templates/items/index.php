@@ -29,6 +29,7 @@ $type = is_string($type ?? null) ? $type : '';
       재고부족
     </label>
   </div>
+  <?php // TODO(#32): add budget_program / budget_year display + filters once those columns exist. ?>
   <button class="btn btn-primary" style="margin-top:0.75rem" type="submit">필터</button>
   <?php if ($type !== '' || !empty($lowStock)): ?>
     <a class="btn btn-ghost" style="margin-top:0.75rem" href="<?= Support::e(App::url('items')) ?>">초기화</a>

@@ -17,6 +17,10 @@ final class Catalog
      * Browse catalog items without a search term. Type and low-stock filters
      * are applied in SQL. Invalid type values are ignored (no type filter).
      *
+     * TODO(#32): when catalog_items.budget_program (TEXT) and budget_year (YYYY)
+     * exist on the schema, SELECT them and accept matching list filters.
+     * #29 does not add that migration.
+     *
      * @param array{type?: mixed, low_stock?: mixed} $filters
      * @return list<array<string, mixed>>
      */
