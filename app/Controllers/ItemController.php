@@ -17,6 +17,18 @@ use Inni\View;
 
 final class ItemController
 {
+    public function index(): void
+    {
+        Auth::requireLogin();
+        $filters = Catalog::listFilters($_GET);
+        $items = Catalog::list(Database::pdo(), $filters);
+        View::render('items/index', [
+            'items' => $items,
+            'type' => $filters['type'] ?? '',
+            'lowStock' => $filters['low_stock'],
+        ]);
+    }
+
     public function createForm(): void
     {
         $user = Auth::requireLogin();

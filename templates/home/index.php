@@ -17,6 +17,7 @@ use Inni\Support;
 
 <div class="actions" style="margin-bottom:1rem">
   <a class="btn btn-primary" href="<?= Support::e(App::url('scan')) ?>">스캔하기</a>
+  <a class="btn btn-ghost" href="<?= Support::e(App::url('items')) ?>">품목 목록</a>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('items/new')) ?>">빠른 등록</a>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('loans')) ?>">대여 현황</a>
 </div>

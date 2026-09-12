@@ -9,7 +9,7 @@ $tags = Support::jsonDecode($item['tags'] ?? null);
 $stockable = in_array($item['type'], ['fixture', 'consumable', 'part'], true);
 $issueable = in_array($item['type'], ['consumable', 'part'], true);
 ?>
-<p class="muted"><a href="<?= Support::e(App::url('search')) ?>">← 찾기</a></p>
+<p class="muted"><a href="<?= Support::e(App::url('items')) ?>">← 품목 목록</a> · <a href="<?= Support::e(App::url('search')) ?>">찾기</a></p>
 <h1><?= Support::e($item['name']) ?></h1>
 <p class="muted">
   <?= Support::e(Support::typeLabel($item['type'])) ?>

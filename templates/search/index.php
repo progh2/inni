@@ -14,7 +14,7 @@ use Inni\Support;
 </form>
 
 <?php if ($q === ''): ?>
-  <p class="muted">검색어를 입력하거나 스캔 탭을 사용하세요.</p>
+  <p class="muted">검색어를 입력하거나 스캔 탭을 사용하세요. 전체를 보려면 <a href="<?= Support::e(App::url('items')) ?>">품목 목록</a>을 여세요.</p>
 <?php else: ?>
   <div class="card">
     <h2 class="section-title" style="margin-top:0">장비 (<?= count($assets) ?>)</h2>

@@ -11,7 +11,7 @@
 ## 구현된 주요 흐름
 
 - 데모·Google OAuth 로그인, 역할 검사 및 사용자 승인.
-- 품목·장비 등록, 검색, 실별 조회, 장비 대여·반납·이동.
+- 품목·장비 등록, 검색, **품목 목록(검색 없이 브라우즈, 유형·재고부족 필터)**, 실별 조회, 장비 대여·반납·이동.
 - 사진 업로드, 장비 고장 신고, QR 스캔 및 라벨 인쇄.
 - 소모품·부품 사용 출고: 품목 상세에서 위치별 수량과 사용 사유 입력.
   - 관리자·담당교사·일반교사가 출고 가능.
@@ -26,12 +26,14 @@
 - 품목 CSV(owner/manager, `canWrite`): 더보기·설정에서 템플릿/목록 내려받기, POST+CSRF 업로드로 신규·수정. 충돌·오류 행은 건너뛰고 이유를 보여 줌. **CSV UTF-8** (Excel CP949도 읽음). xlsx/에듀파인 파일 동기화/실사 연동/텔레그램은 없음.
 - 알림(owner/manager 설정): 재고 부족(소모품·부품, 수량 < 최소재고)·연체 대여. 홈/대여 목록에서 연체 표시. 텔레그램 봇 푸시는 `config.php`의 `telegram.bot_token`이 있을 때만. 채팅 ID·이벤트 on/off는 설정 화면(POST+CSRF). 토큰 공백은 실패 폐쇄(연결 필요). 같은 품목/대여 중복 발송 없음. 실사 종료·AI·에듀파인은 연동하지 않음.
 - AI Provider 자리(제안 전용): OpenAI / Upstage / Ollama 추상화. 키는 `config.php`의 `ai.api_key`만. 폼·SQLite·git에 키 없음. 미설정은 실패 폐쇄(설정에 연결 필요, 더보기 AI 메뉴 숨김). `Ai::suggest`는 초안만. 재고·대여·대장 쓰기 경로 없음. 챗봇·실사 연동 없음.
+- 품목 목록(로그인 사용자, 일반교사 포함): `items`에서 검색어 없이 전체 브라우즈. GET 필터 `type`, `low_stock`. 재고부족은 알림과 같이 소모품·부품·수량 < 최소재고. 찾기(검색어 필수)는 유지.
 
 ## 이번 검증
 
 - PHP 8.4 임시 실행 환경에서 전체 PHP 파일 45개 문법 검사 통과.
 - `php tests/stock.php`: 출고·재입고·출고 취소 수량/권한/롤백 검증.
 - `php tests/catalog.php`: 품목 수정 필드·권한·이력 롤백 검증.
+- `php tests/catalog_list.php`: 품목 전체 브라우즈, 유형·재고부족 필터, 잘못된 유형 무시, 찾기 UX 유지, 일반교사 조회(canWrite 없음).
 - `php tests/csrf.php`: 세션 CSRF 허용/거부, GET 거부, 반납·재입고·출고 취소 경로 실패 폐쇄 검증.
 - `php tests/loan.php`: 대여·반납 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위, 이력 실패 롤백.
 - `php tests/role_block.php`: 학생·pending·disabled의 등록·대여·출고·실사 차단, `demo_login` 키 생략 시 off.
@@ -57,6 +59,7 @@
 5. ~~Docker의 설정 파일 생성 권한 및 필요한 PHP 확장 점검.~~ → issue #5 / Compose 경로로 처리.
 6. ~~Google OAuth 리다이렉트 URI·allowed_domains.~~ 키 없이 단위/스텁 검사까지. Console 실스모크는 사람 자격 증명 필요 (issue #6).
 7. ~~demo_login 운영 off 기본·역할 차단 스모크.~~ 로컬/Docker 예시는 `true`, 운영 예시·키 생략은 `false`. 학생·pending·disabled 쓰기는 `canWrite`/`canLoan`/`canReturn` + `tests/role_block.php` (issue #4).
+8. ~~재료·품목 목록 (검색 없이 브라우즈).~~ issue #29. 찾기(검색어 필수)는 유지. 목록 UI 정돈은 후속.
 
 ## 작업 환경 참고
 

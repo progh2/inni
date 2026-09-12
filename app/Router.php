@@ -43,6 +43,7 @@ final class Router
             'rooms/show' => [RoomController::class, 'show'],
             'rooms/save' => [RoomController::class, 'save'],
 
+            'items' => [ItemController::class, 'index'],
             'items/new' => [ItemController::class, 'createForm'],
             'items/save' => [ItemController::class, 'save'],
             'items/show' => [ItemController::class, 'show'],

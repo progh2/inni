@@ -6,6 +6,9 @@ use Inni\Support;
 ?>
 <h1>더보기</h1>
 <div class="card" style="margin-top:1rem">
+  <a class="list-row" href="<?= Support::e(App::url('items')) ?>">
+    <div class="title">품목 목록</div>
+  </a>
   <a class="list-row" href="<?= Support::e(App::url('items/new')) ?>">
     <div class="title">빠른 등록</div>
   </a>
