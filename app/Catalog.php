@@ -28,6 +28,8 @@ final class Catalog
         ?string $manufacturer,
         ?string $imagePath,
         bool $favorite,
+        mixed $budgetProgram = null,
+        mixed $budgetYear = null,
     ): void {
         if (!Auth::canWrite($actor) || ($actor['status'] ?? '') !== 'active') {
             throw new InvalidArgumentException('수정 권한이 없습니다.');
@@ -45,6 +47,8 @@ final class Catalog
         $description = self::nullableTrim($description);
         $edufine = self::nullableTrim($edufine);
         $manufacturer = self::nullableTrim($manufacturer);
+        $budgetProgram = Budget::parseProgram($budgetProgram);
+        $budgetYear = Budget::parseYear($budgetYear);
         $minStock = self::parseMinStock($minStock);
         $cleanTags = [];
         foreach ($tags as $tag) {
@@ -71,7 +75,8 @@ final class Catalog
             $update = $pdo->prepare(
                 'UPDATE catalog_items
                  SET name = ?, description = ?, tags = ?, unit = ?, min_stock = ?,
-                     edufine_number = ?, manufacturer = ?, image_path = ?, favorite = ?, updated_at = ?
+                     edufine_number = ?, manufacturer = ?, budget_program = ?, budget_year = ?,
+                     image_path = ?, favorite = ?, updated_at = ?
                  WHERE id = ?'
             );
             $update->execute([
@@ -82,6 +87,8 @@ final class Catalog
                 $minStock,
                 $edufine,
                 $manufacturer,
+                $budgetProgram,
+                $budgetYear,
                 $image,
                 $favorite ? 1 : 0,
                 $t,
@@ -95,6 +102,8 @@ final class Catalog
                     'min_stock' => $item['min_stock'],
                     'manufacturer' => $item['manufacturer'],
                     'edufine_number' => $item['edufine_number'],
+                    'budget_program' => $item['budget_program'] ?? null,
+                    'budget_year' => $item['budget_year'] ?? null,
                     'favorite' => (int) $item['favorite'],
                 ],
                 'after' => [
@@ -103,6 +112,8 @@ final class Catalog
                     'min_stock' => $minStock,
                     'manufacturer' => $manufacturer,
                     'edufine_number' => $edufine,
+                    'budget_program' => $budgetProgram,
+                    'budget_year' => $budgetYear,
                     'favorite' => $favorite ? 1 : 0,
                 ],
             ];

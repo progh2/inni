@@ -1,6 +1,7 @@
 <?php
 
 use Inni\App;
+use Inni\Budget;
 use Inni\Support;
 ?>
 <h1>찾기</h1>
@@ -22,7 +23,16 @@ use Inni\Support;
       <a class="list-row" href="<?= Support::e(App::url('assets/show', ['id' => $a['id']])) ?>">
         <div>
           <div class="title"><?= Support::e($a['name']) ?></div>
-          <div class="meta"><?= Support::e($a['management_number']) ?> · <?= Support::e($a['location_name']) ?></div>
+          <div class="meta">
+            <?= Support::e($a['management_number']) ?> · <?= Support::e($a['location_name']) ?>
+            <?php
+              $assetBudget = Budget::format(
+                  isset($a['budget_program']) ? (string) $a['budget_program'] : null,
+                  $a['budget_year'] ?? null,
+              );
+            ?>
+            <?php if ($assetBudget !== ''): ?> · <?= Support::e($assetBudget) ?><?php endif; ?>
+          </div>
         </div>
         <span class="badge <?= Support::e($a['status']) ?>"><?= Support::e(Support::statusLabel($a['status'])) ?></span>
       </a>
@@ -36,7 +46,16 @@ use Inni\Support;
       <a class="list-row" href="<?= Support::e(App::url('items/show', ['id' => $c['id']])) ?>">
         <div>
           <div class="title"><?= Support::e($c['name']) ?></div>
-          <div class="meta"><?= Support::e(Support::typeLabel($c['type'])) ?></div>
+          <div class="meta">
+            <?= Support::e(Support::typeLabel($c['type'])) ?>
+            <?php
+              $catalogBudget = Budget::format(
+                  isset($c['budget_program']) ? (string) $c['budget_program'] : null,
+                  $c['budget_year'] ?? null,
+              );
+            ?>
+            <?php if ($catalogBudget !== ''): ?> · <?= Support::e($catalogBudget) ?><?php endif; ?>
+          </div>
         </div>
       </a>
     <?php endforeach; ?>

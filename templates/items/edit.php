@@ -26,6 +26,16 @@ $tagText = implode(', ', $tags);
     <label>제조사</label>
     <input name="manufacturer" value="<?= Support::e($item['manufacturer'] ?? '') ?>">
   </div>
+  <div class="grid-2">
+    <div class="field">
+      <label>구입 사업명</label>
+      <input name="budget_program" maxlength="200" placeholder="자유 입력 (선택)" value="<?= Support::e($item['budget_program'] ?? '') ?>">
+    </div>
+    <div class="field">
+      <label>예산 연도</label>
+      <input name="budget_year" type="number" inputmode="numeric" min="1900" max="2100" step="1" placeholder="YYYY" value="<?= $item['budget_year'] !== null && $item['budget_year'] !== '' ? Support::e((string) $item['budget_year']) : '' ?>">
+    </div>
+  </div>
   <div class="field">
     <label>단위 / 최소재고 (소모품)</label>
     <div style="display:flex;gap:0.5rem">

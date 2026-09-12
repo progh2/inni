@@ -2,6 +2,7 @@
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Budget;
 use Inni\Csrf;
 use Inni\Support;
 ?>
@@ -13,6 +14,20 @@ use Inni\Support;
 </p>
 <p class="muted"><?= Support::e($path) ?></p>
 <p class="muted">QR: <code><?= Support::e($asset['qr_code']) ?></code></p>
+<?php
+$assetBudget = Budget::format(
+    isset($asset['budget_program']) ? (string) $asset['budget_program'] : null,
+    $asset['budget_year'] ?? null,
+);
+$catalogBudget = Budget::format(
+    isset($asset['catalog_budget_program']) ? (string) $asset['catalog_budget_program'] : null,
+    $asset['catalog_budget_year'] ?? null,
+);
+$budgetLabel = $assetBudget !== '' ? $assetBudget : $catalogBudget;
+?>
+<?php if ($budgetLabel !== ''): ?>
+  <p class="muted">구입 <?= Support::e($budgetLabel) ?></p>
+<?php endif; ?>
 
 <?php if (!empty($asset['image_path'])): ?>
   <p><img class="thumb" src="<?= Support::e(App::baseUrl() . $asset['image_path']) ?>" alt=""></p>
@@ -82,6 +97,24 @@ use Inni\Support;
 </div>
 
 <?php if (Auth::canWrite($user)): ?>
+<div class="card">
+  <h2 class="section-title" style="margin-top:0">구입 사업예산</h2>
+  <form method="post" action="<?= Support::e(App::url('assets/budget')) ?>">
+    <?= Csrf::field() ?>
+    <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
+    <div class="grid-2">
+      <div class="field">
+        <label>구입 사업명</label>
+        <input name="budget_program" maxlength="200" placeholder="자유 입력 (선택)" value="<?= Support::e($asset['budget_program'] ?? '') ?>">
+      </div>
+      <div class="field">
+        <label>예산 연도</label>
+        <input name="budget_year" type="number" inputmode="numeric" min="1900" max="2100" step="1" placeholder="YYYY" value="<?= $asset['budget_year'] !== null && $asset['budget_year'] !== '' ? Support::e((string) $asset['budget_year']) : '' ?>">
+      </div>
+    </div>
+    <button class="btn btn-ghost" type="submit">저장</button>
+  </form>
+</div>
 <div class="card">
   <h2 class="section-title" style="margin-top:0">사진 업로드</h2>
   <form method="post" action="<?= Support::e(App::url('assets/photo')) ?>" enctype="multipart/form-data">

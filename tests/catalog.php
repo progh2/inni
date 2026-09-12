@@ -48,10 +48,11 @@ function reject(PDO $pdo, callable $fn, string $message): void
     }
 }
 
-Catalog::update($pdo, $owner, 'ci-1', '납땜 실납', '1학년 실습', ['소모', '전자'], 'm', '3', 'EF-1', '알파', null, true);
+Catalog::update($pdo, $owner, 'ci-1', '납땜 실납', '1학년 실습', ['소모', '전자'], 'm', '3', 'EF-1', '알파', null, true, '방과후', '2026');
 $row = $pdo->query("SELECT * FROM catalog_items WHERE id='ci-1'")->fetch(PDO::FETCH_ASSOC);
 check($row['name'] === '납땜 실납' && $row['description'] === '1학년 실습' && $row['unit'] === 'm', 'Owner edit fields missing');
 check((float) $row['min_stock'] === 3.0 && $row['edufine_number'] === 'EF-1' && $row['manufacturer'] === '알파', 'Owner edit optional fields missing');
+check($row['budget_program'] === '방과후' && (int) $row['budget_year'] === 2026, 'Owner edit budget missing');
 check((int) $row['favorite'] === 1 && $row['type'] === 'consumable' && $row['qr_code'] === 'CAT:ci-1', 'Type or QR changed');
 check(json_decode($row['tags'], true, 512, JSON_THROW_ON_ERROR) === ['소모', '전자'], 'Tags not stored as JSON list');
 check((float) $pdo->query("SELECT quantity FROM stock_lots WHERE id='lot-1'")->fetchColumn() === 18.0, 'Edit changed stock quantity');
@@ -59,9 +60,10 @@ $log = $pdo->query("SELECT * FROM activity_logs WHERE action='update'")->fetch(P
 $meta = json_decode($log['meta_json'], true, 512, JSON_THROW_ON_ERROR);
 check($log['actor_id'] === 'owner' && $meta['before']['name'] === '납땜' && $meta['after']['name'] === '납땜 실납', 'Edit audit missing');
 
-Catalog::update($pdo, $manager, 'ci-1', '납땜 실납', null, [], 'ea', '', null, null, null, false);
+Catalog::update($pdo, $manager, 'ci-1', '납땜 실납', null, [], 'ea', '', null, null, null, false, '', '');
 $row = $pdo->query("SELECT * FROM catalog_items WHERE id='ci-1'")->fetch(PDO::FETCH_ASSOC);
 check($row['unit'] === 'ea' && $row['min_stock'] === null && (int) $row['favorite'] === 0 && $row['description'] === null, 'Manager clear optional fields failed');
+check($row['budget_program'] === null && $row['budget_year'] === null, 'Manager clear budget failed');
 
 reject($pdo, static fn () => Catalog::update($pdo, $teacher, 'ci-1', '금지', null, [], 'ea', null, null, null, null, false), 'Teacher edit');
 reject($pdo, static fn () => Catalog::update($pdo, array_replace($owner, ['role' => 'student']), 'ci-1', '금지', null, [], 'ea', null, null, null, null, false), 'Student edit');

@@ -2,6 +2,7 @@
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Budget;
 use Inni\Csrf;
 use Inni\Support;
 
@@ -16,11 +17,18 @@ $issueable = in_array($item['type'], ['consumable', 'part'], true);
   · QR <code><?= Support::e($item['qr_code']) ?></code>
   <?php if (!empty($item['favorite'])): ?> · 즐겨찾기<?php endif; ?>
 </p>
-<?php if ($item['manufacturer'] || $item['unit'] || $item['min_stock'] !== null || $tags || $item['description']): ?>
+<?php
+$budgetLabel = Budget::format(
+    isset($item['budget_program']) ? (string) $item['budget_program'] : null,
+    $item['budget_year'] ?? null,
+);
+?>
+<?php if ($item['manufacturer'] || $item['unit'] || $item['min_stock'] !== null || $tags || $item['description'] || $budgetLabel !== ''): ?>
   <p class="muted">
     <?php if ($item['manufacturer']): ?>제조사 <?= Support::e($item['manufacturer']) ?> · <?php endif; ?>
     단위 <?= Support::e($item['unit']) ?>
     <?php if ($item['min_stock'] !== null && $item['min_stock'] !== ''): ?> · 최소재고 <?= Support::e((string) $item['min_stock']) ?><?php endif; ?>
+    <?php if ($budgetLabel !== ''): ?> · 구입 <?= Support::e($budgetLabel) ?><?php endif; ?>
     <?php if ($tags): ?> · <?= Support::e(implode(', ', $tags)) ?><?php endif; ?>
   </p>
   <?php if (!empty($item['description'])): ?>

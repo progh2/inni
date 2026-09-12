@@ -50,6 +50,8 @@ CREATE TABLE IF NOT EXISTS catalog_items (
   min_stock REAL,
   edufine_number TEXT,
   manufacturer TEXT,
+  budget_program TEXT,
+  budget_year INTEGER,
   image_path TEXT,
   favorite INTEGER NOT NULL DEFAULT 0,
   qr_code TEXT NOT NULL UNIQUE,
@@ -70,6 +72,8 @@ CREATE TABLE IF NOT EXISTS assets (
   tags TEXT NOT NULL DEFAULT '[]',
   image_path TEXT,
   purchase_date TEXT,
+  budget_program TEXT,
+  budget_year INTEGER,
   notes TEXT,
   qr_code TEXT NOT NULL UNIQUE,
   created_at TEXT NOT NULL,
@@ -179,6 +183,8 @@ CREATE TABLE IF NOT EXISTS inventory_check_lines (
 CREATE INDEX IF NOT EXISTS idx_assets_location ON assets(location_id);
 CREATE INDEX IF NOT EXISTS idx_assets_status ON assets(status);
 CREATE INDEX IF NOT EXISTS idx_assets_mgmt ON assets(management_number);
+CREATE INDEX IF NOT EXISTS idx_catalog_budget ON catalog_items(budget_year, budget_program);
+CREATE INDEX IF NOT EXISTS idx_assets_budget ON assets(budget_year, budget_program);
 CREATE INDEX IF NOT EXISTS idx_locations_parent ON locations(parent_id);
 CREATE INDEX IF NOT EXISTS idx_locations_kind ON locations(kind);
 CREATE INDEX IF NOT EXISTS idx_stock_location ON stock_lots(location_id);
