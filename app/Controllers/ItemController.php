@@ -6,6 +6,7 @@ namespace Inni\Controllers;
 
 use Inni\App;
 use Inni\Auth;
+use Inni\Budget;
 use Inni\Catalog;
 use Inni\Csrf;
 use Inni\Database;
@@ -26,6 +27,8 @@ final class ItemController
             'items' => $items,
             'type' => $filters['type'] ?? '',
             'lowStock' => $filters['low_stock'],
+            'budgetProgram' => $filters['budget_program'] ?? '',
+            'budgetYear' => $filters['budget_year'] ?? '',
         ]);
     }
 
@@ -62,6 +65,13 @@ final class ItemController
         $minStock = $_POST['min_stock'] !== '' ? (float) $_POST['min_stock'] : null;
         $notes = trim((string) ($_POST['notes'] ?? '')) ?: null;
         $tags = array_values(array_filter(array_map('trim', explode(',', (string) ($_POST['tags'] ?? '')))));
+        try {
+            $budgetProgram = Budget::parseProgram($_POST['budget_program'] ?? null);
+            $budgetYear = Budget::parseYear($_POST['budget_year'] ?? null);
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+            App::redirect('items/new');
+        }
 
         if ($name === '' || $locationId === '' || !in_array($type, ['equipment', 'fixture', 'consumable', 'part'], true)) {
             App::flash('error', '필수 항목을 확인하세요.');
@@ -84,12 +94,12 @@ final class ItemController
         $pdo->beginTransaction();
         try {
             $pdo->prepare(
-                'INSERT INTO catalog_items(id,name,type,description,tags,unit,min_stock,edufine_number,manufacturer,image_path,qr_code,created_at,updated_at)
-                 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                'INSERT INTO catalog_items(id,name,type,description,tags,unit,min_stock,edufine_number,manufacturer,budget_program,budget_year,image_path,qr_code,created_at,updated_at)
+                 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             )->execute([
                 $catalogId, $name, $type, $notes,
                 json_encode($tags, JSON_UNESCAPED_UNICODE),
-                $unit, $minStock, $edufine, $manufacturer, $imagePath,
+                $unit, $minStock, $edufine, $manufacturer, $budgetProgram, $budgetYear, $imagePath,
                 Support::qr('CAT', $catalogId), $t, $t,
             ]);
 
@@ -105,11 +115,11 @@ final class ItemController
                         : 'MGMT-' . strtoupper(substr($aid, -8));
                     $aname = $quantity === 1 ? $name : $name . ' #' . ($i + 1);
                     $pdo->prepare(
-                        'INSERT INTO assets(id,catalog_item_id,name,management_number,edufine_number,status,location_id,tags,image_path,notes,qr_code,created_at,updated_at)
-                         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                        'INSERT INTO assets(id,catalog_item_id,name,management_number,edufine_number,status,location_id,tags,image_path,budget_program,budget_year,notes,qr_code,created_at,updated_at)
+                         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
                     )->execute([
                         $aid, $catalogId, $aname, $number, $edufine, 'available', $locationId,
-                        json_encode($tags, JSON_UNESCAPED_UNICODE), $imagePath, $notes,
+                        json_encode($tags, JSON_UNESCAPED_UNICODE), $imagePath, $budgetProgram, $budgetYear, $notes,
                         Support::qr('AST', $aid), $t, $t,
                     ]);
                 }
@@ -236,6 +246,13 @@ final class ItemController
         $notes = trim((string) ($_POST['notes'] ?? '')) ?: null;
         $tags = array_values(array_filter(array_map('trim', explode(',', (string) ($_POST['tags'] ?? '')))));
         $favorite = !empty($_POST['favorite']);
+        try {
+            $budgetProgram = Budget::parseProgram($_POST['budget_program'] ?? null);
+            $budgetYear = Budget::parseYear($_POST['budget_year'] ?? null);
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+            App::redirect('items/edit', ['id' => $itemId]);
+        }
 
         $imagePath = null;
         try {
@@ -261,6 +278,8 @@ final class ItemController
                 $manufacturer,
                 $imagePath,
                 $favorite,
+                $budgetProgram,
+                $budgetYear,
             );
             App::flash('ok', '품목을 수정했습니다.');
         } catch (\InvalidArgumentException $e) {

@@ -32,6 +32,8 @@ final class CatalogCsv
         'location_name',
         'quantity',
         'management_number',
+        'budget_program',
+        'budget_year',
     ];
 
     /** @var array<string, string> */
@@ -45,6 +47,8 @@ final class CatalogCsv
         'min_stock' => '최소재고',
         'edufine_number' => '에듀파인번호',
         'manufacturer' => '제조사',
+        'budget_program' => '사업명',
+        'budget_year' => '예산연도',
         'favorite' => '즐겨찾기',
         'location_name' => '위치',
         'quantity' => '수량',
@@ -133,6 +137,8 @@ final class CatalogCsv
                 $place['location_name'],
                 $place['quantity'] === '' ? '' : (string) $place['quantity'],
                 $place['management_number'],
+                (string) ($item['budget_program'] ?? ''),
+                $item['budget_year'] === null || $item['budget_year'] === '' ? '' : (string) $item['budget_year'],
             ];
         }
 
@@ -415,6 +421,12 @@ final class CatalogCsv
         $favorite = array_key_exists('favorite', $row)
             ? self::parseFavorite($row['favorite'])
             : !empty($item['favorite']);
+        $budgetProgram = array_key_exists('budget_program', $row)
+            ? (trim($row['budget_program']) === '' ? null : trim($row['budget_program']))
+            : (isset($item['budget_program']) ? (string) $item['budget_program'] : null);
+        $budgetYear = array_key_exists('budget_year', $row)
+            ? $row['budget_year']
+            : ($item['budget_year'] ?? '');
 
         Catalog::update(
             $pdo,
@@ -429,6 +441,8 @@ final class CatalogCsv
             $manufacturer,
             null,
             $favorite,
+            $budgetProgram,
+            $budgetYear,
         );
     }
 
@@ -485,6 +499,8 @@ final class CatalogCsv
         $minStock = self::parseOptionalMinStock($minStock);
         $tags = self::splitTags((string) ($row['tags'] ?? ''));
         $favorite = self::parseFavorite((string) ($row['favorite'] ?? ''));
+        $budgetProgram = Budget::parseProgram($row['budget_program'] ?? null);
+        $budgetYear = Budget::parseYear($row['budget_year'] ?? null);
         $mgmt = trim((string) ($row['management_number'] ?? ''));
 
         $t = Support::now();
@@ -493,8 +509,8 @@ final class CatalogCsv
         self::beginImmediate($pdo);
         try {
             $pdo->prepare(
-                'INSERT INTO catalog_items(id,name,type,description,tags,unit,min_stock,edufine_number,manufacturer,favorite,qr_code,created_at,updated_at)
-                 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                'INSERT INTO catalog_items(id,name,type,description,tags,unit,min_stock,edufine_number,manufacturer,budget_program,budget_year,favorite,qr_code,created_at,updated_at)
+                 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             )->execute([
                 $catalogId,
                 $name,
@@ -505,6 +521,8 @@ final class CatalogCsv
                 $minStock,
                 $edufine,
                 $manufacturer,
+                $budgetProgram,
+                $budgetYear,
                 $favorite ? 1 : 0,
                 Support::qr('CAT', $catalogId),
                 $t,
@@ -521,8 +539,8 @@ final class CatalogCsv
                             : 'MGMT-' . strtoupper(substr($aid, -8));
                         $aname = $count === 1 ? $name : $name . ' #' . ($i + 1);
                         $pdo->prepare(
-                            'INSERT INTO assets(id,catalog_item_id,name,management_number,edufine_number,status,location_id,tags,notes,qr_code,created_at,updated_at)
-                             VALUES(?,?,?,?,?,?,?,?,?,?,?,?)'
+                            'INSERT INTO assets(id,catalog_item_id,name,management_number,edufine_number,status,location_id,tags,budget_program,budget_year,notes,qr_code,created_at,updated_at)
+                             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
                         )->execute([
                             $aid,
                             $catalogId,
@@ -532,6 +550,8 @@ final class CatalogCsv
                             'available',
                             $locationId,
                             json_encode($tags, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+                            $budgetProgram,
+                            $budgetYear,
                             $description,
                             Support::qr('AST', $aid),
                             $t,
@@ -711,6 +731,14 @@ final class CatalogCsv
             '실' => 'location_name',
             '장소' => 'location_name',
             '위치명' => 'location_name',
+            '구입사업명' => 'budget_program',
+            '사업예산' => 'budget_program',
+            '예산사업' => 'budget_program',
+            '연도' => 'budget_year',
+            '년도' => 'budget_year',
+            '예산년도' => 'budget_year',
+            '구입년도' => 'budget_year',
+            '구입연도' => 'budget_year',
         ] as $alias => $col) {
             $aliases[self::normalizeHeader($alias)] = $col;
         }

@@ -42,7 +42,7 @@ final class Database
             Seed::run($pdo);
         } else {
             self::$pdo = $pdo;
-            self::ensureGuards($pdo);
+            self::migrate($pdo);
         }
 
         return self::$pdo;
@@ -51,8 +51,20 @@ final class Database
     /**
      * Idempotent guards for databases created before later schema additions.
      */
+    public static function migrate(PDO $pdo): void
+    {
+        self::ensureGuards($pdo);
+    }
+
     private static function ensureGuards(PDO $pdo): void
     {
+        self::ensureColumn($pdo, 'catalog_items', 'budget_program', 'TEXT');
+        self::ensureColumn($pdo, 'catalog_items', 'budget_year', 'INTEGER');
+        self::ensureColumn($pdo, 'assets', 'budget_program', 'TEXT');
+        self::ensureColumn($pdo, 'assets', 'budget_year', 'INTEGER');
+        $pdo->exec('CREATE INDEX IF NOT EXISTS idx_catalog_budget ON catalog_items(budget_year, budget_program)');
+        $pdo->exec('CREATE INDEX IF NOT EXISTS idx_assets_budget ON assets(budget_year, budget_program)');
+
         $pdo->exec(
             "CREATE UNIQUE INDEX IF NOT EXISTS idx_loans_one_open_asset
              ON loans(asset_id)
@@ -131,5 +143,27 @@ final class Database
              ON inventory_check_lines(check_id, stock_lot_id)
              WHERE stock_lot_id IS NOT NULL'
         );
+    }
+
+    /**
+     * @param 'catalog_items'|'assets' $table
+     */
+    private static function ensureColumn(PDO $pdo, string $table, string $column, string $type): void
+    {
+        $allowed = [
+            'catalog_items' => ['budget_program' => 'TEXT', 'budget_year' => 'INTEGER'],
+            'assets' => ['budget_program' => 'TEXT', 'budget_year' => 'INTEGER'],
+        ];
+        if (!isset($allowed[$table][$column]) || $allowed[$table][$column] !== $type) {
+            throw new RuntimeException('Refusing unknown schema patch: ' . $table . '.' . $column);
+        }
+        $stmt = $pdo->query('PRAGMA table_info(' . $table . ')');
+        $cols = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+        foreach ($cols as $col) {
+            if (($col['name'] ?? '') === $column) {
+                return;
+            }
+        }
+        $pdo->exec('ALTER TABLE ' . $table . ' ADD COLUMN ' . $column . ' ' . $type);
     }
 }

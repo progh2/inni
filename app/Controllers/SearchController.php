@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Inni\Controllers;
 
 use Inni\Auth;
+use Inni\Budget;
 use Inni\Database;
 use Inni\Support;
 use Inni\View;
@@ -29,17 +30,19 @@ final class SearchController
                  WHERE a.name LIKE ? OR a.management_number LIKE ?
                     OR IFNULL(a.serial_number,'') LIKE ? OR IFNULL(a.edufine_number,'') LIKE ?
                     OR a.tags LIKE ?
+                    OR " . Budget::likeSql('a') . "
                  ORDER BY a.name LIMIT 50"
             );
-            $stmt->execute([$like, $like, $like, $like, $like]);
+            $stmt->execute([$like, $like, $like, $like, $like, $like, $like]);
             $assets = $stmt->fetchAll();
 
             $stmt = $pdo->prepare(
-                "SELECT * FROM catalog_items
-                 WHERE name LIKE ? OR tags LIKE ? OR IFNULL(manufacturer,'') LIKE ?
-                 ORDER BY name LIMIT 30"
+                "SELECT * FROM catalog_items c
+                 WHERE c.name LIKE ? OR c.tags LIKE ? OR IFNULL(c.manufacturer,'') LIKE ?
+                    OR " . Budget::likeSql('c') . "
+                 ORDER BY c.name LIMIT 30"
             );
-            $stmt->execute([$like, $like, $like]);
+            $stmt->execute([$like, $like, $like, $like, $like]);
             $catalog = $stmt->fetchAll();
 
             $stmt = $pdo->prepare(

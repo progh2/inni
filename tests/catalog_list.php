@@ -38,6 +38,9 @@ $pdo->exec("INSERT INTO stock_lots(id,catalog_item_id,location_id,quantity,updat
 $pdo->exec("INSERT INTO stock_lots(id,catalog_item_id,location_id,quantity,updated_at) VALUES('lot-tape','tape','room',0,'t')");
 $pdo->exec("INSERT INTO stock_lots(id,catalog_item_id,location_id,quantity,updated_at) VALUES('lot-res','res','room',1,'t')");
 $pdo->exec("INSERT INTO stock_lots(id,catalog_item_id,location_id,quantity,updated_at) VALUES('lot-ok','ok-part','room',4,'t')");
+$pdo->exec("UPDATE catalog_items SET budget_program='방과후', budget_year=2026 WHERE id='solder'");
+$pdo->exec("UPDATE catalog_items SET budget_program='방과후', budget_year=2025 WHERE id='wire'");
+$pdo->exec("UPDATE catalog_items SET budget_program='특화교육', budget_year=2026 WHERE id='res'");
 
 $checks = 0;
 
@@ -128,9 +131,38 @@ check($comboEq === [], 'Equipment + low-stock is empty');
 $none = Catalog::list($pdo, Catalog::listFilters(['type' => 'unknown', 'low_stock' => '0']));
 check(ids($none) === ids($all), 'Unknown type and low_stock=0 means full browse');
 
-check(Catalog::listFilters(['type' => 'part', 'low_stock' => 'yes']) === ['type' => 'part', 'low_stock' => true], 'listFilters parses allowlisted type');
-check(Catalog::listFilters(['type' => 1, 'low_stock' => 'false']) === ['type' => null, 'low_stock' => false], 'non-string type is ignored');
+$emptyBudget = ['budget_program' => null, 'budget_year' => null];
+check(Catalog::listFilters(['type' => 'part', 'low_stock' => 'yes']) === ['type' => 'part', 'low_stock' => true] + $emptyBudget, 'listFilters parses allowlisted type');
+check(Catalog::listFilters(['type' => 1, 'low_stock' => 'false']) === ['type' => null, 'low_stock' => false] + $emptyBudget, 'non-string type is ignored');
 check(Catalog::isTruthyFilter('0') === false && Catalog::isTruthyFilter('') === false, 'falsey low_stock values');
+
+$byProgram = Catalog::list($pdo, ['budget_program' => '방과후']);
+check(idSet($byProgram) === ['solder', 'wire'] && namesSorted($byProgram), 'Budget program exact filter');
+$byYear = Catalog::list($pdo, ['budget_year' => '2026']);
+check(idSet($byYear) === ['res', 'solder'] && namesSorted($byYear), 'Budget year exact filter');
+$byBoth = Catalog::list($pdo, Catalog::listFilters(['budget_program' => '방과후', 'budget_year' => '2026']));
+check(idSet($byBoth) === ['solder'], 'Budget program + year together');
+$comboBudget = Catalog::list($pdo, ['type' => 'consumable', 'budget_program' => '방과후']);
+check(idSet($comboBudget) === ['solder', 'wire'], 'Type + budget program');
+$ignoredBudget = Catalog::list($pdo, Catalog::listFilters(['budget_year' => '26', 'budget_program' => str_repeat('가', 201)]));
+check(ids($ignoredBudget) === ids($all), 'Invalid budget filters are ignored');
+check(Catalog::listFilters(['budget_program' => ' 방과후 ', 'budget_year' => '2026']) === [
+    'type' => null,
+    'low_stock' => false,
+    'budget_program' => '방과후',
+    'budget_year' => 2026,
+], 'listFilters trims budget program and parses YYYY');
+
+$all = Catalog::list($pdo);
+check(isset($all[0]['budget_program'], $all[0]['budget_year']) || array_key_exists('budget_program', $all[0]), 'Browse selects budget columns');
+$solderRow = null;
+foreach ($all as $row) {
+    if ($row['id'] === 'solder') {
+        $solderRow = $row;
+        break;
+    }
+}
+check(is_array($solderRow) && $solderRow['budget_program'] === '방과후' && (int) $solderRow['budget_year'] === 2026, 'Browse includes budget values');
 
 $emptyDb = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 $emptyDb->exec((string) file_get_contents($root . '/sql/schema.sql'));
@@ -155,6 +187,8 @@ check(str_contains($searchTpl, "App::url('items')"), '찾기 points at browse wi
 
 $listTpl = (string) file_get_contents($root . '/templates/items/index.php');
 check(str_contains($listTpl, 'name="type"') && str_contains($listTpl, 'name="low_stock"'), 'Browse UI has type and low-stock filters');
+check(str_contains($listTpl, 'name="budget_program"') && str_contains($listTpl, 'name="budget_year"'), 'Browse UI has budget filters');
+check(str_contains($listTpl, 'Budget::format'), 'Browse UI displays budget on rows');
 check(str_contains($listTpl, 'method="get"') && !str_contains($listTpl, 'Csrf::field()'), 'Browse is a GET read; no CSRF write');
 
 $more = (string) file_get_contents($root . '/templates/more/index.php');

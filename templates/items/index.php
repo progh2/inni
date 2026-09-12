@@ -1,13 +1,19 @@
 <?php
 
 use Inni\App;
+use Inni\Budget;
 use Inni\Catalog;
 use Inni\Support;
 
 /** @var list<array<string, mixed>> $items */
 /** @var string $type */
 /** @var bool $lowStock */
+/** @var string|int|null $budgetProgram */
+/** @var string|int|null $budgetYear */
 $type = is_string($type ?? null) ? $type : '';
+$budgetProgram = is_string($budgetProgram ?? null) ? $budgetProgram : '';
+$budgetYear = isset($budgetYear) && $budgetYear !== null && $budgetYear !== '' ? (string) (int) $budgetYear : '';
+$hasFilters = $type !== '' || !empty($lowStock) || $budgetProgram !== '' || $budgetYear !== '';
 ?>
 <h1>품목 목록</h1>
 <p class="muted">검색 없이 전체를 훑을 수 있습니다. 찾기는 그대로 둡니다.</p>
@@ -29,9 +35,16 @@ $type = is_string($type ?? null) ? $type : '';
       재고부족
     </label>
   </div>
-  <?php // TODO(#32): add budget_program / budget_year display + filters once those columns exist. ?>
+  <div class="field" style="margin-top:0.75rem">
+    <label>사업명</label>
+    <input name="budget_program" maxlength="200" placeholder="자유 입력 (선택)" value="<?= Support::e($budgetProgram) ?>">
+  </div>
+  <div class="field" style="margin-top:0.75rem">
+    <label>예산연도</label>
+    <input name="budget_year" type="number" inputmode="numeric" min="1900" max="2100" step="1" placeholder="YYYY" value="<?= Support::e($budgetYear) ?>">
+  </div>
   <button class="btn btn-primary" style="margin-top:0.75rem" type="submit">필터</button>
-  <?php if ($type !== '' || !empty($lowStock)): ?>
+  <?php if ($hasFilters): ?>
     <a class="btn btn-ghost" style="margin-top:0.75rem" href="<?= Support::e(App::url('items')) ?>">초기화</a>
   <?php endif; ?>
 </form>
@@ -52,6 +65,13 @@ $type = is_string($type ?? null) ? $type : '';
           <?php else: ?>
             · 장비 <?= (int) $c['asset_count'] ?>
           <?php endif; ?>
+          <?php
+            $rowBudget = Budget::format(
+                isset($c['budget_program']) ? (string) $c['budget_program'] : null,
+                $c['budget_year'] ?? null,
+            );
+          ?>
+          <?php if ($rowBudget !== ''): ?> · <?= Support::e($rowBudget) ?><?php endif; ?>
         </div>
       </div>
       <?php if (!empty($c['low_stock'])): ?>

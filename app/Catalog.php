@@ -14,29 +14,32 @@ final class Catalog
     public const TYPES = ['equipment', 'fixture', 'consumable', 'part'];
 
     /**
-     * Browse catalog items without a search term. Type and low-stock filters
-     * are applied in SQL. Invalid type values are ignored (no type filter).
+     * Browse catalog items without a search term. Type, low-stock, and
+     * purchase-budget filters are applied in SQL. Invalid type/budget values
+     * are ignored (no filter).
      *
-     * TODO(#32): when catalog_items.budget_program (TEXT) and budget_year (YYYY)
-     * exist on the schema, SELECT them and accept matching list filters.
-     * #29 does not add that migration.
-     *
-     * @param array{type?: mixed, low_stock?: mixed} $filters
+     * @param array{type?: mixed, low_stock?: mixed, budget_program?: mixed, budget_year?: mixed} $filters
      * @return list<array<string, mixed>>
      */
     public static function list(PDO $pdo, array $filters = []): array
     {
         $parsed = self::listFilters($filters);
         $sql = "SELECT c.id, c.name, c.type, c.description, c.tags, c.unit, c.min_stock,
-                       c.manufacturer, c.favorite, c.qr_code,
+                       c.manufacturer, c.favorite, c.qr_code, c.budget_program, c.budget_year,
                        COALESCE(SUM(s.quantity), 0) AS stock_qty,
                        (SELECT COUNT(*) FROM assets a WHERE a.catalog_item_id = c.id) AS asset_count
                 FROM catalog_items c
                 LEFT JOIN stock_lots s ON s.catalog_item_id = c.id";
         $params = [];
-        if ($parsed['type'] !== null) {
-            $sql .= ' WHERE c.type = ?';
-            $params[] = $parsed['type'];
+        $budget = Budget::filterSql('c', $parsed['budget_program'], $parsed['budget_year']);
+        if ($parsed['type'] !== null || $budget['sql'] !== '') {
+            $sql .= ' WHERE 1=1';
+            if ($parsed['type'] !== null) {
+                $sql .= ' AND c.type = ?';
+                $params[] = $parsed['type'];
+            }
+            $sql .= $budget['sql'];
+            $params = array_merge($params, $budget['params']);
         }
         $sql .= ' GROUP BY c.id';
         if ($parsed['low_stock']) {
@@ -61,13 +64,16 @@ final class Catalog
 
     /**
      * @param array<string, mixed> $query
-     * @return array{type: ?string, low_stock: bool}
+     * @return array{type: ?string, low_stock: bool, budget_program: ?string, budget_year: ?int}
      */
     public static function listFilters(array $query): array
     {
+        $budget = Budget::queryFilters($query);
         return [
             'type' => self::normalizeType($query['type'] ?? null),
             'low_stock' => self::isTruthyFilter($query['low_stock'] ?? null),
+            'budget_program' => $budget['program'],
+            'budget_year' => $budget['year'],
         ];
     }
 
@@ -127,6 +133,8 @@ final class Catalog
         ?string $manufacturer,
         ?string $imagePath,
         bool $favorite,
+        mixed $budgetProgram = null,
+        mixed $budgetYear = null,
     ): void {
         if (!Auth::canWrite($actor) || ($actor['status'] ?? '') !== 'active') {
             throw new InvalidArgumentException('수정 권한이 없습니다.');
@@ -144,6 +152,8 @@ final class Catalog
         $description = self::nullableTrim($description);
         $edufine = self::nullableTrim($edufine);
         $manufacturer = self::nullableTrim($manufacturer);
+        $budgetProgram = Budget::parseProgram($budgetProgram);
+        $budgetYear = Budget::parseYear($budgetYear);
         $minStock = self::parseMinStock($minStock);
         $cleanTags = [];
         foreach ($tags as $tag) {
@@ -170,7 +180,8 @@ final class Catalog
             $update = $pdo->prepare(
                 'UPDATE catalog_items
                  SET name = ?, description = ?, tags = ?, unit = ?, min_stock = ?,
-                     edufine_number = ?, manufacturer = ?, image_path = ?, favorite = ?, updated_at = ?
+                     edufine_number = ?, manufacturer = ?, budget_program = ?, budget_year = ?,
+                     image_path = ?, favorite = ?, updated_at = ?
                  WHERE id = ?'
             );
             $update->execute([
@@ -181,6 +192,8 @@ final class Catalog
                 $minStock,
                 $edufine,
                 $manufacturer,
+                $budgetProgram,
+                $budgetYear,
                 $image,
                 $favorite ? 1 : 0,
                 $t,
@@ -194,6 +207,8 @@ final class Catalog
                     'min_stock' => $item['min_stock'],
                     'manufacturer' => $item['manufacturer'],
                     'edufine_number' => $item['edufine_number'],
+                    'budget_program' => $item['budget_program'] ?? null,
+                    'budget_year' => $item['budget_year'] ?? null,
                     'favorite' => (int) $item['favorite'],
                 ],
                 'after' => [
@@ -202,6 +217,8 @@ final class Catalog
                     'min_stock' => $minStock,
                     'manufacturer' => $manufacturer,
                     'edufine_number' => $edufine,
+                    'budget_program' => $budgetProgram,
+                    'budget_year' => $budgetYear,
                     'favorite' => $favorite ? 1 : 0,
                 ],
             ];
