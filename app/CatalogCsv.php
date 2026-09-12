@@ -540,7 +540,7 @@ final class CatalogCsv
                         $aname = $count === 1 ? $name : $name . ' #' . ($i + 1);
                         $pdo->prepare(
                             'INSERT INTO assets(id,catalog_item_id,name,management_number,edufine_number,status,location_id,tags,budget_program,budget_year,notes,qr_code,created_at,updated_at)
-                             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
                         )->execute([
                             $aid,
                             $catalogId,
