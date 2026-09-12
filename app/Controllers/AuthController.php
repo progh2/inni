@@ -19,7 +19,7 @@ final class AuthController
             'google' => Auth::googleEnabled(),
             'googleStatus' => Auth::googleConfigStatus(),
             'googleRedirectUri' => Auth::googleRedirectUri(),
-            'demo' => (bool) App::config('demo_login', true),
+            'demo' => Auth::isDemoLoginEnabled(),
         ], 'layouts/bare');
     }
 

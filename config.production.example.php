@@ -3,19 +3,18 @@
 declare(strict_types=1);
 
 /**
- * inni 로컬 / Docker 스모크 설정 예시 → config.php 로 복사
+ * inni 운영 설정 예시 → config.php 로 복사
  *
- * 이 파일의 demo_login 은 true 입니다. 데모 버튼이 보여야 하는 로컬·컨테이너 확인용.
- * 운영 배포는 config.production.example.php 를 복사하거나, 반드시 demo_login => false.
- * 키가 빠지면 앱은 false 로 취급합니다 (실패 폐쇄). 실제 Google 키를 이 파일에 넣지 마세요.
+ * demo_login 은 false. 로컬·Docker 스모크는 config.example.php (true) 를 쓰세요.
+ * Google client_id / client_secret 은 서버의 config.php 에만 넣으세요. 이 파일에 실제 키를 넣지 마세요.
  */
 return [
     'app_name' => 'inni',
-    'school_name' => 'inni 데모 마이스터고',
+    'school_name' => '',
     'base_url' => '', // 운영 OAuth는 공개 URL로 고정. 예: https://school.kr/inni/public
     'timezone' => 'Asia/Seoul',
-    // Local / Docker smoke only. Production MUST be false (see config.production.example.php).
-    'demo_login' => true,
+    // Production: keep false. Demo buttons allow login without a school account.
+    'demo_login' => false,
     'session_name' => 'inni_sess',
 
     'google' => [

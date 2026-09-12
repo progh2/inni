@@ -59,7 +59,7 @@ final class Auth
 
     public static function canWrite(?array $user): bool
     {
-        return $user && in_array($user['role'], ['owner', 'manager'], true);
+        return self::isActiveRole($user, ['owner', 'manager']);
     }
 
     public static function canLoan(?array $user): bool
@@ -108,7 +108,13 @@ final class Auth
 
     public static function isOwner(?array $user): bool
     {
-        return $user && $user['role'] === 'owner';
+        return self::isActiveRole($user, ['owner']);
+    }
+
+    /** Local/Docker smoke only. Missing key is off (production-safe). */
+    public static function isDemoLoginEnabled(): bool
+    {
+        return (bool) App::config('demo_login', false);
     }
 
     public static function loginDemo(string $which = 'owner'): void
@@ -126,7 +132,7 @@ final class Auth
     /** Demo-seed id when demo_login is on; null when the shortcut is disabled. */
     public static function demoLoginUserId(string $which = 'owner'): ?string
     {
-        if (!App::config('demo_login', true)) {
+        if (!self::isDemoLoginEnabled()) {
             return null;
         }
         return $which === 'teacher' ? Seed::DEMO_TEACHER_ID : Seed::DEMO_OWNER_ID;

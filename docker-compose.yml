@@ -8,7 +8,8 @@ services:
       # Persist SQLite (inni.sqlite + -wal / -shm) and uploaded photos on the host.
       - ./data:/var/www/inni/data
       - ./public/uploads:/var/www/inni/public/uploads
-      # Optional school config — create the host file first (a missing path becomes a directory):
+      # Optional school/production config — create the host file first (a missing path becomes a directory).
+      # Production: cp config.production.example.php config.php  (demo_login must stay false)
       # - ./config.php:/var/www/inni/config.php:ro
     environment:
       TZ: Asia/Seoul

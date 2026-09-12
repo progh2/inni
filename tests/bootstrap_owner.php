@@ -51,12 +51,18 @@ $configProp = $ref->getProperty('config');
 $configProp->setAccessible(true);
 
 $configProp->setValue(null, ['demo_login' => true]);
+check(Auth::isDemoLoginEnabled() === true, 'demo_login true is enabled');
 check(Auth::demoLoginUserId('owner') === Seed::DEMO_OWNER_ID, 'demo_login owner id');
 check(Auth::demoLoginUserId('teacher') === Seed::DEMO_TEACHER_ID, 'demo_login teacher id');
 
 $configProp->setValue(null, ['demo_login' => false]);
+check(Auth::isDemoLoginEnabled() === false, 'demo_login false is disabled');
 check(Auth::demoLoginUserId('owner') === null, 'demo_login off must hide owner shortcut');
 check(Auth::demoLoginUserId('teacher') === null, 'demo_login off must hide teacher shortcut');
+
+$configProp->setValue(null, []);
+check(Auth::isDemoLoginEnabled() === false, 'omitted demo_login defaults off');
+check(Auth::demoLoginUserId('owner') === null, 'omitted demo_login hides owner shortcut');
 
 $empty = memoryDb();
 check(Auth::countNonDemoUsers($empty) === 0, 'empty DB has no real users');
