@@ -111,7 +111,8 @@ erDiagram
 | locationId | string | 현재 위치 |
 | tags | string[] | |
 | imageUrl | string? | |
-| purchaseDate | string? | ISO date |
+| purchaseDate | string? | ISO date (UI: 도입일) |
+| usefulLifeYears | number? | 내용연한(년). 만료 예정일 = purchaseDate + years |
 | budgetProgram | string? | 구입 사업명 (자유 입력) |
 | budgetYear | number? | YYYY |
 | notes | string? | |

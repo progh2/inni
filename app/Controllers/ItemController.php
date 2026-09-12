@@ -6,6 +6,7 @@ namespace Inni\Controllers;
 
 use Inni\App;
 use Inni\Auth;
+use Inni\AssetLife;
 use Inni\Budget;
 use Inni\Catalog;
 use Inni\Csrf;
@@ -68,6 +69,8 @@ final class ItemController
         try {
             $budgetProgram = Budget::parseProgram($_POST['budget_program'] ?? null);
             $budgetYear = Budget::parseYear($_POST['budget_year'] ?? null);
+            $purchaseDate = AssetLife::parsePurchaseDate($_POST['purchase_date'] ?? null);
+            $usefulLifeYears = AssetLife::parseUsefulLifeYears($_POST['useful_life_years'] ?? null);
         } catch (\InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());
             App::redirect('items/new');
@@ -115,11 +118,12 @@ final class ItemController
                         : 'MGMT-' . strtoupper(substr($aid, -8));
                     $aname = $quantity === 1 ? $name : $name . ' #' . ($i + 1);
                     $pdo->prepare(
-                        'INSERT INTO assets(id,catalog_item_id,name,management_number,edufine_number,status,location_id,tags,image_path,budget_program,budget_year,notes,qr_code,created_at,updated_at)
-                         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                        'INSERT INTO assets(id,catalog_item_id,name,management_number,edufine_number,status,location_id,tags,image_path,purchase_date,useful_life_years,budget_program,budget_year,notes,qr_code,created_at,updated_at)
+                         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
                     )->execute([
                         $aid, $catalogId, $aname, $number, $edufine, 'available', $locationId,
-                        json_encode($tags, JSON_UNESCAPED_UNICODE), $imagePath, $budgetProgram, $budgetYear, $notes,
+                        json_encode($tags, JSON_UNESCAPED_UNICODE), $imagePath, $purchaseDate, $usefulLifeYears,
+                        $budgetProgram, $budgetYear, $notes,
                         Support::qr('AST', $aid), $t, $t,
                     ]);
                 }

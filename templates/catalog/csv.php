@@ -49,7 +49,7 @@ use Inni\Support;
 
 <div class="card">
   <h2 class="section-title" style="margin-top:0">올리기</h2>
-  <p class="muted">담당교사(owner/manager)만 가능합니다. 잘못된 행은 건너뛰고 아래에 이유를 보여 줍니다. 열: 품목ID, 품명, 유형(장비/비품/소모품/부품), 설명, 태그, 단위, 최소재고, 에듀파인번호(옵션 필드), 제조사, 즐겨찾기, 위치, 수량, 관리번호, 사업명, 예산연도.</p>
+  <p class="muted">담당교사(owner/manager)만 가능합니다. 잘못된 행은 건너뛰고 아래에 이유를 보여 줍니다. 열: 품목ID, 품명, 유형(장비/비품/소모품/부품), 설명, 태그, 단위, 최소재고, 에듀파인번호(옵션 필드), 제조사, 즐겨찾기, 위치, 수량, 관리번호, 사업명, 예산연도, 도입일, 내용연한.</p>
   <form method="post" action="<?= Support::e(App::url('catalog/csv/import')) ?>" enctype="multipart/form-data">
     <?= Csrf::field() ?>
     <div class="field">

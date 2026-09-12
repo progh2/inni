@@ -1,6 +1,7 @@
 <?php
 
 use Inni\App;
+use Inni\AssetLife;
 use Inni\Auth;
 use Inni\Budget;
 use Inni\Csrf;
@@ -24,7 +25,14 @@ $catalogBudget = Budget::format(
     $asset['catalog_budget_year'] ?? null,
 );
 $budgetLabel = $assetBudget !== '' ? $assetBudget : $catalogBudget;
+$lifeLabel = AssetLife::format(
+    isset($asset['purchase_date']) ? (string) $asset['purchase_date'] : null,
+    $asset['useful_life_years'] ?? null,
+);
 ?>
+<?php if ($lifeLabel !== ''): ?>
+  <p class="muted"><?= Support::e($lifeLabel) ?></p>
+<?php endif; ?>
 <?php if ($budgetLabel !== ''): ?>
   <p class="muted">구입 <?= Support::e($budgetLabel) ?></p>
 <?php endif; ?>
@@ -97,6 +105,33 @@ $budgetLabel = $assetBudget !== '' ? $assetBudget : $catalogBudget;
 </div>
 
 <?php if (Auth::canWrite($user)): ?>
+<div class="card">
+  <h2 class="section-title" style="margin-top:0">도입일 · 내용연한</h2>
+  <form method="post" action="<?= Support::e(App::url('assets/life')) ?>">
+    <?= Csrf::field() ?>
+    <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
+    <div class="grid-2">
+      <div class="field">
+        <label>도입일</label>
+        <input name="purchase_date" type="date" value="<?= Support::e(AssetLife::formatDate(isset($asset['purchase_date']) ? (string) $asset['purchase_date'] : null)) ?>">
+      </div>
+      <div class="field">
+        <label>내용연한(년)</label>
+        <input name="useful_life_years" type="number" inputmode="numeric" min="1" max="100" step="1" placeholder="예: 5" value="<?= $asset['useful_life_years'] !== null && $asset['useful_life_years'] !== '' ? Support::e((string) $asset['useful_life_years']) : '' ?>">
+      </div>
+    </div>
+    <?php
+      $expiry = AssetLife::expiryDate(
+          isset($asset['purchase_date']) ? (string) $asset['purchase_date'] : null,
+          $asset['useful_life_years'] ?? null,
+      );
+    ?>
+    <?php if ($expiry !== null): ?>
+      <p class="muted">만료 예정일 <?= Support::e($expiry) ?></p>
+    <?php endif; ?>
+    <button class="btn btn-ghost" type="submit">저장</button>
+  </form>
+</div>
 <div class="card">
   <h2 class="section-title" style="margin-top:0">구입 사업예산</h2>
   <form method="post" action="<?= Support::e(App::url('assets/budget')) ?>">

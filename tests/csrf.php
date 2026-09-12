@@ -225,7 +225,7 @@ check(str_contains($field, 'name="csrf_token"') && str_contains($field, $token),
 check(str_contains((string) file_get_contents($root . '/app/Csrf.php'), 'Support::e(self::token())'), 'Hidden field value must be escaped');
 $mutations = [
     'app/Controllers/ItemController.php' => ['save', 'update', 'issue', 'restock', 'cancelIssue'],
-    'app/Controllers/AssetController.php' => ['loan', 'move', 'report', 'photo', 'updateBudget'],
+    'app/Controllers/AssetController.php' => ['loan', 'move', 'report', 'photo', 'updateBudget', 'updateLife'],
     'app/Controllers/LoanController.php' => ['returnLoan'],
     'app/Controllers/RoomController.php' => ['save'],
     'app/Controllers/SettingsController.php' => ['save', 'saveTelegram', 'approve'],
@@ -273,6 +273,7 @@ $show = (string) file_get_contents($root . '/templates/items/show.php');
 check(str_contains($show, 'items/restock') && str_contains($show, 'items/cancel-issue'), 'Item show must include restock and cancel-issue forms');
 $assetShow = (string) file_get_contents($root . '/templates/assets/show.php');
 check(str_contains($assetShow, 'assets/budget') && substr_count($assetShow, 'Csrf::field()') >= 2, 'Asset show must include CSRF budget form');
+check(str_contains($assetShow, 'assets/life') && str_contains($assetShow, '도입일'), 'Asset show must include CSRF 도입일 form');
 $settingsForm = (string) file_get_contents($root . '/templates/settings/index.php');
 check(str_contains($settingsForm, 'settings/telegram'), 'settings telegram form posts to settings/telegram');
 check(substr_count($settingsForm, 'Csrf::field()') >= 2, 'school and telegram settings forms include CSRF');

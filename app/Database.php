@@ -62,6 +62,7 @@ final class Database
         self::ensureColumn($pdo, 'catalog_items', 'budget_year', 'INTEGER');
         self::ensureColumn($pdo, 'assets', 'budget_program', 'TEXT');
         self::ensureColumn($pdo, 'assets', 'budget_year', 'INTEGER');
+        self::ensureColumn($pdo, 'assets', 'useful_life_years', 'INTEGER');
         $pdo->exec('CREATE INDEX IF NOT EXISTS idx_catalog_budget ON catalog_items(budget_year, budget_program)');
         $pdo->exec('CREATE INDEX IF NOT EXISTS idx_assets_budget ON assets(budget_year, budget_program)');
 
@@ -152,7 +153,11 @@ final class Database
     {
         $allowed = [
             'catalog_items' => ['budget_program' => 'TEXT', 'budget_year' => 'INTEGER'],
-            'assets' => ['budget_program' => 'TEXT', 'budget_year' => 'INTEGER'],
+            'assets' => [
+                'budget_program' => 'TEXT',
+                'budget_year' => 'INTEGER',
+                'useful_life_years' => 'INTEGER',
+            ],
         ];
         if (!isset($allowed[$table][$column]) || $allowed[$table][$column] !== $type) {
             throw new RuntimeException('Refusing unknown schema patch: ' . $table . '.' . $column);

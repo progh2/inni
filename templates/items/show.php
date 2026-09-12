@@ -1,6 +1,7 @@
 <?php
 
 use Inni\App;
+use Inni\AssetLife;
 use Inni\Auth;
 use Inni\Budget;
 use Inni\Csrf;
@@ -53,7 +54,16 @@ $budgetLabel = Budget::format(
     <a class="list-row" href="<?= Support::e(App::url('assets/show', ['id' => $a['id']])) ?>">
       <div>
         <div class="title"><?= Support::e($a['name']) ?></div>
-        <div class="meta"><?= Support::e($a['management_number']) ?> · <?= Support::e($a['location_name']) ?></div>
+        <div class="meta">
+          <?= Support::e($a['management_number']) ?> · <?= Support::e($a['location_name']) ?>
+          <?php
+            $assetLife = AssetLife::format(
+                isset($a['purchase_date']) ? (string) $a['purchase_date'] : null,
+                $a['useful_life_years'] ?? null,
+            );
+          ?>
+          <?php if ($assetLife !== ''): ?> · <?= Support::e($assetLife) ?><?php endif; ?>
+        </div>
       </div>
       <span class="badge <?= Support::e($a['status']) ?>"><?= Support::e(Support::statusLabel($a['status'])) ?></span>
     </a>

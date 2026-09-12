@@ -2,6 +2,7 @@
 
 use Inni\App;
 use Inni\AssetBoard;
+use Inni\AssetLife;
 use Inni\Budget;
 use Inni\Support;
 
@@ -110,6 +111,13 @@ $budgetYear = isset($filters['budget_year']) && $filters['budget_year'] !== null
             );
           ?>
           <?php if ($rowBudget !== ''): ?> · <?= Support::e($rowBudget) ?><?php endif; ?>
+          <?php
+            $rowLife = AssetLife::format(
+                isset($asset['purchase_date']) ? (string) $asset['purchase_date'] : null,
+                $asset['useful_life_years'] ?? null,
+            );
+          ?>
+          <?php if ($rowLife !== ''): ?> · <?= Support::e($rowLife) ?><?php endif; ?>
           <?php if (($asset['loan_status'] ?? '') !== ''): ?>
             · <?= Support::e((string) ($asset['borrower_name'] ?? '')) ?>
             · 예정 <?= Support::e(Support::formatWhen(isset($asset['due_at']) ? (string) $asset['due_at'] : null)) ?>

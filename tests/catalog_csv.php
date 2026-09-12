@@ -46,6 +46,7 @@ function snapshot(PDO $pdo): array
 $template = CatalogCsv::template();
 check(str_contains($template, '품명') && str_contains($template, '유형'), 'Template missing Korean headers');
 check(str_contains($template, '사업명') && str_contains($template, '예산연도'), 'Template missing budget headers');
+check(str_contains($template, '도입일') && str_contains($template, '내용연한'), 'Template missing 도입일/내용연한 headers');
 check(!str_contains($template, CatalogCsv::BOM), 'Template helper should not include BOM (controller adds it)');
 
 $map = CatalogCsv::mapHeader(['id', 'name', 'type']);
