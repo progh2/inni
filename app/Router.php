@@ -58,6 +58,7 @@ final class Router
             'catalog/csv/export' => [CatalogCsvController::class, 'export'],
             'catalog/csv/import' => [CatalogCsvController::class, 'import'],
 
+            'assets' => [AssetController::class, 'index'],
             'assets/show' => [AssetController::class, 'show'],
             'assets/loan' => [AssetController::class, 'loan'],
             'assets/move' => [AssetController::class, 'move'],
