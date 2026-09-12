@@ -215,6 +215,7 @@ check(str_contains($catalogCsv, 'function import') && str_contains($catalogCsv, 
 check(str_contains($catalogCsv, 'Csrf::requirePost()'), 'catalog csv import requires POST+CSRF');
 $more = (string) file_get_contents($root . '/templates/more/index.php');
 check(str_contains($more, "App::url('items')") && str_contains($more, '품목 목록'), 'more menu lists catalog browse for any logged-in role');
+check(str_contains($more, "App::url('assets')") && str_contains($more, '기자재 현황'), 'more menu links to assets status board');
 check(str_contains($more, 'Auth::canWrite($user)') && str_contains($more, 'catalog/csv'), 'more menu gates catalog csv on canWrite');
 check(str_contains($more, 'Auth::canConfigureAlerts($user)') && str_contains($more, 'settings'), 'more menu gates settings on canConfigureAlerts');
 check(str_contains($more, '!empty($aiReady)'), 'more menu hides AI helper when not connected');

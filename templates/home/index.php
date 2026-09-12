@@ -10,7 +10,7 @@ use Inni\Support;
 <?php endif; ?>
 
 <div class="stats" style="margin:1rem 0">
-  <div class="stat"><b><?= (int) $assetCount ?></b>장비</div>
+  <a class="stat" href="<?= Support::e(App::url('assets')) ?>"><b><?= (int) $assetCount ?></b>장비</a>
   <div class="stat"><b><?= (int) $roomCount ?></b>실</div>
   <div class="stat"><b><?= (int) $openReports ?></b>신고</div>
 </div>
@@ -19,6 +19,7 @@ use Inni\Support;
   <a class="btn btn-primary" href="<?= Support::e(App::url('scan')) ?>">스캔하기</a>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('items')) ?>">품목 목록</a>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('items/new')) ?>">빠른 등록</a>
+  <a class="btn btn-ghost" href="<?= Support::e(App::url('assets')) ?>">기자재 현황</a>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('loans')) ?>">대여 현황</a>
 </div>
 
