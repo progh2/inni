@@ -22,6 +22,7 @@
 - 품목 수정(owner/manager): 이름·단위·최소재고·제조사·태그·메모·사진·즐겨찾기. 유형/QR/재고 수량은 바꾸지 않음.
 - 재입고(owner/manager): 기존 로트 증가 또는 새 위치에 `stock_lots` 생성. `activity_logs.action=restock`.
 - 출고 취소(owner/manager/teacher): `stock_issue_cancels.issue_log_id` UNIQUE로 이중 취소 실패 폐쇄. 수량 복원과 `cancel_issue` 이력을 같은 트랜잭션으로.
+- 가벼운 실사(owner/manager): 실 선택 → 예상 장비·품목 목록 → #7과 같은 카메라/코드 입력으로 확인 → 종료 시 미확인 목록. 진행 중 세션은 1건. 이어하기·텔레그램·엑셀은 없음.
 
 ## 이번 검증
 
@@ -30,7 +31,8 @@
 - `php tests/catalog.php`: 품목 수정 필드·권한·이력 롤백 검증.
 - `php tests/csrf.php`: 세션 CSRF 허용/거부, GET 거부, 반납·재입고·출고 취소 경로 실패 폐쇄 검증.
 - `php tests/loan.php`: 대여·반납 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위, 이력 실패 롤백.
-- `php tests/role_block.php`: 학생·pending·disabled의 등록·대여·출고 차단, `demo_login` 키 생략 시 off.
+- `php tests/role_block.php`: 학생·pending·disabled의 등록·대여·출고·실사 차단, `demo_login` 키 생략 시 off.
+- `php tests/inventory.php`: 실 선택·스캔/코드 확인·미확인 목록·단일 진행 세션·권한·이력 롤백.
 - 임시 앱 복사본·DB에서 HTTP 검증 통과: 로그인, 품목 화면, 정상 출고와 이력, 재고 부족, GET 거부, 잘못된 CSRF 토큰, 학생 권한 차단.
 - 브라우저 시각 검증, 실제 카메라 스캔, Google Cloud Console 실연동(실제 client_id/secret)은 미실시.
 - Google OAuth: 승인된 리디렉션 URI는 `{base_url}/index.php?r=auth/google/callback`로 고정. 로그인·설정에 동일 문자열 표시. `allowed_domains`는 비면 인증된 메일 허용, 값이 있으면 정확 일치 실패 폐쇄. `email_verified` 필수. `php tests/google_oauth.php`가 토큰 교환을 스텁한다.
@@ -41,7 +43,8 @@
 1. ~~최초 Google 관리자 생성: 시드 데모 사용자와 OAuth 최초 owner 판정 불일치.~~ 데모 시드 계정은 첫 Google=owner 카운트에서 제외. `demo_login` 로컬 데모는 유지. `tests/bootstrap_owner.php`.
 2. ~~기존 변경 요청 전반에 POST·CSRF 검사 적용.~~ 대여·반납·이동·등록·설정·사용자 승인·고장 신고·사진 업로드·출고에 `Csrf::requirePost()` 적용. 스캔 조회·라벨 인쇄·데모 로그인·로그아웃 GET은 상태 변경이 아니거나 인증 진입이라 제외.
 3. ~~장비 대여·반납의 동시 요청 및 반납 권한 범위 검토.~~ `Loan::checkout`/`checkin`이 `BEGIN IMMEDIATE` + 상태 조건부 UPDATE + rowCount로 이중 대여·반납을 실패 폐쇄. 반납은 `Auth::canReturn`(owner/manager/teacher=전체, student=본인). 열린 대여는 자산당 1건 unique index.
-4. ~~품목 수정·재입고, 출고 취소와 취소 이력.~~ issue #9. 실사·엑셀·알림·AI는 별도.
+4. ~~품목 수정·재입고, 출고 취소와 취소 이력.~~ issue #9.
+4b. ~~가벼운 실사 MVP.~~ issue #10. 엑셀·알림·AI·이어하기는 별도.
 5. ~~Docker의 설정 파일 생성 권한 및 필요한 PHP 확장 점검.~~ → issue #5 / Compose 경로로 처리.
 6. ~~Google OAuth 리다이렉트 URI·allowed_domains.~~ 키 없이 단위/스텁 검사까지. Console 실스모크는 사람 자격 증명 필요 (issue #6).
 7. ~~demo_login 운영 off 기본·역할 차단 스모크.~~ 로컬/Docker 예시는 `true`, 운영 예시·키 생략은 `false`. 학생·pending·disabled 쓰기는 `canWrite`/`canLoan`/`canReturn` + `tests/role_block.php` (issue #4).

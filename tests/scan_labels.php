@@ -14,7 +14,9 @@ function check(bool $ok, string $message): void
     $checks++;
 }
 
-$scan = (string) file_get_contents($root . '/templates/scan/index.php');
+$scan = (string) file_get_contents($root . '/templates/scan/index.php')
+    . (string) file_get_contents($root . '/templates/partials/scan_input.php')
+    . (string) file_get_contents($root . '/templates/inventory/show.php');
 $labels = (string) file_get_contents($root . '/templates/labels/index.php');
 $print = (string) file_get_contents($root . '/templates/labels/print.php');
 $printLayout = (string) file_get_contents($root . '/templates/layouts/print.php');
@@ -27,6 +29,8 @@ check(str_contains($scan, 'isSecureContext'), 'Scan must refuse the camera off H
 check(str_contains($scan, '코드를 직접 입력하세요'), 'Camera failures must point at manual code entry');
 check(str_contains($scan, "facingMode: 'environment'") || str_contains($scan, 'environment'), 'Rear camera should be preferred');
 check(str_contains($scan, 'html5-qrcode'), 'Existing html5-qrcode CDN must stay');
+check(str_contains($scan, "App::url('scan/resolve')"), 'Scan page still posts to scan/resolve');
+check(str_contains($scan, "App::url('inventory/confirm')"), 'Inventory session reuses the same scan POST pattern');
 
 check(str_contains($labels, 'Csrf::field()'), 'Label selection form must send CSRF');
 check(str_contains($print, 'QRCode.toDataURL'), 'Label preview must draw QR in the browser');

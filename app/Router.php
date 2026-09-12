@@ -7,6 +7,7 @@ namespace Inni;
 use Inni\Controllers\AssetController;
 use Inni\Controllers\AuthController;
 use Inni\Controllers\HomeController;
+use Inni\Controllers\InventoryController;
 use Inni\Controllers\ItemController;
 use Inni\Controllers\LabelController;
 use Inni\Controllers\LoanController;
@@ -61,6 +62,13 @@ final class Router
 
             'labels' => [LabelController::class, 'index'],
             'labels/print' => [LabelController::class, 'print'],
+
+            'inventory' => [InventoryController::class, 'index'],
+            'inventory/start' => [InventoryController::class, 'start'],
+            'inventory/show' => [InventoryController::class, 'show'],
+            'inventory/confirm' => [InventoryController::class, 'confirm'],
+            'inventory/finish' => [InventoryController::class, 'finish'],
+            'inventory/result' => [InventoryController::class, 'result'],
 
             'more' => [MoreController::class, 'index'],
             'settings' => [SettingsController::class, 'index'],

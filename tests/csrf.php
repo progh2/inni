@@ -231,6 +231,7 @@ $mutations = [
     'app/Controllers/SettingsController.php' => ['save', 'approve'],
     'app/Controllers/ScanController.php' => ['resolve'],
     'app/Controllers/LabelController.php' => ['print'],
+    'app/Controllers/InventoryController.php' => ['start', 'confirm', 'finish'],
 ];
 foreach ($mutations as $file => $methods) {
     $source = file_get_contents($root . '/' . $file);
@@ -249,14 +250,23 @@ $forms = [
     'templates/loans/index.php' => 'loans/return',
     'templates/settings/index.php' => 'settings/save',
     'templates/settings/users.php' => 'settings/approve',
-    'templates/scan/index.php' => 'scan/resolve',
+    'templates/partials/scan_input.php' => 'scan-manual-form',
     'templates/labels/index.php' => 'labels/print',
+    'templates/inventory/index.php' => 'inventory/start',
+    'templates/inventory/show.php' => 'inventory/finish',
+    'templates/rooms/show.php' => 'inventory/start',
 ];
 foreach ($forms as $file => $route) {
     $source = file_get_contents($root . '/' . $file);
     check(is_string($source) && str_contains($source, 'Csrf::field()'), $file . ' form for ' . $route . ' must include Csrf::field()');
     check(str_contains($source, $route), $file . ' must post to ' . $route);
 }
+$scanPage = (string) file_get_contents($root . '/templates/scan/index.php')
+    . (string) file_get_contents($root . '/templates/partials/scan_input.php');
+check(str_contains($scanPage, 'scan/resolve') && str_contains($scanPage, 'Csrf::field()'), 'Scan page + partial post to scan/resolve with CSRF');
+$invShow = (string) file_get_contents($root . '/templates/inventory/show.php')
+    . (string) file_get_contents($root . '/templates/partials/scan_input.php');
+check(str_contains($invShow, 'inventory/confirm') && str_contains($invShow, 'Csrf::field()'), 'Inventory confirm reuses scan CSRF POST');
 $show = (string) file_get_contents($root . '/templates/items/show.php');
 check(str_contains($show, 'items/restock') && str_contains($show, 'items/cancel-issue'), 'Item show must include restock and cancel-issue forms');
 
@@ -279,7 +289,8 @@ $getRejected = invokeReturnLoan('GET', [
 ], $sessionToken);
 check($getRejected['status'] === 405 && $getRejected['loan'] === 'active', 'GET must be rejected for loan return');
 
-$scanTpl = (string) file_get_contents($root . '/templates/scan/index.php');
+$scanTpl = (string) file_get_contents($root . '/templates/scan/index.php')
+    . (string) file_get_contents($root . '/templates/partials/scan_input.php');
 check(str_contains($scanTpl, 'csrf.name = csrfName') && str_contains($scanTpl, 'csrf.value = csrfToken'), 'Camera submit must attach csrf_token');
 check(str_contains($scanTpl, 'isSecureContext') && str_contains($scanTpl, 'useManual'), 'Scan page must fall back to code input when the camera cannot start');
 check(str_contains($scanTpl, "facingMode: 'environment'"), 'Scan should prefer the rear camera');
@@ -475,5 +486,142 @@ $cancelGet = invokeItemAction('cancelIssue', 'GET', [
     'reason' => '오입력',
 ], $sessionToken, true);
 check($cancelGet['status'] === 405 && (float) $cancelGet['quantity'] === 16.0 && $cancelGet['cancels'] === 0, 'GET must be rejected for cancel-issue');
+
+function invokeInventoryAction(string $methodName, string $httpMethod, array $post, ?string $sessionToken, bool $startFirst = false): array
+{
+    $root = dirname(__DIR__);
+    $tmp = sys_get_temp_dir() . '/inni-csrf-inv-' . bin2hex(random_bytes(4));
+    mkdir($tmp, 0700);
+    $dbPath = $tmp . '/inni.sqlite';
+    $runner = $tmp . '/run.php';
+    $resultFile = $tmp . '/result.json';
+    $payload = [
+        'root' => $root,
+        'db' => $dbPath,
+        'method_name' => $methodName,
+        'method' => $httpMethod,
+        'post' => $post,
+        'csrf' => $sessionToken,
+        'start_first' => $startFirst,
+        'result' => $resultFile,
+    ];
+    file_put_contents($tmp . '/payload.json', json_encode($payload, JSON_THROW_ON_ERROR));
+    file_put_contents($runner, <<<'PHP'
+<?php
+declare(strict_types=1);
+$p = json_decode(file_get_contents(__DIR__ . '/payload.json'), true, 512, JSON_THROW_ON_ERROR);
+require $p['root'] . '/app/bootstrap.php';
+
+use Inni\App;
+use Inni\Csrf;
+use Inni\Controllers\InventoryController;
+use Inni\Inventory;
+
+$ref = new ReflectionClass(App::class);
+$rootProp = $ref->getProperty('root');
+$rootProp->setAccessible(true);
+$rootProp->setValue(null, $p['root']);
+$configProp = $ref->getProperty('config');
+$configProp->setAccessible(true);
+$configProp->setValue(null, [
+    'app_name' => 'inni',
+    'school_name' => 'csrf-test',
+    'timezone' => 'UTC',
+    'demo_login' => true,
+    'session_name' => 'inni_csrf_inv_test',
+    'base_url' => 'http://localhost',
+    'db_path' => $p['db'],
+]);
+
+$_SERVER['REQUEST_METHOD'] = $p['method'];
+$_POST = $p['post'];
+$_SESSION = ['user_id' => 'demo-owner'];
+if (is_string($p['csrf'])) {
+    $_SESSION[Csrf::SESSION_KEY] = $p['csrf'];
+}
+
+if (!empty($p['start_first'])) {
+    $actor = ['id' => 'demo-owner', 'display_name' => '김담당', 'role' => 'owner', 'status' => 'active'];
+    $check = Inventory::start(\Inni\Database::pdo(), $actor, 'loc-elec');
+    if (empty($_POST['check_id'])) {
+        $_POST['check_id'] = (string) $check['id'];
+    }
+}
+
+register_shutdown_function(static function () use ($p): void {
+    $active = 0;
+    $confirmed = 0;
+    if (is_file($p['db'])) {
+        $pdo = new PDO('sqlite:' . $p['db']);
+        $active = (int) $pdo->query("SELECT COUNT(*) FROM inventory_checks WHERE status = 'active'")->fetchColumn();
+        $confirmed = (int) $pdo->query('SELECT COUNT(*) FROM inventory_check_lines WHERE confirmed_at IS NOT NULL')->fetchColumn();
+    }
+    file_put_contents($p['result'], json_encode([
+        'status' => http_response_code(),
+        'active' => $active,
+        'confirmed' => $confirmed,
+        'body' => (string) ob_get_contents(),
+    ], JSON_UNESCAPED_UNICODE));
+});
+
+ob_start();
+$controller = new InventoryController();
+$controller->{$p['method_name']}();
+PHP);
+
+    exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($runner) . ' 2>' . escapeshellarg($tmp . '/stderr.txt'));
+    $raw = is_file($resultFile) ? (string) file_get_contents($resultFile) : '';
+    $stderr = is_file($tmp . '/stderr.txt') ? (string) file_get_contents($tmp . '/stderr.txt') : '';
+    $decoded = json_decode($raw, true);
+    foreach (glob($tmp . '/*') ?: [] as $file) {
+        @unlink($file);
+    }
+    @rmdir($tmp);
+    if (!is_array($decoded)) {
+        throw new RuntimeException('Inventory mutation harness failed: ' . $raw . $stderr);
+    }
+    return $decoded;
+}
+
+$invStartOk = invokeInventoryAction('start', 'POST', [
+    'csrf_token' => $sessionToken,
+    'location_id' => 'loc-elec',
+], $sessionToken);
+check(($invStartOk['status'] === 302 || $invStartOk['status'] === 200) && $invStartOk['active'] === 1, 'Valid CSRF should start inventory');
+
+$invStartBad = invokeInventoryAction('start', 'POST', [
+    'csrf_token' => 'wrong-token',
+    'location_id' => 'loc-elec',
+], $sessionToken);
+check($invStartBad['status'] === 403 && $invStartBad['active'] === 0, 'Bad CSRF must fail closed without starting inventory');
+
+$invStartGet = invokeInventoryAction('start', 'GET', [
+    'csrf_token' => $sessionToken,
+    'location_id' => 'loc-elec',
+], $sessionToken);
+check($invStartGet['status'] === 405 && $invStartGet['active'] === 0, 'GET must be rejected for inventory start');
+
+$invConfirmOk = invokeInventoryAction('confirm', 'POST', [
+    'csrf_token' => $sessionToken,
+    'code' => '전장-2024-017',
+], $sessionToken, true);
+check(($invConfirmOk['status'] === 302 || $invConfirmOk['status'] === 200) && $invConfirmOk['confirmed'] === 1, 'Valid CSRF should confirm a scanned item');
+
+$invConfirmBad = invokeInventoryAction('confirm', 'POST', [
+    'csrf_token' => 'wrong-token',
+    'code' => '전장-2024-017',
+], $sessionToken, true);
+check($invConfirmBad['status'] === 403 && $invConfirmBad['confirmed'] === 0, 'Bad CSRF must fail closed without confirming');
+
+$invConfirmGet = invokeInventoryAction('confirm', 'GET', [
+    'csrf_token' => $sessionToken,
+    'code' => '전장-2024-017',
+], $sessionToken, true);
+check($invConfirmGet['status'] === 405 && $invConfirmGet['confirmed'] === 0, 'GET must be rejected for inventory confirm');
+
+$invFinishGet = invokeInventoryAction('finish', 'GET', [
+    'csrf_token' => $sessionToken,
+], $sessionToken, true);
+check($invFinishGet['status'] === 405 && $invFinishGet['active'] === 1, 'GET must be rejected for inventory finish');
 
 echo "PASS: {$checks} csrf checks\n";

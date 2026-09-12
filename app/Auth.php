@@ -62,6 +62,12 @@ final class Auth
         return self::isActiveRole($user, ['owner', 'manager']);
     }
 
+    /** 실사(가벼운 MVP): owner/manager만. 이어하기·텔레그램·엑셀은 범위 밖. */
+    public static function canInventory(?array $user): bool
+    {
+        return self::isActiveRole($user, ['owner', 'manager']);
+    }
+
     public static function canLoan(?array $user): bool
     {
         return self::isActiveRole($user, ['owner', 'manager', 'teacher']);

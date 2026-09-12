@@ -22,6 +22,10 @@ $tabActive = static function (string $tab, string $current): bool {
     if ($tab === 'home') {
         return $current === 'home' || $current === '';
     }
+    if ($tab === 'more') {
+        return $current === 'more' || str_starts_with($current, 'more/')
+            || $current === 'inventory' || str_starts_with($current, 'inventory/');
+    }
     return $current === $tab || str_starts_with($current, $tab . '/');
 };
 ?>
