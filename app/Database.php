@@ -49,7 +49,7 @@ final class Database
     }
 
     /**
-     * Idempotent guards for databases created before the open-loan unique index.
+     * Idempotent guards for databases created before later schema additions.
      */
     private static function ensureGuards(PDO $pdo): void
     {
@@ -57,6 +57,24 @@ final class Database
             "CREATE UNIQUE INDEX IF NOT EXISTS idx_loans_one_open_asset
              ON loans(asset_id)
              WHERE asset_id IS NOT NULL AND status IN ('active','overdue')"
+        );
+        $pdo->exec(
+            'CREATE TABLE IF NOT EXISTS stock_issue_cancels (
+              id TEXT PRIMARY KEY,
+              issue_log_id TEXT NOT NULL UNIQUE,
+              catalog_item_id TEXT NOT NULL REFERENCES catalog_items(id),
+              lot_id TEXT NOT NULL,
+              location_id TEXT NOT NULL REFERENCES locations(id),
+              quantity REAL NOT NULL,
+              reason TEXT NOT NULL,
+              actor_id TEXT,
+              actor_name TEXT NOT NULL,
+              created_at TEXT NOT NULL
+            )'
+        );
+        $pdo->exec(
+            'CREATE INDEX IF NOT EXISTS idx_stock_issue_cancels_item
+             ON stock_issue_cancels(catalog_item_id, created_at)'
         );
     }
 }
