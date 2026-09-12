@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS assets (
   tags TEXT NOT NULL DEFAULT '[]',
   image_path TEXT,
   purchase_date TEXT,
+  useful_life_years INTEGER,
   budget_program TEXT,
   budget_year INTEGER,
   notes TEXT,

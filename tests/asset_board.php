@@ -171,6 +171,7 @@ $tpl = (string) file_get_contents($root . '/templates/assets/index.php');
 check(str_contains($tpl, 'name="status"') && str_contains($tpl, 'name="room"') && str_contains($tpl, 'name="overdue"'), 'board form has status/room/overdue');
 check(str_contains($tpl, 'name="budget_program"') && str_contains($tpl, 'name="budget_year"'), 'board form has budget filters');
 check(str_contains($tpl, 'Budget::format'), 'board displays budget on rows');
+check(str_contains($tpl, 'AssetLife::format'), 'board displays 도입일/내용연한/만료 예정일');
 check(str_contains($tpl, 'method="get"'), 'board filters are GET/SSR');
 check(!preg_match('/name=["\']q["\']/', $tpl), 'board does not require a search box');
 check(!str_contains($tpl, 'catalog_items') && !str_contains($tpl, '품목 ('), 'board template is assets-only');

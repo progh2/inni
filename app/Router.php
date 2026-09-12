@@ -64,6 +64,7 @@ final class Router
             'assets/move' => [AssetController::class, 'move'],
             'assets/report' => [AssetController::class, 'report'],
             'assets/budget' => [AssetController::class, 'updateBudget'],
+            'assets/life' => [AssetController::class, 'updateLife'],
             'assets/photo' => [AssetController::class, 'photo'],
 
             'loans' => [LoanController::class, 'index'],

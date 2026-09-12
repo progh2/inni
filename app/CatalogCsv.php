@@ -34,6 +34,8 @@ final class CatalogCsv
         'management_number',
         'budget_program',
         'budget_year',
+        'purchase_date',
+        'useful_life_years',
     ];
 
     /** @var array<string, string> */
@@ -49,6 +51,8 @@ final class CatalogCsv
         'manufacturer' => '제조사',
         'budget_program' => '사업명',
         'budget_year' => '예산연도',
+        'purchase_date' => '도입일',
+        'useful_life_years' => '내용연한',
         'favorite' => '즐겨찾기',
         'location_name' => '위치',
         'quantity' => '수량',
@@ -139,6 +143,8 @@ final class CatalogCsv
                 $place['management_number'],
                 (string) ($item['budget_program'] ?? ''),
                 $item['budget_year'] === null || $item['budget_year'] === '' ? '' : (string) $item['budget_year'],
+                $place['purchase_date'],
+                $place['useful_life_years'],
             ];
         }
 
@@ -428,6 +434,10 @@ final class CatalogCsv
             ? $row['budget_year']
             : ($item['budget_year'] ?? '');
 
+        $purchaseDate = array_key_exists('purchase_date', $row) ? $row['purchase_date'] : null;
+        $usefulLifeYears = array_key_exists('useful_life_years', $row) ? $row['useful_life_years'] : null;
+        $hasLifeCols = array_key_exists('purchase_date', $row) || array_key_exists('useful_life_years', $row);
+
         Catalog::update(
             $pdo,
             $actor,
@@ -444,6 +454,10 @@ final class CatalogCsv
             $budgetProgram,
             $budgetYear,
         );
+
+        if ($hasLifeCols) {
+            self::updateAssetsLife($pdo, $itemId, $row, $purchaseDate, $usefulLifeYears);
+        }
     }
 
     /**
@@ -501,6 +515,8 @@ final class CatalogCsv
         $favorite = self::parseFavorite((string) ($row['favorite'] ?? ''));
         $budgetProgram = Budget::parseProgram($row['budget_program'] ?? null);
         $budgetYear = Budget::parseYear($row['budget_year'] ?? null);
+        $purchaseDate = AssetLife::parsePurchaseDate($row['purchase_date'] ?? null);
+        $usefulLifeYears = AssetLife::parseUsefulLifeYears($row['useful_life_years'] ?? null);
         $mgmt = trim((string) ($row['management_number'] ?? ''));
 
         $t = Support::now();
@@ -539,8 +555,8 @@ final class CatalogCsv
                             : 'MGMT-' . strtoupper(substr($aid, -8));
                         $aname = $count === 1 ? $name : $name . ' #' . ($i + 1);
                         $pdo->prepare(
-                            'INSERT INTO assets(id,catalog_item_id,name,management_number,edufine_number,status,location_id,tags,budget_program,budget_year,notes,qr_code,created_at,updated_at)
-                             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                            'INSERT INTO assets(id,catalog_item_id,name,management_number,edufine_number,status,location_id,tags,purchase_date,useful_life_years,budget_program,budget_year,notes,qr_code,created_at,updated_at)
+                             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
                         )->execute([
                             $aid,
                             $catalogId,
@@ -550,6 +566,8 @@ final class CatalogCsv
                             'available',
                             $locationId,
                             json_encode($tags, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+                            $purchaseDate,
+                            $usefulLifeYears,
                             $budgetProgram,
                             $budgetYear,
                             $description,
@@ -615,13 +633,47 @@ final class CatalogCsv
     }
 
     /**
-     * @return array{location_name: string, quantity: string, management_number: string}
+     * @param array<string, string> $row
+     */
+    private static function updateAssetsLife(
+        PDO $pdo,
+        string $catalogId,
+        array $row,
+        mixed $purchaseDateRaw,
+        mixed $usefulLifeYearsRaw,
+    ): void {
+        $stmt = $pdo->prepare(
+            'SELECT id, purchase_date, useful_life_years FROM assets WHERE catalog_item_id = ? ORDER BY management_number'
+        );
+        $stmt->execute([$catalogId]);
+        $assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($assets === []) {
+            return;
+        }
+
+        $t = Support::now();
+        $update = $pdo->prepare(
+            'UPDATE assets SET purchase_date = ?, useful_life_years = ?, updated_at = ? WHERE id = ?'
+        );
+        foreach ($assets as $asset) {
+            $purchaseDate = array_key_exists('purchase_date', $row)
+                ? AssetLife::parsePurchaseDate($purchaseDateRaw)
+                : (isset($asset['purchase_date']) ? (string) $asset['purchase_date'] : null);
+            $years = array_key_exists('useful_life_years', $row)
+                ? AssetLife::parseUsefulLifeYears($usefulLifeYearsRaw)
+                : ($asset['useful_life_years'] ?? null);
+            $update->execute([$purchaseDate, $years, $t, $asset['id']]);
+        }
+    }
+
+    /**
+     * @return array{location_name: string, quantity: string, management_number: string, purchase_date: string, useful_life_years: string}
      */
     private static function primaryPlace(PDO $pdo, string $itemId, string $type): array
     {
         if ($type === 'equipment') {
             $stmt = $pdo->prepare(
-                'SELECT a.management_number, l.name AS location_name
+                'SELECT a.management_number, a.purchase_date, a.useful_life_years, l.name AS location_name
                  FROM assets a JOIN locations l ON l.id = a.location_id
                  WHERE a.catalog_item_id = ? ORDER BY a.management_number LIMIT 1'
             );
@@ -634,6 +686,12 @@ final class CatalogCsv
                 'location_name' => is_array($row) ? (string) $row['location_name'] : '',
                 'quantity' => $count > 0 ? (string) $count : '',
                 'management_number' => is_array($row) ? (string) $row['management_number'] : '',
+                'purchase_date' => is_array($row) && ($row['purchase_date'] ?? '') !== '' && $row['purchase_date'] !== null
+                    ? (string) $row['purchase_date']
+                    : '',
+                'useful_life_years' => is_array($row) && ($row['useful_life_years'] ?? '') !== '' && $row['useful_life_years'] !== null
+                    ? (string) $row['useful_life_years']
+                    : '',
             ];
         }
 
@@ -651,6 +709,8 @@ final class CatalogCsv
             'location_name' => is_array($row) ? (string) $row['location_name'] : '',
             'quantity' => $sum > 0 ? (string) $sum : '',
             'management_number' => '',
+            'purchase_date' => '',
+            'useful_life_years' => '',
         ];
     }
 
@@ -739,6 +799,11 @@ final class CatalogCsv
             '예산년도' => 'budget_year',
             '구입년도' => 'budget_year',
             '구입연도' => 'budget_year',
+            '구입일' => 'purchase_date',
+            '구매일' => 'purchase_date',
+            '도입날짜' => 'purchase_date',
+            '내용연한(년)' => 'useful_life_years',
+            '내용연한년' => 'useful_life_years',
         ] as $alias => $col) {
             $aliases[self::normalizeHeader($alias)] = $col;
         }

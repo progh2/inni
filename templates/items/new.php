@@ -40,6 +40,16 @@ use Inni\Support;
     <label>관리번호 (장비)</label>
     <input name="management_number" placeholder="전장-2026-001">
   </div>
+  <div class="grid-2">
+    <div class="field">
+      <label>도입일</label>
+      <input name="purchase_date" type="date">
+    </div>
+    <div class="field">
+      <label>내용연한(년)</label>
+      <input name="useful_life_years" type="number" inputmode="numeric" min="1" max="100" step="1" placeholder="예: 5">
+    </div>
+  </div>
   <div class="field">
     <label>에듀파인 번호 (옵션)</label>
     <input name="edufine_number">

@@ -214,6 +214,33 @@ final class AssetController
         App::redirect('assets/show', ['id' => $assetId]);
     }
 
+    public function updateLife(): void
+    {
+        $user = Auth::requireLogin();
+        if (!Auth::canWrite($user)) {
+            App::flash('error', '수정 권한이 없습니다.');
+            App::redirect('home');
+        }
+        Csrf::requirePost();
+        $assetId = is_string($_POST['asset_id'] ?? null) ? $_POST['asset_id'] : '';
+        try {
+            Asset::updateLife(
+                Database::pdo(),
+                $user,
+                $assetId,
+                $_POST['purchase_date'] ?? null,
+                $_POST['useful_life_years'] ?? null,
+            );
+            App::flash('ok', '도입일·내용연한을 저장했습니다.');
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '도입일·내용연한을 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
+        App::redirect('assets/show', ['id' => $assetId]);
+    }
+
     public function photo(): void
     {
         $user = Auth::requireLogin();
