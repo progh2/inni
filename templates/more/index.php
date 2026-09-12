@@ -12,6 +12,9 @@ use Inni\Support;
   <a class="list-row" href="<?= Support::e(App::url('assets')) ?>">
     <div class="title">기자재 현황</div>
   </a>
+  <a class="list-row" href="<?= Support::e(App::url('materials')) ?>">
+    <div class="title">실험실습재료 현황</div>
+  </a>
   <a class="list-row" href="<?= Support::e(App::url('items/new')) ?>">
     <div class="title">빠른 등록</div>
   </a>

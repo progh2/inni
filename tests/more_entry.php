@@ -30,11 +30,14 @@ check(substr_count($more, "App::url('items')") === 1, 'More must not duplicate t
 check(str_contains($more, '기자재 현황'), 'More menu must expose 기자재 현황');
 check(str_contains($more, "App::url('assets')"), '기자재 현황 must link to assets');
 check(substr_count($more, "App::url('assets')") === 1, 'More must not duplicate the assets board link');
+check(str_contains($more, '실험실습재료 현황'), 'More menu must expose 실험실습재료 현황');
+check(str_contains($more, "App::url('materials')"), '실험실습재료 현황 must link to materials');
+check(substr_count($more, "App::url('materials')") === 1, 'More must not duplicate the materials board link');
 check(!str_contains($more, "App::url('search')"), 'More must not replace the search tab');
 
 check(preg_match("/\\\$tabs = \\[\\s*\\['home', '홈'\\],\\s*\\['search', '찾기'\\],\\s*\\['scan', '스캔'\\],\\s*\\['rooms', '실'\\],\\s*\\['more', '더보기'\\],\\s*\\];/", $layout) === 1, 'Bottom nav stays 홈/찾기/스캔/실/더보기');
 check(substr_count($layout, "['home', '홈']") === 1 && substr_count($layout, "['more', '더보기']") === 1, 'Tab labels stay a single 5-tab set');
-check(str_contains($layout, "\$current === 'items' || \$current === 'assets'"), 'List/status screens keep the 더보기 tab active');
+check(str_contains($layout, "\$current === 'items' || \$current === 'assets' || \$current === 'materials'"), 'List/status screens keep the 더보기 tab active');
 check(!str_contains($layout, "str_starts_with(\$current, 'items/')"), 'Item detail/new must not steal the 더보기 tab');
 check(!str_contains($layout, "str_starts_with(\$current, 'assets/')"), 'Asset detail must not steal the 더보기 tab');
 
@@ -45,6 +48,7 @@ check(str_contains($searchCtl, "if (\$q !== '')"), 'Search results still require
 
 check(str_contains($router, "'items' => [ItemController::class, 'index']"), 'items GET route is registered');
 check(str_contains($router, "'assets' => [AssetController::class, 'index']"), 'assets GET route is registered');
+check(str_contains($router, "'materials' => [MaterialController::class, 'index']"), 'materials GET route is registered');
 
 check(str_contains($itemCtl, 'Catalog::list'), 'ItemController index keeps the #29 catalog list');
 check(str_contains($itemsTpl, '<h1>품목 목록</h1>'), 'items/index.php keeps the #29 list title');

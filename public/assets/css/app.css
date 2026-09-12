@@ -119,6 +119,12 @@ h1 { font-size: clamp(1.5rem, 3vw, 1.9rem); }
 .list-row:last-child { border-bottom: 0; }
 .list-row .title { font-weight: 600; }
 .list-row .meta { font-size: 0.85rem; color: rgba(26,42,40,0.55); }
+.list-row.is-low-stock {
+  background: rgba(161,29,46,0.06);
+  margin: 0 -1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
 
 .badge {
   display: inline-flex; align-items: center; border-radius: 0.4rem;

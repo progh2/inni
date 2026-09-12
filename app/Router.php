@@ -12,6 +12,7 @@ use Inni\Controllers\InventoryController;
 use Inni\Controllers\ItemController;
 use Inni\Controllers\LabelController;
 use Inni\Controllers\LoanController;
+use Inni\Controllers\MaterialController;
 use Inni\Controllers\MoreController;
 use Inni\Controllers\RoomController;
 use Inni\Controllers\ScanController;
@@ -57,6 +58,8 @@ final class Router
             'catalog/csv/template' => [CatalogCsvController::class, 'template'],
             'catalog/csv/export' => [CatalogCsvController::class, 'export'],
             'catalog/csv/import' => [CatalogCsvController::class, 'import'],
+
+            'materials' => [MaterialController::class, 'index'],
 
             'assets' => [AssetController::class, 'index'],
             'assets/show' => [AssetController::class, 'show'],

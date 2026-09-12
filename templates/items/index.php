@@ -81,4 +81,4 @@ $hasFilters = $type !== '' || !empty($lowStock) || $budgetProgram !== '' || $bud
   <?php endforeach; ?>
   <?php if (!$items): ?><p class="muted">결과 없음</p><?php endif; ?>
 </div>
-<p class="muted" style="margin-top:1rem"><a href="<?= Support::e(App::url('search')) ?>">찾기로 이름·관리번호 검색</a></p>
+<p class="muted" style="margin-top:1rem"><a href="<?= Support::e(App::url('search')) ?>">찾기로 이름·관리번호 검색</a> · <a href="<?= Support::e(App::url('materials')) ?>">실험실습재료 현황</a></p>
