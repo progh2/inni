@@ -34,6 +34,7 @@
 - `php tests/stock.php`: 출고·재입고·출고 취소 수량/권한/롤백 검증.
 - `php tests/catalog.php`: 품목 수정 필드·권한·이력 롤백 검증.
 - `php tests/budget.php`: 사업명·예산연도 파싱, 마이그레이션, 저장/비우기, CSV 라운드트립.
+- HTTP 스모크: 데모 owner 로그인 후 품목 등록·상세·수정(비우기), 장비 복사, 잘못된 연도 거부, CSV 내보내기 열 확인. 브라우저에서 동일 흐름 재현.
 - `php tests/csrf.php`: 세션 CSRF 허용/거부, GET 거부, 반납·재입고·출고 취소 경로 실패 폐쇄 검증.
 - `php tests/loan.php`: 대여·반납 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위, 이력 실패 롤백.
 - `php tests/role_block.php`: 학생·pending·disabled의 등록·대여·출고·실사 차단, `demo_login` 키 생략 시 off.
