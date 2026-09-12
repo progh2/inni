@@ -29,7 +29,7 @@ check(str_contains($scan, "facingMode: 'environment'") || str_contains($scan, 'e
 check(str_contains($scan, 'html5-qrcode'), 'Existing html5-qrcode CDN must stay');
 
 check(str_contains($labels, 'Csrf::field()'), 'Label selection form must send CSRF');
-check(str_contains($print, 'QRCode.toCanvas'), 'Label preview must draw QR in the browser');
+check(str_contains($print, 'QRCode.toDataURL'), 'Label preview must draw QR in the browser');
 check(str_contains($print, 'label[\'name\']') || str_contains($print, '$label[\'name\']'), 'Label must show the name');
 check(str_contains($print, 'label[\'code\']') || str_contains($print, '$label[\'code\']'), 'Label must show the management number');
 

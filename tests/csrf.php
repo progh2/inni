@@ -325,7 +325,7 @@ $printOk = invokeNamedController('Inni\\Controllers\\LabelController', 'print', 
 check(
     ($printOk['status'] === 200 || $printOk['status'] === false)
     && str_contains((string) $printOk['body'], 'qr-0')
-    && str_contains((string) $printOk['body'], 'QRCode.toCanvas'),
+    && str_contains((string) $printOk['body'], 'QRCode.toDataURL'),
     'Valid label CSRF should render a QR preview'
 );
 
