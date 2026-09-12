@@ -20,6 +20,7 @@ use Inni\Support;
   <a class="btn btn-ghost" href="<?= Support::e(App::url('items')) ?>">품목 목록</a>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('items/new')) ?>">빠른 등록</a>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('assets')) ?>">기자재 현황</a>
+  <a class="btn btn-ghost" href="<?= Support::e(App::url('materials')) ?>">실험실습재료</a>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('loans')) ?>">대여 현황</a>
 </div>
 
