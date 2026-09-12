@@ -38,7 +38,7 @@ check(str_contains($printLayout, '@media print') && str_contains($printLayout, '
 check(str_contains($printLayout, 'page-break-inside: avoid'), 'Stickers must not split across pages');
 check(str_contains($printLayout, 'dashed'), 'Cut guides should be dashed');
 check(str_contains($printLayout, '70mm') && str_contains($printLayout, '32mm'), 'Stickers need a fixed label size');
-check(str_contains($printLayout, 'qrcode@'), 'Existing qrcode.js CDN must stay');
+check(str_contains($printLayout, 'qrcode@1.5.1'), 'Label print must use a CDN build that actually ships qrcode.min.js');
 
 check(str_contains($appCss, '#qr-reader'), 'Camera viewport styles must live in app.css');
 check(str_contains($appCss, 'max-height: min(52dvh, 22rem)'), 'Camera preview must stay inside the mobile viewport');

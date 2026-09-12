@@ -20,7 +20,14 @@ use Inni\Support;
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
   const items = <?= json_encode(array_values($labels), JSON_UNESCAPED_UNICODE) ?>;
-  if (!window.QRCode) {
+  const waitForQr = async () => {
+    const start = Date.now();
+    while (!window.QRCode && Date.now() - start < 2500) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    return window.QRCode;
+  };
+  if (!(await waitForQr())) {
     document.querySelectorAll('#labels canvas').forEach((el) => {
       el.replaceWith(Object.assign(document.createElement('div'), {
         className: 'code',
