@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Inni\Controllers;
 
+use Inni\Ai;
 use Inni\Alert;
 use Inni\App;
 use Inni\Auth;
@@ -36,6 +37,10 @@ final class SettingsController
         $telegramChatId = $telegramSettings['chat_id'];
         $telegramEvents = $telegramSettings['events'];
         $telegramDefaultChat = Telegram::defaultChatId();
+        $aiReady = Ai::isReady();
+        $aiStatus = Ai::configStatus();
+        $aiProviderLabel = Ai::providerLabel();
+        $aiModel = Ai::model();
         View::render('settings/index', compact(
             'user',
             'school',
@@ -50,7 +55,11 @@ final class SettingsController
             'telegramReady',
             'telegramChatId',
             'telegramEvents',
-            'telegramDefaultChat'
+            'telegramDefaultChat',
+            'aiReady',
+            'aiStatus',
+            'aiProviderLabel',
+            'aiModel'
         ));
     }
 

@@ -30,6 +30,14 @@ use Inni\Support;
       <div class="title">학교 설정</div>
     </a>
   <?php endif; ?>
+  <?php if (!empty($aiReady)): ?>
+    <a class="list-row" href="<?= Support::e(App::url('settings')) ?>#ai">
+      <div>
+        <div class="title">AI 도우미</div>
+        <div class="meta">제안 전용 · 재고는 바꾸지 않습니다</div>
+      </div>
+    </a>
+  <?php endif; ?>
   <?php if (Auth::isOwner($user)): ?>
     <a class="list-row" href="<?= Support::e(App::url('settings/users')) ?>">
       <div class="title">사용자 승인</div>

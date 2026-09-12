@@ -52,6 +52,16 @@ use Inni\Support;
   </form>
 </div>
 
+<div class="card" id="ai">
+  <h2 class="section-title" style="margin-top:0">AI 도우미</h2>
+  <?php if (empty($aiReady)): ?>
+    <p class="flash error" style="margin-top:0">연결 필요. API 키는 서버 <code>config.php</code>의 <code>ai.api_key</code>에만 넣으세요. 프로바이더(<code>openai</code> / <code>upstage</code> / <code>ollama</code>)가 비어 있으면 제안을 만들지 않습니다.</p>
+  <?php else: ?>
+    <p class="muted">프로바이더 · <?= Support::e((string) (($aiProviderLabel ?? '') !== '' ? $aiProviderLabel : '연결됨')) ?><?php if (($aiModel ?? '') !== ''): ?> · 모델 <?= Support::e((string) $aiModel) ?><?php endif; ?>. 키는 화면에 표시하지 않습니다.</p>
+  <?php endif; ?>
+  <p class="muted">제안만 합니다. 재고·대여·대장은 AI 출력으로 바꾸지 않습니다. 챗봇·실사 연동은 없습니다.</p>
+</div>
+
 <div class="card">
   <h2 class="section-title" style="margin-top:0">Google 로그인</h2>
   <?php if (!empty($google)): ?>

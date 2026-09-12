@@ -37,4 +37,13 @@ return [
         'bot_token' => '',
         'default_chat_id' => '',
     ],
+
+    // Put the real AI key only in the server copy of config.php. Never commit it.
+    // Empty provider/key fails closed. Suggestions only — never auto-change stock/loans/catalog.
+    'ai' => [
+        'provider' => '', // openai | upstage | ollama
+        'api_key' => '',
+        'base_url' => '',
+        'model' => '',
+    ],
 ];

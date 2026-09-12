@@ -38,4 +38,13 @@ return [
         'bot_token' => '',
         'default_chat_id' => '',
     ],
+
+    // AI keys stay in the server config.php only. Never form, never SQLite, never git.
+    // Empty provider/key = fail closed (설정 shows 연결 필요). Suggestions only — no stock writes.
+    'ai' => [
+        'provider' => '', // openai | upstage | ollama
+        'api_key' => '',
+        'base_url' => '', // Ollama: required, e.g. http://127.0.0.1:11434
+        'model' => '',
+    ],
 ];
