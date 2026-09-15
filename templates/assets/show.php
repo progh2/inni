@@ -41,6 +41,22 @@ $lifeLabel = AssetLife::format(
   <p><img class="thumb" src="<?= Support::e(App::baseUrl() . $asset['image_path']) ?>" alt=""></p>
 <?php endif; ?>
 
+<?php if ($asset['status'] === 'retired'): ?>
+  <p class="muted">
+    파기
+    <?php if (!empty($asset['retired_at'])): ?> · <?= Support::e((string) $asset['retired_at']) ?><?php endif; ?>
+    <?php if (!empty($asset['retire_reason'])): ?> · <?= Support::e((string) $asset['retire_reason']) ?><?php endif; ?>
+  </p>
+  <?php if (!empty($asset['retire_evidence'])): ?>
+    <?php $ev = (string) $asset['retire_evidence']; ?>
+    <?php if (str_starts_with($ev, '/uploads/')): ?>
+      <p><img class="thumb" src="<?= Support::e(App::baseUrl() . $ev) ?>" alt="파기 증빙"></p>
+    <?php else: ?>
+      <p class="muted">증빙 <?= Support::e($ev) ?></p>
+    <?php endif; ?>
+  <?php endif; ?>
+<?php endif; ?>
+
 <?php if ($asset['status'] === 'available' && Auth::canLoan($user)): ?>
 <div class="card">
   <h2 class="section-title" style="margin-top:0">대여</h2>
@@ -85,6 +101,7 @@ $lifeLabel = AssetLife::format(
 </div>
 <?php endif; ?>
 
+<?php if ($asset['status'] !== 'retired'): ?>
 <div class="card">
   <h2 class="section-title" style="margin-top:0">위치 이동</h2>
   <form method="post" action="<?= Support::e(App::url('assets/move')) ?>">
@@ -103,6 +120,7 @@ $lifeLabel = AssetLife::format(
     <button class="btn btn-ghost" type="submit">이동</button>
   </form>
 </div>
+<?php endif; ?>
 
 <?php if (Auth::canWrite($user)): ?>
 <div class="card">
@@ -167,6 +185,36 @@ $lifeLabel = AssetLife::format(
     </div>
     <button class="btn btn-ghost" type="submit">업로드</button>
   </form>
+</div>
+<div class="card" id="retire">
+  <h2 class="section-title" style="margin-top:0">파기</h2>
+  <?php if ($asset['status'] === 'retired'): ?>
+    <p class="muted">이미 폐기된 장비입니다.</p>
+  <?php elseif ($asset['status'] === 'on_loan'): ?>
+    <p class="muted">대여 중인 장비는 반납 후 파기할 수 있습니다.</p>
+  <?php else: ?>
+    <form method="post" action="<?= Support::e(App::url('assets/retire')) ?>" enctype="multipart/form-data">
+      <?= Csrf::field() ?>
+      <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
+      <div class="field">
+        <label>사유</label>
+        <input name="reason" required maxlength="200" placeholder="내용연한 만료, 파손 등">
+      </div>
+      <div class="field">
+        <label>파기일</label>
+        <input name="retired_at" type="date" required value="<?= Support::e(date('Y-m-d')) ?>">
+      </div>
+      <div class="field">
+        <label>증빙 메모</label>
+        <input name="evidence" maxlength="200" placeholder="폐기조서 번호 또는 메모">
+      </div>
+      <div class="field">
+        <label>증빙 사진 (메모가 없으면 필수)</label>
+        <input type="file" name="evidence_photo" accept="image/*" capture="environment">
+      </div>
+      <button class="btn btn-ink btn-block" type="submit">파기 처리</button>
+    </form>
+  <?php endif; ?>
 </div>
 <?php endif; ?>
 

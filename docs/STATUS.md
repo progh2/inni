@@ -24,11 +24,12 @@
 - 재입고(owner/manager): 기존 로트 증가 또는 새 위치에 `stock_lots` 생성. 선택 로트/유통기한. `activity_logs.action=restock`.
 - 출고 취소(owner/manager/teacher): `stock_issue_cancels.issue_log_id` UNIQUE로 이중 취소 실패 폐쇄. 수량 복원과 `cancel_issue` 이력을 같은 트랜잭션으로.
 - 가벼운 실사(owner/manager): 실 선택 → 예상 장비·품목 목록 → #7과 같은 카메라/코드 입력으로 확인 → 종료 시 미확인 목록. 진행 중 세션은 1건. 이어하기·텔레그램·엑셀은 없음.
+- 실사 보정·파기(#53): 종료된 실사의 미확인 항목을 사유·승인자로 장부 반영(장비 위치/상태, 재고 수량). 파기는 장비 상세에서 사유·일자·증빙(메모 또는 사진)으로 `retired` 전이. POST+CSRF, `canWrite`(owner/manager). 이력은 `activity_logs`. 대여 중·이미 폐기는 거부. 수리비(#54)·에듀파인·감가상각은 없음.
 - 품목 CSV(owner/manager, `canWrite`): 더보기·설정에서 템플릿/목록 내려받기, POST+CSRF 업로드로 신규·수정. 충돌·오류 행은 건너뛰고 이유를 보여 줌. **CSV UTF-8** (Excel CP949도 읽음). xlsx/에듀파인 파일 동기화/실사 연동/텔레그램은 없음. 사업명·예산연도 열 포함.
 - 구입 사업예산(#32): `catalog_items`/`assets`에 `budget_program`(자유 입력) + `budget_year`(YYYY). 기존 DB는 `Database::migrate`/`ensureGuards`로 컬럼 추가. 빈 값 허용. 등록·수정·상세·CSV 라운드트립. #29 품목 목록과 #30 기자재 현황 보드에서 표시·GET 필터(`budget_program`, `budget_year`).
 - 도입일·내용연한(#39): `assets.purchase_date`를 UI에서 **도입일**로 노출·편집. `useful_life_years`(INTEGER, nullable) 추가. 기존 DB는 `Database::migrate`/`ensureGuards`. 빈 값 허용. 등록·장비 상세·현황 보드에 도입일·내용연한·(둘 다 있을 때) 만료 예정일=도입일+년. CSV 열 `도입일`/`내용연한`.
 - 조달청 내용연수 제안(#40): 정적 시드 `app/data/pps_useful_life.json` (조달청고시 제2024-30호, 2025-01-01 시행, 품명 1711). 등록/수정에서 이름·물품분류번호로 후보 표시 → 수락 시에만 내용연한 채움. 강제 아님. 근거(고시·품명) 표시. 실시간 API·PDF 크롤 없음. 확장: JSON `items`에 `{class_number, name, years}` 추가.
-- 연한·노후 기자재 보드(#52): `assets/aging`. 로그인(기자재 현황과 동일). #39 도입일+내용연한으로 만료일 계산. 기본 목록은 임박(오늘~365일) ∪ 초과(만료일 이전). GET 필터 `life=imminent|exceeded`(임박/초과 별칭 허용). 더보기·기자재 현황에서 진입. 조달청 제안은 장비 상세 기존 UI. 보정·파기·수리비 없음.
+- 연한·노후 기자재 보드(#52): `assets/aging`. 로그인(기자재 현황과 동일). #39 도입일+내용연한으로 만료일 계산. 기본 목록은 임박(오늘~365일) ∪ 초과(만료일 이전). GET 필터 `life=imminent|exceeded`(임박/초과 별칭 허용). 더보기·기자재 현황에서 진입. 조달청 제안은 장비 상세 기존 UI. 파기는 장비 상세(#53). 수리비는 없음.
 - 알림(owner/manager 설정): 재고 부족(소모품·부품, 수량 < 최소재고)·연체 대여. 홈/대여 목록에서 연체 표시. 텔레그램 봇 푸시는 `config.php`의 `telegram.bot_token`이 있을 때만. 채팅 ID·이벤트 on/off는 설정 화면(POST+CSRF). 토큰 공백은 실패 폐쇄(연결 필요). 같은 품목/대여 중복 발송 없음. 실사 종료·AI·에듀파인은 연동하지 않음.
 - AI Provider 자리(제안 전용): OpenAI / Upstage / Ollama 추상화. 키는 `config.php`의 `ai.api_key`만. 폼·SQLite·git에 키 없음. 미설정은 실패 폐쇄(설정에 연결 필요, 더보기 AI 메뉴 숨김). `Ai::suggest`는 초안만. 재고·대여·대장 쓰기 경로 없음. 챗봇·실사 연동 없음.
 - 품목 목록(로그인 사용자, 일반교사 포함): `items`에서 검색어 없이 전체 브라우즈. GET 필터 `type`, `low_stock`, `budget_program`, `budget_year`. 재고부족은 알림과 같이 소모품·부품·수량 < 최소재고. 찾기(검색어 필수)는 유지.
@@ -50,6 +51,7 @@
 - `php tests/loan.php`: 대여·반납 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위, 이력 실패 롤백.
 - `php tests/role_block.php`: 학생·pending·disabled의 등록·대여·출고·실사 차단, `demo_login` 키 생략 시 off.
 - `php tests/inventory.php`: 실 선택·스캔/코드 확인·미확인 목록·단일 진행 세션·권한·이력 롤백.
+- `php tests/inventory_adjust.php`: 일반교사 보정/파기 거부, 성공 보정·파기, 이력, 활성 실사/대여중/이중 파기 거부, 로그 실패 롤백, 마이그레이션.
 - `php tests/catalog_csv.php`: 품목 CSV 템플릿·내보내기·가져오기, 충돌 건너뜀, 역할, xlsx 거부.
 - `php tests/alerts.php`: 재고 부족·연체 텔레그램(HTTP 스텁), 토큰 공백 실패 폐쇄, 이벤트 off, 중복 방지, 설정 CSRF, owner/manager. 실제 봇 토큰 없음.
 - `php tests/ai.php`: 프로바이더 미설정/불완전/미지원 실패 폐쇄, 설정 시 제안만, 재고·대여·대장 무변경, 쓰기 훅 없음, 설정 폼에 키 필드 없음. 실제 API 키 없음.
@@ -76,7 +78,8 @@
 4f. ~~기자재 현황 보드.~~ issue #30. 더보기 진입(#31) 스텁을 보드로 대체. 품목 목록(#29)은 별도. 사업예산(#32) 표시·필터 연동.
 4g. ~~도입일·내용연한.~~ issue #39.
 4h. ~~조달청 내용연수 자동 제안.~~ issue #40. 실시간 API·PDF 크롤은 후속.
-4i. ~~연한·노후 기자재 보드.~~ issue #52. 보정·파기(#53)·수리비(#54)는 별도.
+4i. ~~연한·노후 기자재 보드.~~ issue #52.
+4j. ~~불일치 보정·파기.~~ issue #53. 수리비(#54)·에듀파인·감가상각은 별도.
 5. ~~Docker의 설정 파일 생성 권한 및 필요한 PHP 확장 점검.~~ → issue #5 / Compose 경로로 처리.
 6. ~~Google OAuth 리다이렉트 URI·allowed_domains.~~ 키 없이 단위/스텁 검사까지. Console 실스모크는 사람 자격 증명 필요 (issue #6).
 7. ~~demo_login 운영 off 기본·역할 차단 스모크.~~ 로컬/Docker 예시는 `true`, 운영 예시·키 생략은 `false`. 학생·pending·disabled 쓰기는 `canWrite`/`canLoan`/`canReturn` + `tests/role_block.php` (issue #4).

@@ -10,6 +10,7 @@ use Inni\CatalogCsv;
 use Inni\Csrf;
 use Inni\Database;
 use Inni\Inventory;
+use Inni\InventoryAdjust;
 use Inni\InventoryBudget;
 use Inni\View;
 use InvalidArgumentException;
@@ -116,7 +117,47 @@ final class InventoryController
         }
         $unchecked = Inventory::unchecked($pdo, (string) $check['id']);
         $lines = Inventory::lines($pdo, (string) $check['id']);
-        View::render('inventory/result', compact('user', 'check', 'unchecked', 'lines'));
+        $locations = $pdo->query('SELECT id, name, kind FROM locations ORDER BY kind, name')->fetchAll();
+        $approvers = InventoryAdjust::approvers($pdo);
+        View::render('inventory/result', compact('user', 'check', 'unchecked', 'lines', 'locations', 'approvers'));
+    }
+
+    public function adjust(): void
+    {
+        $user = $this->requireManager();
+        if (!Auth::canWrite($user)) {
+            App::flash('error', '보정 권한이 없습니다.');
+            App::redirect('more');
+        }
+        Csrf::requirePost();
+        $lineId = is_string($_POST['line_id'] ?? null) ? $_POST['line_id'] : '';
+        $returnTo = trim((string) ($_POST['return_to'] ?? 'result'));
+        $checkId = trim((string) ($_POST['check_id'] ?? ''));
+        try {
+            InventoryAdjust::adjust(
+                Database::pdo(),
+                $user,
+                $lineId,
+                $_POST['reason'] ?? null,
+                $_POST['approver_id'] ?? null,
+                $_POST['location_id'] ?? null,
+                $_POST['status'] ?? null,
+                $_POST['quantity'] ?? null,
+            );
+            App::flash('ok', '장부를 보정했습니다.');
+        } catch (InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '장부를 보정하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
+        if ($returnTo === 'report') {
+            App::redirect('inventory/report', InventoryBudget::query(InventoryBudget::filtersFromRequest($_POST)));
+        }
+        if ($checkId !== '') {
+            App::redirect('inventory/result', ['id' => $checkId]);
+        }
+        App::redirect('inventory/report');
     }
 
     public function report(): void
@@ -128,7 +169,9 @@ final class InventoryController
         $aggregates = InventoryBudget::aggregates($pdo, $filters);
         $lines = InventoryBudget::lines($pdo, $filters);
         $summary = InventoryBudget::summary($pdo, $filters);
-        View::render('inventory/report', compact('user', 'filters', 'checks', 'aggregates', 'lines', 'summary'));
+        $locations = $pdo->query('SELECT id, name, kind FROM locations ORDER BY kind, name')->fetchAll();
+        $approvers = InventoryAdjust::approvers($pdo);
+        View::render('inventory/report', compact('user', 'filters', 'checks', 'aggregates', 'lines', 'summary', 'locations', 'approvers'));
     }
 
     public function reportCsv(): void

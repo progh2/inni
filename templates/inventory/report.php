@@ -24,7 +24,7 @@ $csvQuery = InventoryBudget::query($filters);
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('inventory')) ?>">← 실사</a></p>
 <h1>사업예산 실사</h1>
-<p class="muted">종료·진행 중 실사를 사업명·예산연도로 거릅니다. 장부는 실사 시작 수량, 실물은 확인이면 장부와 같고 미확인이면 0입니다. 수량 재입력·장부 보정은 없습니다.</p>
+<p class="muted">종료·진행 중 실사를 사업명·예산연도로 거릅니다. 장부는 실사 시작 수량, 실물은 확인이면 장부와 같고 미확인이면 0입니다. 종료된 실사의 미확인은 아래에서 장부 보정할 수 있습니다.</p>
 
 <div class="stats" style="margin:1rem 0">
   <a class="stat" href="<?= Support::e(App::url('inventory/report', $filterQuery(['diff' => 'all']))) ?>">
@@ -145,6 +145,7 @@ $csvQuery = InventoryBudget::query($filters);
             <th class="num">실물</th>
             <th class="num">차이</th>
             <th>결과</th>
+            <th>보정</th>
           </tr>
         </thead>
         <tbody>
@@ -176,6 +177,23 @@ $csvQuery = InventoryBudget::query($filters);
                 <span class="badge <?= !empty($line['is_confirmed']) ? 'confirmed' : 'unchecked' ?>">
                   <?= Support::e(InventoryBudget::resultLabel(!empty($line['is_confirmed']))) ?>
                 </span>
+                <?php if (!empty($line['is_adjusted'])): ?>
+                  <div class="meta">보정됨</div>
+                <?php endif; ?>
+              </td>
+              <td>
+                <?php if (empty($line['is_confirmed']) && ($line['check_status'] ?? '') === 'done'): ?>
+                  <?php
+                    $returnTo = 'report';
+                    $checkId = (string) ($line['check_id'] ?? '');
+                    $returnQuery = $csvQuery;
+                    require dirname(__DIR__) . '/partials/inventory_adjust.php';
+                  ?>
+                <?php elseif (($line['check_status'] ?? '') === 'active'): ?>
+                  <span class="muted">종료 후</span>
+                <?php else: ?>
+                  <span class="muted">—</span>
+                <?php endif; ?>
               </td>
             </tr>
           <?php endforeach; ?>

@@ -310,4 +310,37 @@ final class AssetController
         }
         App::redirect('assets/show', ['id' => $assetId]);
     }
+
+    public function retire(): void
+    {
+        $user = Auth::requireLogin();
+        if (!Auth::canWrite($user)) {
+            App::flash('error', '파기 권한이 없습니다.');
+            App::redirect('home');
+        }
+        Csrf::requirePost();
+        $assetId = is_string($_POST['asset_id'] ?? null) ? $_POST['asset_id'] : '';
+        $evidencePath = null;
+        try {
+            if (!empty($_FILES['evidence_photo']['name'])) {
+                $evidencePath = Uploader::store($_FILES['evidence_photo'], 'retire');
+            }
+            Asset::retire(
+                Database::pdo(),
+                $user,
+                $assetId,
+                $_POST['reason'] ?? null,
+                $_POST['retired_at'] ?? null,
+                $_POST['evidence'] ?? null,
+                $evidencePath,
+            );
+            App::flash('ok', '장비를 파기 처리했습니다.');
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '파기 처리를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
+        App::redirect('assets/show', ['id' => $assetId]);
+    }
 }

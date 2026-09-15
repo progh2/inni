@@ -77,6 +77,9 @@ CREATE TABLE IF NOT EXISTS assets (
   budget_year INTEGER,
   notes TEXT,
   qr_code TEXT NOT NULL UNIQUE,
+  retired_at TEXT,
+  retire_reason TEXT,
+  retire_evidence TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -180,7 +183,11 @@ CREATE TABLE IF NOT EXISTS inventory_check_lines (
   expected_qty REAL NOT NULL DEFAULT 1,
   unit TEXT,
   confirmed_at TEXT,
-  confirmed_by TEXT REFERENCES users(id)
+  confirmed_by TEXT REFERENCES users(id),
+  adjusted_at TEXT,
+  adjusted_by TEXT REFERENCES users(id),
+  adjust_reason TEXT,
+  adjust_approver TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_assets_location ON assets(location_id);
