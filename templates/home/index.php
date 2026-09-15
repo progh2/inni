@@ -13,7 +13,11 @@ use Inni\Support;
 <div class="stats" style="margin:1rem 0">
   <a class="stat" href="<?= Support::e(App::url('assets')) ?>"><b><?= (int) $assetCount ?></b>장비</a>
   <div class="stat"><b><?= (int) $roomCount ?></b>실</div>
-  <div class="stat"><b><?= (int) $openReports ?></b>신고</div>
+  <?php if (Auth::canWrite($user)): ?>
+    <a class="stat" href="<?= Support::e(App::url('reports')) ?>"><b><?= (int) $openReports ?></b>수리</a>
+  <?php else: ?>
+    <div class="stat"><b><?= (int) $openReports ?></b>수리</div>
+  <?php endif; ?>
 </div>
 
 <div class="actions" style="margin-bottom:1rem">
@@ -24,6 +28,9 @@ use Inni\Support;
   <a class="btn btn-ghost" href="<?= Support::e(App::url('materials')) ?>">실험실습재료</a>
   <?php if (Auth::canLoan($user)): ?>
     <a class="btn btn-ghost" href="<?= Support::e(App::url('loans/mine')) ?>">내 대여함</a>
+  <?php endif; ?>
+  <?php if (Auth::canWrite($user)): ?>
+    <a class="btn btn-ghost" href="<?= Support::e(App::url('reports')) ?>">수리 대기</a>
   <?php endif; ?>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('loans')) ?>">대여 현황</a>
 </div>

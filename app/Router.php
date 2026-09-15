@@ -14,6 +14,7 @@ use Inni\Controllers\LabelController;
 use Inni\Controllers\LoanController;
 use Inni\Controllers\MaterialController;
 use Inni\Controllers\MoreController;
+use Inni\Controllers\ReportController;
 use Inni\Controllers\RoomController;
 use Inni\Controllers\ScanController;
 use Inni\Controllers\SearchController;
@@ -74,6 +75,10 @@ final class Router
             'loans' => [LoanController::class, 'index'],
             'loans/mine' => [LoanController::class, 'mine'],
             'loans/return' => [LoanController::class, 'returnLoan'],
+
+            'reports' => [ReportController::class, 'index'],
+            'reports/show' => [ReportController::class, 'show'],
+            'reports/status' => [ReportController::class, 'updateStatus'],
 
             'labels' => [LabelController::class, 'index'],
             'labels/print' => [LabelController::class, 'print'],
