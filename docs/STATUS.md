@@ -32,7 +32,7 @@
 - AI Provider 자리(제안 전용): OpenAI / Upstage / Ollama 추상화. 키는 `config.php`의 `ai.api_key`만. 폼·SQLite·git에 키 없음. 미설정은 실패 폐쇄(설정에 연결 필요, 더보기 AI 메뉴 숨김). `Ai::suggest`는 초안만. 재고·대여·대장 쓰기 경로 없음. 챗봇·실사 연동 없음.
 - 품목 목록(로그인 사용자, 일반교사 포함): `items`에서 검색어 없이 전체 브라우즈. GET 필터 `type`, `low_stock`, `budget_program`, `budget_year`. 재고부족은 알림과 같이 소모품·부품·수량 < 최소재고. 찾기(검색어 필수)는 유지.
 - 기자재 현황 보드(로그인, `assets`): 검색어 없이 장비 전체 훑기. GET 필터는 상태(`assets.status`)·실(하위 위치 포함)·연체(`loans.status=overdue`)·사업예산(`assets.budget_program`/`budget_year`). 연체 표시는 대여 현황과 같음(`Alert::refreshOverdue`, 자산 상태는 `on_loan` 유지). 더보기 #31 스텁을 이 보드로 대체. 품목 대장 브라우즈(#29)는 `items`에 그대로.
-- 실험실습재료 현황 보드(로그인, `materials`): 검색어 없이 소모품·부품 재고 한 화면. GET 필터는 유형(`consumable`/`part`만, 그 외는 무시)·재고부족(알림과 같이 수량 < 최소재고)·실(하위 위치 포함)·사업예산(`catalog_items.budget_program`/`budget_year`). 부족 행은 뱃지·하이라이트. 장비는 #30, 비품·전체 대장은 #29. 타입 확장은 하지 않음.
+- 실험실습재료 현황 보드(로그인, `materials`): 검색어 없이 소모품·부품 재고 한 화면. GET 필터는 유형(`consumable`/`part`만, 그 외는 무시)·재고부족(알림과 같이 수량 < 최소재고)·실(하위 위치 포함)·사업예산(`catalog_items.budget_program`/`budget_year`). 부족 행은 뱃지·하이라이트. **재료 담당 대시보드(#50):** 부족 / 최근 분출 / 재입고 대기 섹션·칩. 보드 CTA는 품목 상세 `#restock`·`#issue`로 GET 이동. 쓰기는 기존 재입고·분출 POST+CSRF. 재입고 대기는 최근 분출이 최근 재입고보다 나중이고 수량 < 최소재고인 소모품·부품. 장비는 #30, 비품·전체 대장은 #29. 타입 확장은 하지 않음. 예산 보드(#51+)는 없음.
 
 ## 이번 검증
 
@@ -53,7 +53,7 @@
 - `php tests/ai.php`: 프로바이더 미설정/불완전/미지원 실패 폐쇄, 설정 시 제안만, 재고·대여·대장 무변경, 쓰기 훅 없음, 설정 폼에 키 필드 없음. 실제 API 키 없음.
 - `php tests/more_entry.php`: 더보기 진입(#31) 유지, 기자재 현황 스텁은 #30 보드로 대체.
 - `php tests/asset_board.php`: 검색 없이 전체 목록, 상태/실(하위 포함)/연체/사업예산 필터, 잘못된 상태·예산 무시, 연체는 `loan.status`·`refreshOverdue`와 동일, 품목 브라우즈 없음. #31 스텁 대체.
-- `php tests/material_board.php`: 검색 없이 소모품·부품 현황, 유형/부족/실(하위 포함)/사업예산 필터, 잘못된 유형·예산 무시, 부족 하이라이트는 알림과 동일. 장비·비품·새 타입 없음.
+- `php tests/material_board.php`: 검색 없이 소모품·부품 현황, 유형/부족/실(하위 포함)/사업예산 필터, 잘못된 유형·예산 무시, 부족 하이라이트는 알림과 동일. 장비·비품·새 타입 없음. 부족/최근 분출/재입고 대기 섹션과 품목 상세 재입고·분출 CTA(#50).
 - `php tests/stock_lot.php`: 로트/유통기한 파싱, 마이그레이션, 로트 수정·재입고 속성, 최소재고 변경 후 부족 판정, 등록/수정 UI·부족 뱃지, POST+CSRF·canWrite. 대여함·데스크·수리 컨트롤러는 유지.
 - 임시 앱 복사본·DB에서 HTTP 검증 통과: 로그인, 품목 화면, 정상 출고와 이력, 재고 부족, GET 거부, 잘못된 CSRF 토큰, 학생 권한 차단.
 - 브라우저 시각 검증, 실제 카메라 스캔, Google Cloud Console 실연동(실제 client_id/secret)은 미실시.

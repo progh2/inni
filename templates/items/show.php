@@ -80,7 +80,8 @@ $budgetLabel = Budget::format(
 <?php endif; ?>
 
 <?php if ($lots || ($stockable && Auth::canWrite($user))): ?>
-<div class="card">
+<?php $issueAnchor = false; $restockAnchor = false; ?>
+<div class="card" id="stock">
   <h2 class="section-title" style="margin-top:0">위치별 재고</h2>
   <?php foreach ($lots as $lot): ?>
     <?php
@@ -121,7 +122,8 @@ $budgetLabel = Budget::format(
     </form>
     <?php endif; ?>
     <?php if ($issueable && Auth::canLoan($user) && (float) $lot['quantity'] > 0): ?>
-    <form method="post" action="<?= Support::e(App::url('items/issue')) ?>">
+    <form method="post" action="<?= Support::e(App::url('items/issue')) ?>"<?= !$issueAnchor ? ' id="issue"' : '' ?>>
+      <?php $issueAnchor = true; ?>
       <?= Csrf::field() ?>
       <input type="hidden" name="item_id" value="<?= Support::e($item['id']) ?>">
       <input type="hidden" name="lot_id" value="<?= Support::e($lot['id']) ?>">
@@ -157,7 +159,8 @@ $budgetLabel = Budget::format(
       <p class="muted">출고할 재고가 없습니다.</p>
     <?php endif; ?>
     <?php if ($stockable && Auth::canWrite($user)): ?>
-    <form method="post" action="<?= Support::e(App::url('items/restock')) ?>">
+    <form method="post" action="<?= Support::e(App::url('items/restock')) ?>"<?= !$restockAnchor ? ' id="restock"' : '' ?>>
+      <?php $restockAnchor = true; ?>
       <?= Csrf::field() ?>
       <input type="hidden" name="item_id" value="<?= Support::e($item['id']) ?>">
       <input type="hidden" name="location_id" value="<?= Support::e($lot['location_id']) ?>">
@@ -185,7 +188,8 @@ $budgetLabel = Budget::format(
   <?php endforeach; ?>
   <?php if ($stockable && Auth::canWrite($user) && $openLocations): ?>
     <h3 class="section-title">다른 위치에 입고</h3>
-    <form method="post" action="<?= Support::e(App::url('items/restock')) ?>">
+    <form method="post" action="<?= Support::e(App::url('items/restock')) ?>"<?= !$restockAnchor ? ' id="restock"' : '' ?>>
+      <?php $restockAnchor = true; ?>
       <?= Csrf::field() ?>
       <input type="hidden" name="item_id" value="<?= Support::e($item['id']) ?>">
       <div class="field">

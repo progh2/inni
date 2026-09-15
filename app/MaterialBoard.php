@@ -91,6 +91,55 @@ final class MaterialBoard
     }
 
     /**
+     * Materials waiting for restock: issued more recently than last restock,
+     * and still below min_stock. Distinct from the shortage list (never-issued
+     * low stock stays only in 부족).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public static function restockWait(PDO $pdo, int $limit = 12): array
+    {
+        $limit = max(1, $limit);
+        $stmt = $pdo->query(
+            "SELECT c.id, c.name, c.type, c.unit, c.min_stock,
+                    COALESCE(SUM(s.quantity), 0) AS stock_qty,
+                    (
+                      SELECT MAX(a.created_at) FROM activity_logs a
+                      WHERE a.entity_type = 'catalog' AND a.entity_id = c.id AND a.action = 'issue'
+                    ) AS last_issue_at,
+                    (
+                      SELECT MAX(a.created_at) FROM activity_logs a
+                      WHERE a.entity_type = 'catalog' AND a.entity_id = c.id AND a.action = 'restock'
+                    ) AS last_restock_at
+             FROM catalog_items c
+             LEFT JOIN stock_lots s ON s.catalog_item_id = c.id
+             WHERE c.type IN ('consumable','part')
+             GROUP BY c.id
+             HAVING last_issue_at IS NOT NULL
+                AND (last_restock_at IS NULL OR last_issue_at > last_restock_at)
+                AND c.min_stock IS NOT NULL
+                AND COALESCE(SUM(s.quantity), 0) < c.min_stock
+             ORDER BY last_issue_at DESC, c.name"
+        );
+        $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+        if (!$rows) {
+            return [];
+        }
+        $rows = array_slice($rows, 0, $limit);
+
+        return self::attachLots($pdo, $rows);
+    }
+
+    /**
+     * GET jump from the board to the item restock or issue form. Writes stay POST+CSRF there.
+     */
+    public static function itemFocusUrl(string $itemId, string $focus = 'issue'): string
+    {
+        $focus = $focus === 'restock' ? 'restock' : 'issue';
+        return App::url('items/show', ['id' => $itemId]) . '#' . $focus;
+    }
+
+    /**
      * Unfiltered board totals. Low-stock matches Alert::listLowStock / Catalog::rowIsLowStock.
      *
      * @return array{total: int, low_stock: int, by_type: array<string, int>}

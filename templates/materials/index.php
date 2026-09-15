@@ -1,16 +1,20 @@
 <?php
 
 use Inni\App;
+use Inni\Auth;
 use Inni\Budget;
 use Inni\MaterialBoard;
 use Inni\Support;
 
+/** @var array $user */
 /** @var list<array<string, mixed>> $items */
 /** @var list<array<string, mixed>> $rooms */
 /** @var array{type: ?string, low_stock: bool, room: ?string, budget_program: ?string, budget_year: ?int} $filters */
 /** @var array{total: int, low_stock: int, by_type: array<string, int>} $summary */
 /** @var list<array<string, mixed>> $issueLogs */
 /** @var ?string $issueRoom */
+/** @var list<array<string, mixed>> $shortage */
+/** @var list<array<string, mixed>> $restockWait */
 
 $filterQuery = static function (array $extra = []) use ($filters): array {
     $query = [];
@@ -40,9 +44,14 @@ $budgetProgram = is_string($filters['budget_program'] ?? null) ? $filters['budge
 $budgetYear = isset($filters['budget_year']) && $filters['budget_year'] !== null ? (string) (int) $filters['budget_year'] : '';
 $issueLogs = $issueLogs ?? [];
 $issueRoom = $issueRoom ?? null;
+$shortage = $shortage ?? [];
+$restockWait = $restockWait ?? [];
+$canRestock = Auth::canWrite($user);
+$canIssue = Auth::canLoan($user);
+$ctaPartial = dirname(__DIR__) . '/partials/material_item_cta.php';
 ?>
 <h1>실험실습재료 현황</h1>
-<p class="muted">검색 없이 소모품·부품 재고를 훑습니다. 장비·비품은 <a href="<?= Support::e(App::url('items')) ?>">품목 목록</a>·<a href="<?= Support::e(App::url('assets')) ?>">기자재 현황</a>을 사용하세요.</p>
+<p class="muted">부족·최근 분출·재입고 대기를 한 보드에서 보고, 품목의 재입고·분출로 바로 이동합니다. 장비·비품은 <a href="<?= Support::e(App::url('items')) ?>">품목 목록</a>·<a href="<?= Support::e(App::url('assets')) ?>">기자재 현황</a>을 사용하세요.</p>
 
 <div class="stats" style="margin:1rem 0">
   <a class="stat" href="<?= Support::e(App::url('materials')) ?>">
@@ -54,6 +63,12 @@ $issueRoom = $issueRoom ?? null;
   <a class="stat" href="<?= Support::e(App::url('materials', $filterQuery(['type' => null, 'low_stock' => true]))) ?>">
     <b><?= (int) $summary['low_stock'] ?></b>부족
   </a>
+</div>
+
+<div class="actions" style="margin:0 0 1rem">
+  <a class="btn btn-ghost" href="#shortage">부족 <?= count($shortage) ?></a>
+  <a class="btn btn-ghost" href="#recent-issues">최근 분출 <?= count($issueLogs) ?></a>
+  <a class="btn btn-ghost" href="#restock-wait">재입고 대기 <?= count($restockWait) ?></a>
 </div>
 
 <form method="get" action="<?= Support::e(App::url('materials')) ?>" class="card">
@@ -97,41 +112,40 @@ $issueRoom = $issueRoom ?? null;
   <button class="btn btn-primary" type="submit">걸러보기</button>
 </form>
 
-<div class="card">
-  <h2 class="section-title" style="margin-top:0">실험실습재료 (<?= count($items) ?>)</h2>
-  <?php foreach ($items as $item): ?>
-    <?php $low = !empty($item['low_stock']); ?>
-    <a class="list-row<?= $low ? ' is-low-stock' : '' ?>" href="<?= Support::e(App::url('items/show', ['id' => $item['id']])) ?>">
+<div class="card" id="shortage">
+  <h2 class="section-title" style="margin-top:0">부족 (<?= count($shortage) ?>)</h2>
+  <p class="muted">최소재고보다 적은 소모품·부품입니다. 재입고로 보충하거나, 남은 수량이 있으면 분출합니다.</p>
+  <?php foreach ($shortage as $item): ?>
+    <div class="list-row is-low-stock">
       <div>
-        <div class="title"><?= Support::e((string) $item['name']) ?></div>
+        <a class="title" href="<?= Support::e(App::url('items/show', ['id' => $item['id']])) ?>">
+          <?= Support::e((string) $item['name']) ?>
+        </a>
         <div class="meta">
           <?= Support::e(Support::typeLabel((string) $item['type'])) ?>
           · <?= Support::e((string) $item['stock_qty']) ?><?= !empty($item['unit']) ? ' ' . Support::e((string) $item['unit']) : '' ?>
           <?php if ($item['min_stock'] !== null && $item['min_stock'] !== ''): ?>
             / 최소 <?= Support::e((string) $item['min_stock']) ?>
           <?php endif; ?>
-          <?php
-            $rowBudget = Budget::format(
-                isset($item['budget_program']) ? (string) $item['budget_program'] : null,
-                $item['budget_year'] ?? null,
-            );
-          ?>
-          <?php if ($rowBudget !== ''): ?> · <?= Support::e($rowBudget) ?><?php endif; ?>
-          <?php if (($item['rooms_label'] ?? '') !== ''): ?>
-            · <?= Support::e((string) $item['rooms_label']) ?>
-          <?php endif; ?>
         </div>
       </div>
-      <?php if ($low): ?>
+      <div class="actions" style="margin-top:0">
         <span class="badge overdue">부족</span>
-      <?php endif; ?>
-    </a>
+        <?php
+          $itemId = (string) $item['id'];
+          $offerRestock = $canRestock;
+          $offerIssue = $canIssue && (float) ($item['stock_qty'] ?? 0) > 0;
+          $issueLabel = '분출';
+          require $ctaPartial;
+        ?>
+      </div>
+    </div>
   <?php endforeach; ?>
-  <?php if (!$items): ?><p class="muted">조건에 맞는 실험실습재료가 없습니다.</p><?php endif; ?>
+  <?php if (!$shortage): ?><p class="muted">부족한 실험실습재료가 없습니다.</p><?php endif; ?>
 </div>
 
-<div class="card">
-  <h2 class="section-title" style="margin-top:0">분출 이력</h2>
+<div class="card" id="recent-issues">
+  <h2 class="section-title" style="margin-top:0">최근 분출</h2>
   <form method="get" action="<?= Support::e(App::url('materials')) ?>">
     <input type="hidden" name="r" value="materials">
     <?php if (is_string($filters['type'] ?? null) && $filters['type'] !== ''): ?>
@@ -165,12 +179,101 @@ $issueRoom = $issueRoom ?? null;
     <button class="btn btn-ghost" type="submit">이력 걸러보기</button>
   </form>
   <?php foreach ($issueLogs as $log): ?>
-    <a class="list-row" href="<?= Support::e(App::url('items/show', ['id' => $log['entity_id']])) ?>">
+    <div class="list-row">
       <div>
-        <div class="title"><?= Support::e((string) $log['summary']) ?></div>
+        <a class="title" href="<?= Support::e(App::url('items/show', ['id' => $log['entity_id']])) ?>">
+          <?= Support::e((string) $log['summary']) ?>
+        </a>
         <div class="meta"><?= Support::e((string) $log['actor_name']) ?> · <?= Support::e(Support::formatWhen($log['created_at'])) ?></div>
       </div>
-    </a>
+      <div class="actions" style="margin-top:0">
+        <?php
+          $itemId = (string) $log['entity_id'];
+          $offerRestock = $canRestock;
+          $offerIssue = $canIssue;
+          $issueLabel = '다시 분출';
+          require $ctaPartial;
+        ?>
+      </div>
+    </div>
   <?php endforeach; ?>
   <?php if (!$issueLogs): ?><p class="muted">분출 이력이 없습니다.</p><?php endif; ?>
+</div>
+
+<div class="card" id="restock-wait">
+  <h2 class="section-title" style="margin-top:0">재입고 대기 (<?= count($restockWait) ?>)</h2>
+  <p class="muted">분출 뒤에 아직 재입고하지 않았고, 최소재고보다 적은 품목입니다.</p>
+  <?php foreach ($restockWait as $item): ?>
+    <div class="list-row is-low-stock">
+      <div>
+        <a class="title" href="<?= Support::e(App::url('items/show', ['id' => $item['id']])) ?>">
+          <?= Support::e((string) $item['name']) ?>
+        </a>
+        <div class="meta">
+          <?= Support::e((string) $item['stock_qty']) ?><?= !empty($item['unit']) ? ' ' . Support::e((string) $item['unit']) : '' ?>
+          <?php if ($item['min_stock'] !== null && $item['min_stock'] !== ''): ?>
+            / 최소 <?= Support::e((string) $item['min_stock']) ?>
+          <?php endif; ?>
+          <?php if (!empty($item['last_issue_at'])): ?>
+            · 분출 <?= Support::e(Support::formatWhen($item['last_issue_at'])) ?>
+          <?php endif; ?>
+        </div>
+      </div>
+      <div class="actions" style="margin-top:0">
+        <span class="badge overdue">재입고</span>
+        <?php
+          $itemId = (string) $item['id'];
+          $offerRestock = $canRestock;
+          $offerIssue = false;
+          $issueLabel = '분출';
+          require $ctaPartial;
+        ?>
+      </div>
+    </div>
+  <?php endforeach; ?>
+  <?php if (!$restockWait): ?><p class="muted">재입고를 기다리는 품목이 없습니다.</p><?php endif; ?>
+</div>
+
+<div class="card">
+  <h2 class="section-title" style="margin-top:0">실험실습재료 (<?= count($items) ?>)</h2>
+  <?php foreach ($items as $item): ?>
+    <?php $low = !empty($item['low_stock']); ?>
+    <div class="list-row<?= $low ? ' is-low-stock' : '' ?>">
+      <div>
+        <a class="title" href="<?= Support::e(App::url('items/show', ['id' => $item['id']])) ?>">
+          <?= Support::e((string) $item['name']) ?>
+        </a>
+        <div class="meta">
+          <?= Support::e(Support::typeLabel((string) $item['type'])) ?>
+          · <?= Support::e((string) $item['stock_qty']) ?><?= !empty($item['unit']) ? ' ' . Support::e((string) $item['unit']) : '' ?>
+          <?php if ($item['min_stock'] !== null && $item['min_stock'] !== ''): ?>
+            / 최소 <?= Support::e((string) $item['min_stock']) ?>
+          <?php endif; ?>
+          <?php
+            $rowBudget = Budget::format(
+                isset($item['budget_program']) ? (string) $item['budget_program'] : null,
+                $item['budget_year'] ?? null,
+            );
+          ?>
+          <?php if ($rowBudget !== ''): ?> · <?= Support::e($rowBudget) ?><?php endif; ?>
+          <?php if (($item['rooms_label'] ?? '') !== ''): ?>
+            · <?= Support::e((string) $item['rooms_label']) ?>
+          <?php endif; ?>
+        </div>
+      </div>
+      <div class="actions" style="margin-top:0">
+        <?php if ($low): ?>
+          <span class="badge overdue">부족</span>
+        <?php endif; ?>
+        <?php
+          $itemId = (string) $item['id'];
+          $offerRestock = $canRestock;
+          $offerIssue = $canIssue && (float) ($item['stock_qty'] ?? 0) > 0;
+          $issueLabel = '분출';
+          require $ctaPartial;
+        ?>
+      </div>
+    </div>
+  <?php endforeach; ?>
+  <?php if (!$items): ?><p class="muted">조건에 맞는 실험실습재료가 없습니다.</p><?php endif; ?>
 </div>

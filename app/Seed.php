@@ -149,6 +149,30 @@ final class Seed
             'log-1', 'seed', 'location', 'loc-elec', $ownerId, '시스템', '데모 데이터를 불러왔습니다.', $t,
         ]);
 
+        $issueAt = gmdate('c', time() - 3600);
+        $pdo->prepare(
+            'INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,meta_json,created_at)
+             VALUES(?,?,?,?,?,?,?,?,?)'
+        )->execute([
+            'log-issue-wire',
+            'issue',
+            'catalog',
+            'ci-wire',
+            $teacherId,
+            '이수업',
+            '«전선 1.5sq» 2 m 분출 · 전자실습실 · 5교시 실습',
+            json_encode([
+                'lot_id' => 'lot-wire',
+                'location_id' => 'loc-store',
+                'quantity' => 2,
+                'remaining_quantity' => 12,
+                'purpose' => '5교시 실습',
+                'room_id' => 'loc-elec',
+                'room_name' => '전자실습실',
+            ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+            $issueAt,
+        ]);
+
         $pdo->prepare(
             'INSERT INTO reports(id,target_type,target_id,reporter_user_id,reporter_name,title,body,status,created_at,updated_at)
              VALUES(?,?,?,?,?,?,?,?,?,?)'

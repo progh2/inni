@@ -227,6 +227,20 @@ h1 { font-size: clamp(1.5rem, 3vw, 1.9rem); }
 }
 .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
 .section-title { margin: 1.2rem 0 0.5rem; font-size: 1.05rem; }
+#shortage:target,
+#recent-issues:target,
+#restock-wait:target,
+#issue:target,
+#restock:target,
+#stock:target {
+  scroll-margin-top: 5rem;
+}
+#issue:target,
+#restock:target {
+  outline: 2px solid var(--accent);
+  outline-offset: 6px;
+  border-radius: 0.8rem;
+}
 .life-suggest-box { margin: 0 0 0.85rem; }
 .life-suggest-list {
   list-style: none;

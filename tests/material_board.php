@@ -187,6 +187,7 @@ check(str_contains($ctl, 'Auth::requireLogin()'), 'board requires login');
 check(!preg_match('/function index\(\): void\s*\{[^}]*canWrite/', $ctl), 'board browse is not write-gated');
 check(!str_contains($ctl, 'Csrf::'), 'read-only board has no CSRF write');
 check(str_contains($ctl, 'Stock::issueHistory'), 'board loads issue history for room filter');
+check(str_contains($ctl, 'MaterialBoard::restockWait') && str_contains($ctl, 'low_stock'), 'board loads shortage and restock-wait widgets');
 
 $router = (string) file_get_contents($root . '/app/Router.php');
 check(str_contains($router, "'materials' => [MaterialController::class, 'index']"), 'router registers materials board');
@@ -202,8 +203,9 @@ check(str_contains($tpl, 'method="get"'), 'board filters are GET/SSR');
 check(!preg_match('/name=["\']q["\']/', $tpl), 'board does not require a search box');
 check(!str_contains($tpl, 'Csrf::field()'), 'board is a GET read; no CSRF write');
 check(str_contains($tpl, "App::url('items')"), 'board points at #29 catalog for equipment/fixture');
-check(str_contains($tpl, 'name="issue_room"') && str_contains($tpl, '분출 이력'), 'board can filter issue history by room');
-check(!str_contains($tpl, 'items/issue') && !str_contains($tpl, 'items/restock'), 'board history is not an issue/restock CTA');
+check(str_contains($tpl, 'name="issue_room"') && str_contains($tpl, '최근 분출'), 'board can filter recent issues by room');
+check(str_contains($tpl, 'id="shortage"') && str_contains($tpl, 'id="recent-issues"') && str_contains($tpl, 'id="restock-wait"'), 'board has shortage / recent-issue / restock-wait sections');
+check(str_contains($tpl, 'material_item_cta.php') && str_contains($tpl, 'offerRestock') && str_contains($tpl, 'offerIssue'), 'board wires restock/issue CTAs');
 
 $more = (string) file_get_contents($root . '/templates/more/index.php');
 check(str_contains($more, "App::url('materials')") && str_contains($more, '실험실습재료 현황'), 'more menu links to the board');
@@ -214,5 +216,45 @@ check(str_contains($home, "App::url('materials')"), 'home links to the board');
 
 $layout = (string) file_get_contents($root . '/templates/layouts/app.php');
 check(str_contains($layout, "\$current === 'materials'"), 'materials board keeps the 더보기 tab active');
+
+$showTpl = (string) file_get_contents($root . '/templates/items/show.php');
+check(str_contains($showTpl, 'id="issue"') && str_contains($showTpl, 'id="restock"'), 'item show exposes issue/restock anchors for board CTAs');
+check(str_contains($showTpl, 'Csrf::field()') && str_contains($showTpl, "App::url('items/issue')") && str_contains($showTpl, "App::url('items/restock')"), 'item writes stay POST+CSRF');
+
+$ctaTpl = (string) file_get_contents($root . '/templates/partials/material_item_cta.php');
+check(str_contains($ctaTpl, 'Auth::canWrite') && str_contains($ctaTpl, 'Auth::canLoan'), 'board CTAs follow restock/issue roles');
+check(str_contains($ctaTpl, "itemFocusUrl(\$itemId, 'restock')") && str_contains($ctaTpl, "itemFocusUrl(\$itemId, 'issue')"), 'CTA hrefs use item focus urls');
+check(!str_contains($ctaTpl, 'Csrf::field()') && !str_contains($ctaTpl, 'method="post"'), 'board CTAs are GET jumps, not writes');
+
+check(str_ends_with(MaterialBoard::itemFocusUrl('solder', 'restock'), '#restock'), 'restock focus url ends with #restock');
+check(str_ends_with(MaterialBoard::itemFocusUrl('solder', 'issue'), '#issue'), 'issue focus url ends with #issue');
+check(str_ends_with(MaterialBoard::itemFocusUrl('solder', 'other'), '#issue'), 'unknown focus falls back to issue');
+$restockHref = MaterialBoard::itemFocusUrl('solder', 'restock');
+check(str_contains($restockHref, 'id=solder') && (str_contains($restockHref, 'items/show') || str_contains($restockHref, 'items%2Fshow')), 'focus url stays on item show');
+
+check(MaterialBoard::restockWait($pdo) === [], 'restock wait is empty without issue logs');
+
+$pdo->exec("INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,created_at) VALUES('log-iss-s','issue','catalog','solder','u','교사','분출','2026-09-14T10:00:00+00:00')");
+$pdo->exec("INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,created_at) VALUES('log-iss-r','issue','catalog','res','u','교사','분출','2026-09-15T09:00:00+00:00')");
+$pdo->exec("INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,created_at) VALUES('log-iss-w','issue','catalog','wire','u','교사','분출','2026-09-15T11:00:00+00:00')");
+$pdo->exec("INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,created_at) VALUES('log-iss-eq','issue','catalog','eq','u','교사','장비 이력','2026-09-15T12:00:00+00:00')");
+
+$wait = MaterialBoard::restockWait($pdo);
+check(ids($wait) === ['res', 'solder'], 'restock wait is issued low-stock materials, newest first');
+check(!in_array('wire', ids($wait), true), 'issued item at min_stock is not restock-wait');
+check(!in_array('empty', ids($wait), true), 'low stock never issued stays off restock-wait');
+check(!in_array('eq', ids($wait), true), 'equipment stays off restock-wait');
+check((int) $wait[0]['low_stock'] === 1 && (int) $wait[1]['low_stock'] === 1, 'restock-wait rows keep shortage flag');
+
+$pdo->exec("INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,created_at) VALUES('log-rs-s','restock','catalog','solder','u','담당','재입고','2026-09-14T18:00:00+00:00')");
+$afterRestock = MaterialBoard::restockWait($pdo);
+check(ids($afterRestock) === ['res'], 'restock newer than last issue drops the wait row');
+
+$pdo->exec("INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,created_at) VALUES('log-iss-s2','issue','catalog','solder','u','교사','다시 분출','2026-09-15T08:00:00+00:00')");
+$reopened = MaterialBoard::restockWait($pdo);
+check(idSet($reopened) === ['res', 'solder'], 'newer issue after restock reopens the wait');
+
+$capped = MaterialBoard::restockWait($pdo, 1);
+check(ids($capped) === ['res'], 'restock wait honors limit');
 
 echo "PASS: {$checks} material-board checks\n";

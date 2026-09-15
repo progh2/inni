@@ -148,7 +148,7 @@ final class Stock
     }
 
     /**
-     * Recent material issues across items. Read-only; no write CTAs.
+     * Recent material issues across items. Board links to item issue/restock; writes stay there.
      *
      * @return list<array<string, mixed>>
      */
