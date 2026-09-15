@@ -44,3 +44,6 @@ $total = count($lines);
   <input type="hidden" name="check_id" value="<?= Support::e($check['id']) ?>">
   <button class="btn btn-ink btn-block" type="submit">실사 종료 · 미확인 보기</button>
 </form>
+<p class="muted" style="margin-top:0.75rem">
+  <a href="<?= Support::e(App::url('inventory/report', ['check_id' => $check['id']])) ?>">이 실사 사업예산 리포트</a>
+</p>

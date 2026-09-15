@@ -33,5 +33,6 @@ $confirmed = $total - $missing;
 
 <div class="actions">
   <a class="btn btn-ghost" href="<?= Support::e(App::url('rooms/show', ['id' => $check['location_id']])) ?>">실 보기</a>
+  <a class="btn btn-ghost" href="<?= Support::e(App::url('inventory/report', ['check_id' => $check['id']])) ?>">사업예산 리포트</a>
   <a class="btn btn-primary" href="<?= Support::e(App::url('inventory')) ?>">다른 실 실사</a>
 </div>
