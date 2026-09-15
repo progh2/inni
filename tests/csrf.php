@@ -226,6 +226,7 @@ check(str_contains((string) file_get_contents($root . '/app/Csrf.php'), 'Support
 $mutations = [
     'app/Controllers/ItemController.php' => ['save', 'update', 'issue', 'restock', 'cancelIssue'],
     'app/Controllers/AssetController.php' => ['loan', 'move', 'report', 'photo', 'updateBudget', 'updateLife'],
+    'app/Controllers/ReportController.php' => ['updateStatus'],
     'app/Controllers/LoanController.php' => ['returnLoan'],
     'app/Controllers/RoomController.php' => ['save'],
     'app/Controllers/SettingsController.php' => ['save', 'saveTelegram', 'approve'],
@@ -248,6 +249,7 @@ $forms = [
     'templates/items/edit.php' => 'items/update',
     'templates/rooms/index.php' => 'rooms/save',
     'templates/assets/show.php' => 'assets/loan',
+    'templates/reports/show.php' => 'reports/status',
     'templates/loans/index.php' => 'loans/return',
     'templates/loans/mine.php' => 'loans/return',
     'templates/settings/index.php' => 'settings/save',

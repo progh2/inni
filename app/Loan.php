@@ -136,11 +136,12 @@ final class Loan
 
             $assetId = $loan['asset_id'] ?? null;
             if (is_string($assetId) && $assetId !== '') {
+                $nextStatus = Report::hasOpenForAsset($pdo, $assetId) ? 'repair' : 'available';
                 $free = $pdo->prepare(
-                    "UPDATE assets SET status = 'available', updated_at = ?
-                     WHERE id = ? AND status = 'on_loan'"
+                    'UPDATE assets SET status = ?, updated_at = ?
+                     WHERE id = ? AND status = \'on_loan\''
                 );
-                $free->execute([$t, $assetId]);
+                $free->execute([$nextStatus, $t, $assetId]);
                 if ($free->rowCount() !== 1) {
                     throw new InvalidArgumentException('장비 상태가 대여중이 아니라 반납할 수 없습니다.');
                 }

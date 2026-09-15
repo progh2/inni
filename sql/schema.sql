@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS reports (
   title TEXT NOT NULL,
   body TEXT NOT NULL,
   image_path TEXT,
-  status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','in_progress','done')),
+  status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','in_progress','done','impossible')),
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );

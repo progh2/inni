@@ -39,10 +39,14 @@ check(preg_match("/\\\$tabs = \\[\\s*\\['home', '홈'\\],\\s*\\['search', '찾�
 check(substr_count($layout, "['home', '홈']") === 1 && substr_count($layout, "['more', '더보기']") === 1, 'Tab labels stay a single 5-tab set');
 check(str_contains($layout, "\$current === 'items' || \$current === 'assets' || \$current === 'materials'"), 'List/status screens keep the 더보기 tab active');
 check(str_contains($layout, "\$current === 'loans' || str_starts_with(\$current, 'loans/')"), 'Loan inbox/list keep the 더보기 tab active');
+check(str_contains($layout, "\$current === 'reports' || str_starts_with(\$current, 'reports/')"), 'Repair queue keeps the 더보기 tab active');
 check(str_contains($more, '내 대여함'), 'More menu must expose 내 대여함');
 check(str_contains($more, "App::url('loans/mine')"), '내 대여함 must link to loans/mine');
 check(str_contains($more, 'Auth::canLoan($user)'), '내 대여함 is gated on canLoan');
 check(substr_count($more, "App::url('loans/mine')") === 1, 'More must not duplicate the inbox link');
+check(str_contains($more, '수리 요청'), 'More menu must expose 수리 요청');
+check(str_contains($more, "App::url('reports')"), '수리 요청 must link to reports');
+check(substr_count($more, "App::url('reports')") === 1, 'More must not duplicate the reports queue link');
 check(!str_contains($layout, "str_starts_with(\$current, 'items/')"), 'Item detail/new must not steal the 더보기 tab');
 check(!str_contains($layout, "str_starts_with(\$current, 'assets/')"), 'Asset detail must not steal the 더보기 tab');
 

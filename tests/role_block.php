@@ -222,6 +222,14 @@ check(str_contains($more, '!empty($aiReady)'), 'more menu hides AI helper when n
 check(str_contains($more, '재료·품목 목록') && str_contains($more, "App::url('items')"), 'more menu links to 재료·품목 목록');
 check(str_contains($more, '기자재 현황') && str_contains($more, "App::url('assets')"), 'more menu links to 기자재 현황');
 check(str_contains($more, '내 대여함') && str_contains($more, 'Auth::canLoan($user)'), 'more menu gates 내 대여함 on canLoan');
+check(str_contains($more, '수리 요청') && str_contains($more, "App::url('reports')"), 'more menu links to repair queue');
+
+$reportCtl = (string) file_get_contents($root . '/app/Controllers/ReportController.php');
+check(str_contains($reportCtl, 'function updateStatus') && str_contains($reportCtl, 'Report::canTransition'), 'report status requires canWrite');
+check(str_contains($reportCtl, 'Csrf::requirePost()'), 'report status requires POST+CSRF');
+$reportDomain = (string) file_get_contents($root . '/app/Report.php');
+check(str_contains($reportDomain, 'Auth::canLoan($user)') && str_contains($reportDomain, 'function canCreate'), 'teachers may create reports via canLoan');
+check(str_contains($reportDomain, 'Auth::canWrite($user)') && str_contains($reportDomain, 'function canTransition'), 'only owner/manager change repair status');
 
 $loanCtl = (string) file_get_contents($root . '/app/Controllers/LoanController.php');
 check(str_contains($loanCtl, 'function mine') && str_contains($loanCtl, 'Auth::requireLogin()'), 'loan inbox requires login');

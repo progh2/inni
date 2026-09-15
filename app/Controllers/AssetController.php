@@ -14,6 +14,7 @@ use Inni\Database;
 use Inni\Loan;
 use Inni\Logger;
 use Inni\PpsUsefulLife;
+use Inni\Report;
 use Inni\Support;
 use Inni\Uploader;
 use Inni\View;
@@ -182,14 +183,14 @@ final class AssetController
     public function report(): void
     {
         $user = Auth::requireLogin();
-        Csrf::requirePost();
         $assetId = (string) ($_POST['asset_id'] ?? '');
-        $title = trim((string) ($_POST['title'] ?? ''));
-        $body = trim((string) ($_POST['body'] ?? ''));
-        if ($title === '' || $body === '') {
-            App::flash('error', '제목과 내용을 입력하세요.');
+        if (!Report::canCreate($user)) {
+            App::flash('error', '수리 요청 권한이 없습니다.');
             App::redirect('assets/show', ['id' => $assetId]);
         }
+        Csrf::requirePost();
+        $title = trim((string) ($_POST['title'] ?? ''));
+        $body = trim((string) ($_POST['body'] ?? ''));
         $imagePath = null;
         try {
             if (!empty($_FILES['photo']['name'])) {
@@ -199,17 +200,15 @@ final class AssetController
             App::flash('error', $e->getMessage());
             App::redirect('assets/show', ['id' => $assetId]);
         }
-        $id = Support::id('rep');
-        $t = Support::now();
-        Database::pdo()->prepare(
-            'INSERT INTO reports(id,target_type,target_id,reporter_user_id,reporter_name,title,body,image_path,status,created_at,updated_at)
-             VALUES(?,?,?,?,?,?,?,?,?,?,?)'
-        )->execute([
-            $id, 'asset', $assetId, $user['id'], $user['display_name'], $title, $body,
-            $imagePath, 'open', $t, $t,
-        ]);
-        Logger::write('report', 'report', $id, "고장 신고: {$title}");
-        App::flash('ok', '신고가 접수되었습니다.');
+        try {
+            Report::create(Database::pdo(), $user, 'asset', $assetId, $title, $body, $imagePath);
+            App::flash('ok', '수리 요청이 접수되었습니다.');
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '수리 요청을 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
         App::redirect('assets/show', ['id' => $assetId]);
     }
 

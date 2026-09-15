@@ -26,6 +26,9 @@ use Inni\Support;
   <a class="list-row" href="<?= Support::e(App::url('loans')) ?>">
     <div class="title">대여 현황</div>
   </a>
+  <a class="list-row" href="<?= Support::e(App::url('reports')) ?>">
+    <div class="title">수리 요청</div>
+  </a>
   <a class="list-row" href="<?= Support::e(App::url('labels')) ?>">
     <div class="title">라벨 인쇄</div>
   </a>

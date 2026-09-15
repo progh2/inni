@@ -5,6 +5,7 @@ use Inni\AssetLife;
 use Inni\Auth;
 use Inni\Budget;
 use Inni\Csrf;
+use Inni\Report;
 use Inni\Support;
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('search')) ?>">← 찾기</a></p>
@@ -171,31 +172,37 @@ $lifeLabel = AssetLife::format(
 <?php endif; ?>
 
 <div class="card">
-  <h2 class="section-title" style="margin-top:0">고장 · 이상 신고</h2>
-  <form method="post" action="<?= Support::e(App::url('assets/report')) ?>" enctype="multipart/form-data">
-    <?= Csrf::field() ?>
-    <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
-    <div class="field">
-      <label>제목</label>
-      <input name="title" required placeholder="전원 안 켜짐">
-    </div>
-    <div class="field">
-      <label>내용</label>
-      <textarea name="body" rows="3" required></textarea>
-    </div>
-    <div class="field">
-      <label>사진</label>
-      <input type="file" name="photo" accept="image/*" capture="environment">
-    </div>
-    <button class="btn btn-ghost" type="submit">신고</button>
-  </form>
+  <h2 class="section-title" style="margin-top:0">수리 요청</h2>
+  <?php if (Report::canCreate($user)): ?>
+    <p class="muted">증상과 사진을 남기면 기자재 담당이 접수·수리중·완료·불가로 처리합니다.</p>
+    <form method="post" action="<?= Support::e(App::url('assets/report')) ?>" enctype="multipart/form-data">
+      <?= Csrf::field() ?>
+      <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
+      <div class="field">
+        <label>증상 제목</label>
+        <input name="title" required placeholder="전원 안 켜짐">
+      </div>
+      <div class="field">
+        <label>증상</label>
+        <textarea name="body" rows="3" required placeholder="언제부터, 어떤 증상이 있는지"></textarea>
+      </div>
+      <div class="field">
+        <label>사진</label>
+        <input type="file" name="photo" accept="image/*" capture="environment">
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">수리 요청하기</button>
+    </form>
+  <?php else: ?>
+    <p class="muted">수리 요청은 교사·담당자 계정으로 할 수 있습니다.</p>
+  <?php endif; ?>
   <?php foreach ($reports as $r): ?>
-    <div class="list-row">
+    <a class="list-row" href="<?= Support::e(App::url('reports/show', ['id' => $r['id']])) ?>">
       <div>
         <div class="title"><?= Support::e($r['title']) ?></div>
         <div class="meta"><?= Support::e(Support::statusLabel($r['status'])) ?> · <?= Support::e(Support::formatWhen($r['created_at'])) ?></div>
       </div>
-    </div>
+      <span class="badge <?= Support::e($r['status']) ?>"><?= Support::e(Support::statusLabel($r['status'])) ?></span>
+    </a>
   <?php endforeach; ?>
 </div>
 

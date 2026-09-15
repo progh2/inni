@@ -89,6 +89,7 @@ final class Database
             'CREATE INDEX IF NOT EXISTS idx_stock_issue_cancels_item
              ON stock_issue_cancels(catalog_item_id, created_at)'
         );
+        self::ensureReportStatuses($pdo);
         $pdo->exec(
             'CREATE TABLE IF NOT EXISTS alert_dispatches (
               event_key TEXT NOT NULL,
@@ -144,6 +145,75 @@ final class Database
              ON inventory_check_lines(check_id, stock_lot_id)
              WHERE stock_lot_id IS NOT NULL'
         );
+    }
+
+    /**
+     * Add `impossible`(불가) to reports.status without inventing a second machine.
+     * SQLite cannot ALTER a CHECK, so older DBs rebuild the table once.
+     */
+    private static function ensureReportStatuses(PDO $pdo): void
+    {
+        $ddl = $pdo->query("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'reports'")->fetchColumn();
+        if (!is_string($ddl) || $ddl === '') {
+            $pdo->exec(
+                "CREATE TABLE IF NOT EXISTS reports (
+                  id TEXT PRIMARY KEY,
+                  target_type TEXT NOT NULL CHECK(target_type IN ('room','asset')),
+                  target_id TEXT NOT NULL,
+                  reporter_user_id TEXT REFERENCES users(id),
+                  reporter_name TEXT NOT NULL,
+                  title TEXT NOT NULL,
+                  body TEXT NOT NULL,
+                  image_path TEXT,
+                  status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','in_progress','done','impossible')),
+                  created_at TEXT NOT NULL,
+                  updated_at TEXT NOT NULL
+                )"
+            );
+            $pdo->exec('CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status)');
+            return;
+        }
+        if (str_contains($ddl, 'impossible')) {
+            $pdo->exec('CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status)');
+            return;
+        }
+
+        $pdo->exec('PRAGMA foreign_keys = OFF');
+        $pdo->exec('BEGIN');
+        try {
+            $pdo->exec('ALTER TABLE reports RENAME TO reports_legacy_m5');
+            $pdo->exec(
+                "CREATE TABLE reports (
+                  id TEXT PRIMARY KEY,
+                  target_type TEXT NOT NULL CHECK(target_type IN ('room','asset')),
+                  target_id TEXT NOT NULL,
+                  reporter_user_id TEXT REFERENCES users(id),
+                  reporter_name TEXT NOT NULL,
+                  title TEXT NOT NULL,
+                  body TEXT NOT NULL,
+                  image_path TEXT,
+                  status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','in_progress','done','impossible')),
+                  created_at TEXT NOT NULL,
+                  updated_at TEXT NOT NULL
+                )"
+            );
+            $pdo->exec(
+                'INSERT INTO reports(id,target_type,target_id,reporter_user_id,reporter_name,title,body,image_path,status,created_at,updated_at)
+                 SELECT id,target_type,target_id,reporter_user_id,reporter_name,title,body,image_path,status,created_at,updated_at
+                 FROM reports_legacy_m5'
+            );
+            $pdo->exec('DROP TABLE reports_legacy_m5');
+            $pdo->exec('CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status)');
+            $pdo->exec('COMMIT');
+        } catch (\Throwable $e) {
+            try {
+                $pdo->exec('ROLLBACK');
+            } catch (\Throwable) {
+            }
+            $pdo->exec('PRAGMA foreign_keys = ON');
+            throw $e;
+        }
+        $pdo->exec('PRAGMA foreign_keys = ON');
     }
 
     /**

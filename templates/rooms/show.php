@@ -68,12 +68,13 @@ use Inni\Support;
 <div class="card">
   <h2 class="section-title" style="margin-top:0">시설 신고</h2>
   <?php foreach ($reports as $r): ?>
-    <div class="list-row">
+    <a class="list-row" href="<?= Support::e(App::url('reports/show', ['id' => $r['id']])) ?>">
       <div>
         <div class="title"><?= Support::e($r['title']) ?></div>
         <div class="meta"><?= Support::e($r['reporter_name']) ?> · <?= Support::e(Support::statusLabel($r['status'])) ?></div>
       </div>
-    </div>
+      <span class="badge <?= Support::e($r['status']) ?>"><?= Support::e(Support::statusLabel($r['status'])) ?></span>
+    </a>
   <?php endforeach; ?>
 </div>
 <?php endif; ?>
