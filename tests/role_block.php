@@ -232,6 +232,9 @@ check(str_contains($more, '수리 대기') && str_contains($more, 'Auth::canWrit
 $loanCtl = (string) file_get_contents($root . '/app/Controllers/LoanController.php');
 check(str_contains($loanCtl, 'function mine') && str_contains($loanCtl, 'Auth::requireLogin()'), 'loan inbox requires login');
 check(str_contains($loanCtl, 'Auth::canReturn($user)') && str_contains($loanCtl, 'Csrf::requirePost()'), 'loan return keeps canReturn and POST+CSRF');
+$deskCtl = (string) file_get_contents($root . '/app/Controllers/DeskController.php');
+check(str_contains($deskCtl, 'Auth::canLoan($user)'), 'desk requires canLoan');
+check(substr_count($deskCtl, 'Csrf::requirePost()') >= 2, 'desk resolve/loan require POST+CSRF');
 
 $settings = (string) file_get_contents($root . '/app/Controllers/SettingsController.php');
 check(str_contains($settings, 'Auth::canConfigureAlerts($user)'), 'telegram settings allow owner/manager');

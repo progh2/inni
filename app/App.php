@@ -96,7 +96,12 @@ final class App
 
     public static function redirect(string $route, array $query = []): never
     {
-        header('Location: ' . self::url($route, $query));
+        $url = self::url($route, $query);
+        $sink = getenv('INNI_TEST_REDIRECT');
+        if (is_string($sink) && $sink !== '') {
+            file_put_contents($sink, $url);
+        }
+        header('Location: ' . $url);
         exit;
     }
 
