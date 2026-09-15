@@ -79,9 +79,16 @@ $budgetLabel = Budget::format(
 </div>
 <?php endif; ?>
 
-<?php if ($lots || ($stockable && Auth::canWrite($user))): ?>
+<?php
+$showStock = $lots || ($stockable && Auth::canWrite($user));
+if ($issueable && !$showStock): ?><span id="issue"></span><?php endif; ?>
+<?php if ($stockable && !$showStock): ?><span id="restock"></span><?php endif; ?>
+
+<?php if ($showStock): ?>
 <div class="card">
   <h2 class="section-title" style="margin-top:0">위치별 재고</h2>
+  <?php if ($issueable): ?><span id="issue"></span><?php endif; ?>
+  <?php if ($stockable): ?><span id="restock"></span><?php endif; ?>
   <?php foreach ($lots as $lot): ?>
     <?php
       $lotLabel = StockLot::format(

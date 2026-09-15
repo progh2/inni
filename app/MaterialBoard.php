@@ -18,6 +18,9 @@ final class MaterialBoard
     /** @var list<string> */
     public const MATERIAL_TYPES = ['consumable', 'part'];
 
+    public const ACTION_ISSUE = 'issue';
+    public const ACTION_RESTOCK = 'restock';
+
     /**
      * @param array<string, mixed> $query
      * @return array{type: ?string, low_stock: bool, room: ?string, budget_program: ?string, budget_year: ?int}
@@ -175,6 +178,35 @@ final class MaterialBoard
             $parts[] = $name . ' ' . $qtyText;
         }
         return implode(' · ', $parts);
+    }
+
+    /**
+     * GET deep-link to the item-show 분출 / 재입고 forms. Unknown action falls back to 분출.
+     */
+    public static function itemActionUrl(string $itemId, string $action): string
+    {
+        $itemId = trim($itemId);
+        $normalized = self::normalizeAction($action) ?? self::ACTION_ISSUE;
+        return App::url('items/show', ['id' => $itemId]) . '#' . $normalized;
+    }
+
+    public static function normalizeAction(mixed $action): ?string
+    {
+        if (!is_string($action)) {
+            return null;
+        }
+        $action = trim($action);
+        return in_array($action, [self::ACTION_ISSUE, self::ACTION_RESTOCK], true) ? $action : null;
+    }
+
+    /**
+     * Unfiltered shortage list — 재입고 대기. Same qty < min_stock rule as summary.low_stock.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public static function waitingRestock(PDO $pdo): array
+    {
+        return self::list($pdo, ['low_stock' => true]);
     }
 
     /**

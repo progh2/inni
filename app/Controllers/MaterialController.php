@@ -21,9 +21,18 @@ final class MaterialController
         $items = MaterialBoard::list($pdo, $filters);
         $rooms = MaterialBoard::rooms($pdo);
         $summary = MaterialBoard::summary($pdo);
+        $waitingRestock = MaterialBoard::waitingRestock($pdo);
         $issueRoom = Stock::issueRoomFromRequest($_GET, 'issue_room');
         $issueLogs = Stock::issueHistory($pdo, $issueRoom);
 
-        View::render('materials/index', compact('items', 'rooms', 'filters', 'summary', 'issueLogs', 'issueRoom'));
+        View::render('materials/index', compact(
+            'items',
+            'rooms',
+            'filters',
+            'summary',
+            'waitingRestock',
+            'issueLogs',
+            'issueRoom',
+        ));
     }
 }
