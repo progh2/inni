@@ -9,6 +9,8 @@ use Inni\Support;
 /** @var list<array<string, mixed>> $rooms */
 /** @var array{type: ?string, low_stock: bool, room: ?string, budget_program: ?string, budget_year: ?int} $filters */
 /** @var array{total: int, low_stock: int, by_type: array<string, int>} $summary */
+/** @var list<array<string, mixed>> $issueLogs */
+/** @var ?string $issueRoom */
 
 $filterQuery = static function (array $extra = []) use ($filters): array {
     $query = [];
@@ -36,6 +38,8 @@ $filterQuery = static function (array $extra = []) use ($filters): array {
 };
 $budgetProgram = is_string($filters['budget_program'] ?? null) ? $filters['budget_program'] : '';
 $budgetYear = isset($filters['budget_year']) && $filters['budget_year'] !== null ? (string) (int) $filters['budget_year'] : '';
+$issueLogs = $issueLogs ?? [];
+$issueRoom = $issueRoom ?? null;
 ?>
 <h1>실험실습재료 현황</h1>
 <p class="muted">검색 없이 소모품·부품 재고를 훑습니다. 장비·비품은 <a href="<?= Support::e(App::url('items')) ?>">품목 목록</a>·<a href="<?= Support::e(App::url('assets')) ?>">기자재 현황</a>을 사용하세요.</p>
@@ -124,4 +128,49 @@ $budgetYear = isset($filters['budget_year']) && $filters['budget_year'] !== null
     </a>
   <?php endforeach; ?>
   <?php if (!$items): ?><p class="muted">조건에 맞는 실험실습재료가 없습니다.</p><?php endif; ?>
+</div>
+
+<div class="card">
+  <h2 class="section-title" style="margin-top:0">분출 이력</h2>
+  <form method="get" action="<?= Support::e(App::url('materials')) ?>">
+    <input type="hidden" name="r" value="materials">
+    <?php if (is_string($filters['type'] ?? null) && $filters['type'] !== ''): ?>
+      <input type="hidden" name="type" value="<?= Support::e((string) $filters['type']) ?>">
+    <?php endif; ?>
+    <?php if (is_string($filters['room'] ?? null) && $filters['room'] !== ''): ?>
+      <input type="hidden" name="room" value="<?= Support::e((string) $filters['room']) ?>">
+    <?php endif; ?>
+    <?php if (!empty($filters['low_stock'])): ?>
+      <input type="hidden" name="low_stock" value="1">
+    <?php endif; ?>
+    <?php if (is_string($filters['budget_program'] ?? null) && $filters['budget_program'] !== ''): ?>
+      <input type="hidden" name="budget_program" value="<?= Support::e((string) $filters['budget_program']) ?>">
+    <?php endif; ?>
+    <?php if (isset($filters['budget_year']) && $filters['budget_year'] !== null): ?>
+      <input type="hidden" name="budget_year" value="<?= Support::e((string) (int) $filters['budget_year']) ?>">
+    <?php endif; ?>
+    <div class="field">
+      <label for="material-issue-room">분출 실</label>
+      <select id="material-issue-room" name="issue_room">
+        <option value="">전체</option>
+        <?php foreach ($rooms as $room): ?>
+          <option value="<?= Support::e((string) $room['id']) ?>" <?= ($issueRoom ?? null) === $room['id'] ? 'selected' : '' ?>>
+            <?= Support::e((string) $room['name']) ?>
+            <?= !empty($room['parent_name']) ? ' · ' . Support::e((string) $room['parent_name']) : '' ?>
+            <?= !empty($room['code']) ? ' · ' . Support::e((string) $room['code']) : '' ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <button class="btn btn-ghost" type="submit">이력 걸러보기</button>
+  </form>
+  <?php foreach ($issueLogs as $log): ?>
+    <a class="list-row" href="<?= Support::e(App::url('items/show', ['id' => $log['entity_id']])) ?>">
+      <div>
+        <div class="title"><?= Support::e((string) $log['summary']) ?></div>
+        <div class="meta"><?= Support::e((string) $log['actor_name']) ?> · <?= Support::e(Support::formatWhen($log['created_at'])) ?></div>
+      </div>
+    </a>
+  <?php endforeach; ?>
+  <?php if (!$issueLogs): ?><p class="muted">분출 이력이 없습니다.</p><?php endif; ?>
 </div>
