@@ -63,6 +63,8 @@ final class Database
         self::ensureColumn($pdo, 'assets', 'budget_program', 'TEXT');
         self::ensureColumn($pdo, 'assets', 'budget_year', 'INTEGER');
         self::ensureColumn($pdo, 'assets', 'useful_life_years', 'INTEGER');
+        self::ensureColumn($pdo, 'stock_lots', 'lot_code', 'TEXT');
+        self::ensureColumn($pdo, 'stock_lots', 'expires_at', 'TEXT');
         $pdo->exec('CREATE INDEX IF NOT EXISTS idx_catalog_budget ON catalog_items(budget_year, budget_program)');
         $pdo->exec('CREATE INDEX IF NOT EXISTS idx_assets_budget ON assets(budget_year, budget_program)');
 
@@ -148,7 +150,7 @@ final class Database
     }
 
     /**
-     * @param 'catalog_items'|'assets' $table
+     * @param 'catalog_items'|'assets'|'stock_lots' $table
      */
     private static function ensureColumn(PDO $pdo, string $table, string $column, string $type): void
     {
@@ -159,12 +161,19 @@ final class Database
                 'budget_year' => 'INTEGER',
                 'useful_life_years' => 'INTEGER',
             ],
+            'stock_lots' => [
+                'lot_code' => 'TEXT',
+                'expires_at' => 'TEXT',
+            ],
         ];
         if (!isset($allowed[$table][$column]) || $allowed[$table][$column] !== $type) {
             throw new RuntimeException('Refusing unknown schema patch: ' . $table . '.' . $column);
         }
         $stmt = $pdo->query('PRAGMA table_info(' . $table . ')');
         $cols = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+        if ($cols === []) {
+            return;
+        }
         foreach ($cols as $col) {
             if (($col['name'] ?? '') === $column) {
                 return;

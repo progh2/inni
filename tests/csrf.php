@@ -280,6 +280,7 @@ check(str_contains($deskPage, 'loans/desk/resolve') && str_contains($deskPage, '
 check(str_contains($deskPage, 'loans/return') && str_contains($deskPage, 'return_to'), 'Desk return posts to loans/return with CSRF');
 $show = (string) file_get_contents($root . '/templates/items/show.php');
 check(str_contains($show, 'items/restock') && str_contains($show, 'items/cancel-issue'), 'Item show must include restock and cancel-issue forms');
+check(str_contains($show, 'items/lot'), 'Item show must include lot update form');
 $assetShow = (string) file_get_contents($root . '/templates/assets/show.php');
 check(str_contains($assetShow, 'assets/budget') && substr_count($assetShow, 'Csrf::field()') >= 2, 'Asset show must include CSRF budget form');
 check(str_contains($assetShow, 'assets/life') && str_contains($assetShow, '도입일'), 'Asset show must include CSRF 도입일 form');
@@ -485,6 +486,31 @@ $restockGet = invokeItemAction('restock', 'GET', [
     'quantity' => '3',
 ], $sessionToken);
 check($restockGet['status'] === 405 && (float) $restockGet['quantity'] === 18.0, 'GET must be rejected for restock');
+
+$lotOk = invokeItemAction('updateLot', 'POST', [
+    'csrf_token' => $sessionToken,
+    'item_id' => 'ci-solder',
+    'lot_id' => 'lot-solder',
+    'lot_code' => 'SN-CSRF',
+    'expires_at' => '2028-01-01',
+], $sessionToken);
+check(($lotOk['status'] === 302 || $lotOk['status'] === 200) && (float) $lotOk['quantity'] === 18.0, 'Valid CSRF should update lot without changing qty');
+
+$lotBad = invokeItemAction('updateLot', 'POST', [
+    'csrf_token' => 'wrong-token',
+    'item_id' => 'ci-solder',
+    'lot_id' => 'lot-solder',
+    'lot_code' => 'SN-BAD',
+], $sessionToken);
+check($lotBad['status'] === 403 && (float) $lotBad['quantity'] === 18.0, 'Bad CSRF must fail closed on lot update');
+
+$lotGet = invokeItemAction('updateLot', 'GET', [
+    'csrf_token' => $sessionToken,
+    'item_id' => 'ci-solder',
+    'lot_id' => 'lot-solder',
+    'lot_code' => 'SN-GET',
+], $sessionToken);
+check($lotGet['status'] === 405 && (float) $lotGet['quantity'] === 18.0, 'GET must be rejected for lot update');
 
 $cancelOk = invokeItemAction('cancelIssue', 'POST', [
     'csrf_token' => $sessionToken,

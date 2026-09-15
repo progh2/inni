@@ -6,6 +6,7 @@ use Inni\Support;
 
 $tags = Support::jsonDecode($item['tags'] ?? null);
 $tagText = implode(', ', $tags);
+$isMaterial = in_array((string) $item['type'], ['consumable', 'part'], true);
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('items/show', ['id' => $item['id']])) ?>">← 품목</a></p>
 <h1>품목 수정</h1>
@@ -36,13 +37,19 @@ $tagText = implode(', ', $tags);
       <input name="budget_year" type="number" inputmode="numeric" min="1900" max="2100" step="1" placeholder="YYYY" value="<?= $item['budget_year'] !== null && $item['budget_year'] !== '' ? Support::e((string) $item['budget_year']) : '' ?>">
     </div>
   </div>
-  <div class="field">
-    <label>단위 / 최소재고 (소모품)</label>
-    <div style="display:flex;gap:0.5rem">
-      <input name="unit" value="<?= Support::e($item['unit'] ?? 'ea') ?>" style="max-width:6rem">
-      <input name="min_stock" type="number" step="0.1" min="0" placeholder="최소재고" value="<?= $item['min_stock'] !== null && $item['min_stock'] !== '' ? Support::e((string) $item['min_stock']) : '' ?>">
+  <div class="grid-2">
+    <div class="field">
+      <label for="unit">단위</label>
+      <input id="unit" name="unit" value="<?= Support::e($item['unit'] ?? 'ea') ?>" placeholder="ea, m, 개">
+    </div>
+    <div class="field">
+      <label for="min_stock">최소재고</label>
+      <input id="min_stock" name="min_stock" type="number" step="0.1" min="0" placeholder="부족 알림 기준" value="<?= $item['min_stock'] !== null && $item['min_stock'] !== '' ? Support::e((string) $item['min_stock']) : '' ?>">
     </div>
   </div>
+  <?php if ($isMaterial): ?>
+    <p class="muted">수량이 최소재고보다 적으면 품목 목록·실험실습재료 현황에 부족 뱃지가 보입니다. 로트 번호·유통기한은 위치별 재고에서 수정합니다.</p>
+  <?php endif; ?>
   <div class="field">
     <label>태그 (쉼표)</label>
     <input name="tags" value="<?= Support::e($tagText) ?>" placeholder="계측,전자">

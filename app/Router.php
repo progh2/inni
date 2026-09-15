@@ -54,6 +54,7 @@ final class Router
             'items/update' => [ItemController::class, 'update'],
             'items/issue' => [ItemController::class, 'issue'],
             'items/restock' => [ItemController::class, 'restock'],
+            'items/lot' => [ItemController::class, 'updateLot'],
             'items/cancel-issue' => [ItemController::class, 'cancelIssue'],
 
             'catalog/csv' => [CatalogCsvController::class, 'index'],

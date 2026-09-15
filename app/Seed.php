@@ -114,18 +114,19 @@ final class Seed
         }
 
         $lots = [
-            ['lot-solder', 'ci-solder', 'loc-elec', 18],
-            ['lot-wire', 'ci-wire', 'loc-store', 12],
-            ['lot-bit', 'ci-bit', 'loc-tool-a', 1],
-            ['lot-res', 'ci-res', 'loc-elec', 4],
-            ['lot-chair', 'ci-chair', 'loc-elec', 24],
-            ['lot-chair2', 'ci-chair', 'loc-weld', 16],
+            ['lot-solder', 'ci-solder', 'loc-elec', 18, 'SN-2025-11', '2028-11-30'],
+            ['lot-wire', 'ci-wire', 'loc-store', 12, 'W-2026-03', '2027-03-31'],
+            ['lot-bit', 'ci-bit', 'loc-tool-a', 1, null, null],
+            ['lot-res', 'ci-res', 'loc-elec', 4, null, null],
+            ['lot-chair', 'ci-chair', 'loc-elec', 24, null, null],
+            ['lot-chair2', 'ci-chair', 'loc-weld', 16, null, null],
         ];
         $insLot = $pdo->prepare(
-            'INSERT INTO stock_lots(id,catalog_item_id,location_id,quantity,updated_at) VALUES(?,?,?,?,?)'
+            'INSERT INTO stock_lots(id,catalog_item_id,location_id,quantity,lot_code,expires_at,updated_at)
+             VALUES(?,?,?,?,?,?,?)'
         );
         foreach ($lots as $l) {
-            $insLot->execute([$l[0], $l[1], $l[2], $l[3], $t]);
+            $insLot->execute([$l[0], $l[1], $l[2], $l[3], $l[4], $l[5], $t]);
         }
 
         $dueSoon = gmdate('c', time() + 4 * 3600);

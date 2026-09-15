@@ -142,13 +142,10 @@ final class Catalog
 
         $itemId = trim($itemId);
         $name = trim($name);
-        $unit = trim($unit);
         if ($itemId === '' || $name === '') {
             throw new InvalidArgumentException('필수 항목을 확인하세요.');
         }
-        if ($unit === '') {
-            $unit = 'ea';
-        }
+        $unit = self::parseUnit($unit);
         $description = self::nullableTrim($description);
         $edufine = self::nullableTrim($edufine);
         $manufacturer = self::nullableTrim($manufacturer);
@@ -244,7 +241,25 @@ final class Catalog
         Alert::notifyLowStock($pdo, $itemId);
     }
 
-    private static function parseMinStock(mixed $minStock): ?float
+    public static function parseUnit(mixed $unit): string
+    {
+        if ($unit === null || $unit === '') {
+            return 'ea';
+        }
+        if (!is_string($unit) && !is_int($unit) && !is_float($unit)) {
+            throw new InvalidArgumentException('단위를 확인하세요.');
+        }
+        $unit = trim((string) $unit);
+        if ($unit === '') {
+            return 'ea';
+        }
+        if (str_contains($unit, "\n") || str_contains($unit, "\r")) {
+            throw new InvalidArgumentException('단위는 한 줄로 입력하세요.');
+        }
+        return $unit;
+    }
+
+    public static function parseMinStock(mixed $minStock): ?float
     {
         if ($minStock === null || $minStock === '') {
             return null;

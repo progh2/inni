@@ -19,8 +19,9 @@
   - 조건부 UPDATE로 잔량 검사와 차감 처리. 이력 저장까지 같은 트랜잭션으로 묶음.
   - POST 및 세션 CSRF 토큰 검사(`Csrf::requirePost`, 품목 상세에 최신 이력 20개 표시).
   - 사용 출고는 반환할 대여가 아니므로 `loans` 대신 `activity_logs`에 기록.
-- 품목 수정(owner/manager): 이름·단위·최소재고·제조사·태그·메모·사진·즐겨찾기. 유형/QR/재고 수량은 바꾸지 않음.
-- 재입고(owner/manager): 기존 로트 증가 또는 새 위치에 `stock_lots` 생성. `activity_logs.action=restock`.
+- 품목 수정(owner/manager): 이름·단위·최소재고·제조사·태그·메모·사진·즐겨찾기. 유형/QR/재고 수량은 바꾸지 않음. 최소재고 변경 후 기존 부족 알림 경로(`Alert::notifyLowStock`)를 탄다.
+- 재료 등록 보강(#48): 소모품·부품 등록/수정에서 단위·최소재고를 따로 입력. 위치별 재고에 선택 `lot_code`/`expires_at`. 기존 DB는 `Database::migrate`. 품목 목록·재료 보드·홈·품목 상세에 부족 뱃지(수량 < 최소재고, 알림과 동일). 로트 수정은 POST+CSRF·`canWrite`.
+- 재입고(owner/manager): 기존 로트 증가 또는 새 위치에 `stock_lots` 생성. 선택 로트/유통기한. `activity_logs.action=restock`.
 - 출고 취소(owner/manager/teacher): `stock_issue_cancels.issue_log_id` UNIQUE로 이중 취소 실패 폐쇄. 수량 복원과 `cancel_issue` 이력을 같은 트랜잭션으로.
 - 가벼운 실사(owner/manager): 실 선택 → 예상 장비·품목 목록 → #7과 같은 카메라/코드 입력으로 확인 → 종료 시 미확인 목록. 진행 중 세션은 1건. 이어하기·텔레그램·엑셀은 없음.
 - 품목 CSV(owner/manager, `canWrite`): 더보기·설정에서 템플릿/목록 내려받기, POST+CSRF 업로드로 신규·수정. 충돌·오류 행은 건너뛰고 이유를 보여 줌. **CSV UTF-8** (Excel CP949도 읽음). xlsx/에듀파인 파일 동기화/실사 연동/텔레그램은 없음. 사업명·예산연도 열 포함.
@@ -52,6 +53,7 @@
 - `php tests/more_entry.php`: 더보기 진입(#31) 유지, 기자재 현황 스텁은 #30 보드로 대체.
 - `php tests/asset_board.php`: 검색 없이 전체 목록, 상태/실(하위 포함)/연체/사업예산 필터, 잘못된 상태·예산 무시, 연체는 `loan.status`·`refreshOverdue`와 동일, 품목 브라우즈 없음. #31 스텁 대체.
 - `php tests/material_board.php`: 검색 없이 소모품·부품 현황, 유형/부족/실(하위 포함)/사업예산 필터, 잘못된 유형·예산 무시, 부족 하이라이트는 알림과 동일. 장비·비품·새 타입 없음.
+- `php tests/stock_lot.php`: 로트/유통기한 파싱, 마이그레이션, 로트 수정·재입고 속성, 최소재고 변경 후 부족 판정, 등록/수정 UI·부족 뱃지, POST+CSRF·canWrite. 대여함·데스크·수리 컨트롤러는 유지.
 - 임시 앱 복사본·DB에서 HTTP 검증 통과: 로그인, 품목 화면, 정상 출고와 이력, 재고 부족, GET 거부, 잘못된 CSRF 토큰, 학생 권한 차단.
 - 브라우저 시각 검증, 실제 카메라 스캔, Google Cloud Console 실연동(실제 client_id/secret)은 미실시.
 - Google OAuth: 승인된 리디렉션 URI는 `{base_url}/index.php?r=auth/google/callback`로 고정. 로그인·설정에 동일 문자열 표시. `allowed_domains`는 비면 인증된 메일 허용, 값이 있으면 정확 일치 실패 폐쇄. `email_verified` 필수. `php tests/google_oauth.php`가 토큰 교환을 스텁한다.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Inni\Controllers;
 
+use Inni\Alert;
 use Inni\App;
 use Inni\Auth;
 use Inni\AssetLife;
@@ -12,8 +13,9 @@ use Inni\Catalog;
 use Inni\Csrf;
 use Inni\Database;
 use Inni\Logger;
-use Inni\Support;
 use Inni\Stock;
+use Inni\StockLot;
+use Inni\Support;
 use Inni\Uploader;
 use Inni\View;
 
@@ -62,15 +64,21 @@ final class ItemController
         $mgmt = trim((string) ($_POST['management_number'] ?? ''));
         $manufacturer = trim((string) ($_POST['manufacturer'] ?? '')) ?: null;
         $edufine = trim((string) ($_POST['edufine_number'] ?? '')) ?: null;
-        $unit = trim((string) ($_POST['unit'] ?? 'ea')) ?: 'ea';
-        $minStock = $_POST['min_stock'] !== '' ? (float) $_POST['min_stock'] : null;
         $notes = trim((string) ($_POST['notes'] ?? '')) ?: null;
         $tags = array_values(array_filter(array_map('trim', explode(',', (string) ($_POST['tags'] ?? '')))));
+        $lotCode = null;
+        $expiresAt = null;
         try {
+            $unit = Catalog::parseUnit($_POST['unit'] ?? 'ea');
+            $minStock = Catalog::parseMinStock($_POST['min_stock'] ?? '');
             $budgetProgram = Budget::parseProgram($_POST['budget_program'] ?? null);
             $budgetYear = Budget::parseYear($_POST['budget_year'] ?? null);
             $purchaseDate = AssetLife::parsePurchaseDate($_POST['purchase_date'] ?? null);
             $usefulLifeYears = AssetLife::parseUsefulLifeYears($_POST['useful_life_years'] ?? null);
+            if (in_array($type, ['fixture', 'consumable', 'part'], true)) {
+                $lotCode = StockLot::parseLotCode($_POST['lot_code'] ?? null);
+                $expiresAt = StockLot::parseExpiresAt($_POST['expires_at'] ?? null);
+            }
         } catch (\InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());
             App::redirect('items/new');
@@ -129,8 +137,9 @@ final class ItemController
                 }
             } else {
                 $pdo->prepare(
-                    'INSERT INTO stock_lots(id,catalog_item_id,location_id,quantity,updated_at) VALUES(?,?,?,?,?)'
-                )->execute([Support::id('lot'), $catalogId, $locationId, $quantity, $t]);
+                    'INSERT INTO stock_lots(id,catalog_item_id,location_id,quantity,lot_code,expires_at,updated_at)
+                     VALUES(?,?,?,?,?,?,?)'
+                )->execute([Support::id('lot'), $catalogId, $locationId, $quantity, $lotCode, $expiresAt, $t]);
             }
 
             $pdo->commit();
@@ -141,6 +150,9 @@ final class ItemController
         }
 
         Logger::write('create', 'catalog', $catalogId, "«{$name}» 등록");
+        if (in_array($type, ['consumable', 'part'], true)) {
+            Alert::notifyLowStock($pdo, $catalogId);
+        }
         App::flash('ok', '등록되었습니다.');
         if ($firstAssetId) {
             App::redirect('assets/show', ['id' => $firstAssetId]);
@@ -210,7 +222,14 @@ final class ItemController
             }
         }
 
-        View::render('items/show', compact('item', 'assets', 'lots', 'logs', 'cancels', 'locations', 'openLocations'));
+        $stockQty = 0.0;
+        foreach ($lots as $lot) {
+            $stockQty += (float) ($lot['quantity'] ?? 0);
+        }
+        $item['stock_qty'] = $stockQty;
+        $lowStock = Catalog::rowIsLowStock($item);
+
+        View::render('items/show', compact('item', 'assets', 'lots', 'logs', 'cancels', 'locations', 'openLocations', 'lowStock'));
     }
 
     public function editForm(): void
@@ -344,6 +363,10 @@ final class ItemController
                 is_string($_POST['location_id'] ?? null) ? $_POST['location_id'] : '',
                 $_POST['quantity'] ?? null,
                 is_string($_POST['note'] ?? null) ? $_POST['note'] : '',
+                [
+                    'lot_code' => $_POST['lot_code'] ?? '',
+                    'expires_at' => $_POST['expires_at'] ?? '',
+                ],
             );
             App::flash('ok', '재입고를 처리했습니다.');
         } catch (\InvalidArgumentException $e) {
@@ -351,6 +374,36 @@ final class ItemController
         } catch (\Throwable $e) {
             error_log((string) $e);
             App::flash('error', '재입고를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
+        App::redirect('items/show', ['id' => $itemId]);
+    }
+
+    public function updateLot(): void
+    {
+        $user = Auth::requireLogin();
+        Csrf::requirePost();
+        if (!Auth::canWrite($user)) {
+            http_response_code(403);
+            echo '로트 수정 권한이 없습니다.';
+            return;
+        }
+
+        $itemId = is_string($_POST['item_id'] ?? null) ? $_POST['item_id'] : '';
+        try {
+            Stock::updateLot(
+                Database::pdo(),
+                $user,
+                $itemId,
+                is_string($_POST['lot_id'] ?? null) ? $_POST['lot_id'] : '',
+                $_POST['lot_code'] ?? '',
+                $_POST['expires_at'] ?? '',
+            );
+            App::flash('ok', '로트 정보를 저장했습니다.');
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '로트 정보를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
         }
         App::redirect('items/show', ['id' => $itemId]);
     }

@@ -5,14 +5,19 @@ use Inni\AssetLife;
 use Inni\Auth;
 use Inni\Budget;
 use Inni\Csrf;
+use Inni\StockLot;
 use Inni\Support;
 
 $tags = Support::jsonDecode($item['tags'] ?? null);
 $stockable = in_array($item['type'], ['fixture', 'consumable', 'part'], true);
 $issueable = in_array($item['type'], ['consumable', 'part'], true);
+$lowStock = !empty($lowStock);
 ?>
-<p class="muted"><a href="<?= Support::e(App::url('items')) ?>">← 품목 목록</a> · <a href="<?= Support::e(App::url('search')) ?>">찾기</a></p>
-<h1><?= Support::e($item['name']) ?></h1>
+<p class="muted"><a href="<?= Support::e(App::url('items')) ?>">← 품목 목록</a> · <a href="<?= Support::e(App::url('search')) ?>">찾기</a><?php if ($issueable): ?> · <a href="<?= Support::e(App::url('materials')) ?>">실험실습재료</a><?php endif; ?></p>
+<h1>
+  <?= Support::e($item['name']) ?>
+  <?php if ($lowStock): ?><span class="badge overdue">부족</span><?php endif; ?>
+</h1>
 <p class="muted">
   <?= Support::e(Support::typeLabel($item['type'])) ?>
   · QR <code><?= Support::e($item['qr_code']) ?></code>
@@ -29,6 +34,7 @@ $budgetLabel = Budget::format(
     <?php if ($item['manufacturer']): ?>제조사 <?= Support::e($item['manufacturer']) ?> · <?php endif; ?>
     단위 <?= Support::e($item['unit']) ?>
     <?php if ($item['min_stock'] !== null && $item['min_stock'] !== ''): ?> · 최소재고 <?= Support::e((string) $item['min_stock']) ?><?php endif; ?>
+    <?php if ($lowStock): ?> · 현재 <?= Support::e((string) ($item['stock_qty'] ?? 0)) ?><?php endif; ?>
     <?php if ($budgetLabel !== ''): ?> · 구입 <?= Support::e($budgetLabel) ?><?php endif; ?>
     <?php if ($tags): ?> · <?= Support::e(implode(', ', $tags)) ?><?php endif; ?>
   </p>
@@ -75,10 +81,43 @@ $budgetLabel = Budget::format(
 <div class="card">
   <h2 class="section-title" style="margin-top:0">위치별 재고</h2>
   <?php foreach ($lots as $lot): ?>
+    <?php
+      $lotLabel = StockLot::format(
+          isset($lot['lot_code']) ? (string) $lot['lot_code'] : null,
+          isset($lot['expires_at']) ? (string) $lot['expires_at'] : null,
+      );
+      $lotExpired = StockLot::isExpired(isset($lot['expires_at']) ? (string) $lot['expires_at'] : null);
+    ?>
     <div class="list-row">
-      <div class="title"><?= Support::e($lot['location_name']) ?></div>
-      <div><strong><?= Support::e((string) $lot['quantity']) ?></strong> <?= Support::e($item['unit']) ?></div>
+      <div>
+        <div class="title"><?= Support::e($lot['location_name']) ?></div>
+        <?php if ($lotLabel !== ''): ?>
+          <div class="meta"><?= Support::e($lotLabel) ?></div>
+        <?php endif; ?>
+      </div>
+      <div>
+        <strong><?= Support::e((string) $lot['quantity']) ?></strong> <?= Support::e($item['unit']) ?>
+        <?php if ($lotExpired): ?><span class="badge overdue">기한만료</span><?php endif; ?>
+      </div>
     </div>
+    <?php if ($stockable && Auth::canWrite($user)): ?>
+    <form method="post" action="<?= Support::e(App::url('items/lot')) ?>">
+      <?= Csrf::field() ?>
+      <input type="hidden" name="item_id" value="<?= Support::e($item['id']) ?>">
+      <input type="hidden" name="lot_id" value="<?= Support::e($lot['id']) ?>">
+      <div class="grid-2">
+        <div class="field">
+          <label for="lot-code-<?= Support::e($lot['id']) ?>">로트 번호</label>
+          <input id="lot-code-<?= Support::e($lot['id']) ?>" name="lot_code" maxlength="80" value="<?= Support::e((string) ($lot['lot_code'] ?? '')) ?>" placeholder="선택">
+        </div>
+        <div class="field">
+          <label for="lot-exp-<?= Support::e($lot['id']) ?>">유통기한</label>
+          <input id="lot-exp-<?= Support::e($lot['id']) ?>" name="expires_at" type="date" value="<?= Support::e((string) ($lot['expires_at'] ?? '')) ?>">
+        </div>
+      </div>
+      <button class="btn btn-ghost" type="submit">로트 정보 저장</button>
+    </form>
+    <?php endif; ?>
     <?php if ($issueable && Auth::canLoan($user) && (float) $lot['quantity'] > 0): ?>
     <form method="post" action="<?= Support::e(App::url('items/issue')) ?>">
       <?= Csrf::field() ?>
@@ -111,6 +150,16 @@ $budgetLabel = Budget::format(
         <label for="restock-note-<?= Support::e($lot['id']) ?>">입고 메모</label>
         <input id="restock-note-<?= Support::e($lot['id']) ?>" name="note" placeholder="예: 학기 초 보충">
       </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="restock-lot-<?= Support::e($lot['id']) ?>">로트 번호</label>
+          <input id="restock-lot-<?= Support::e($lot['id']) ?>" name="lot_code" maxlength="80" value="<?= Support::e((string) ($lot['lot_code'] ?? '')) ?>" placeholder="선택">
+        </div>
+        <div class="field">
+          <label for="restock-exp-<?= Support::e($lot['id']) ?>">유통기한</label>
+          <input id="restock-exp-<?= Support::e($lot['id']) ?>" name="expires_at" type="date" value="<?= Support::e((string) ($lot['expires_at'] ?? '')) ?>">
+        </div>
+      </div>
       <button class="btn btn-ink btn-block" type="submit">재입고</button>
     </form>
     <?php endif; ?>
@@ -137,6 +186,16 @@ $budgetLabel = Budget::format(
       <div class="field">
         <label for="restock-new-note">입고 메모</label>
         <input id="restock-new-note" name="note" placeholder="예: 새 보관함">
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="restock-new-lot">로트 번호</label>
+          <input id="restock-new-lot" name="lot_code" maxlength="80" placeholder="선택">
+        </div>
+        <div class="field">
+          <label for="restock-new-exp">유통기한</label>
+          <input id="restock-new-exp" name="expires_at" type="date">
+        </div>
       </div>
       <button class="btn btn-ink btn-block" type="submit">이 위치에 입고</button>
     </form>
