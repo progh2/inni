@@ -68,7 +68,7 @@
 | `settings` `settings/save` `settings/telegram` | Settings | `settings/index` | 알림: `canConfigureAlerts` / 학교명: `owner` | 학교명·텔레그램·AI 연결 상태·Google URI |
 | `settings/users` `settings/approve` | Settings | `settings/users` | `owner` | 역할·상태 승인 |
 
-없는 라우트(스키마만 있거나 기획만 있음): 수리비, 재료 전용 등록/분출 화면, 실 고장 신고 작성, 위치 수정·삭제, 분류 트리, 실사 이력 목록.
+없는 라우트(스키마만 있거나 기획만 있음): 재료 전용 등록/분출 화면, 실 고장 신고 작성, 위치 수정·삭제, 분류 트리, 실사 이력 목록.
 
 ### 2.2 스키마에 있고 UI가 약한 것
 
@@ -79,7 +79,7 @@
 | `assets.purchase_date` `useful_life_years` | 등록·상세 저장, CSV, 조달청 제안 | 만료일 문구 + **연한·노후 보드**(`assets/aging`, 임박/초과) |
 | `catalog_items` / `assets` `budget_program` `budget_year` | 자유 입력, 목록 필터, CSV | 사업 마스터·합계·재물조사 집계 없음 |
 | `loans.kind=consumable` | 컬럼만 | 소모품은 `loans`가 아니라 `activity_logs.action=issue` |
-| `reports` (`room` \| `asset`, `open`/`in_progress`/`done`) | 장비 상세에서 `asset`+`open` INSERT | 상태 변경·큐·실 신고 폼 없음. 실 상세는 **읽기만** |
+| `reports` (`room` \| `asset`, `open`/`in_progress`/`done`/`rejected` + 비용 컬럼) | 장비 상세 요청 + 담당 큐/상태 + 수리비 | 실 신고 작성 폼은 없음. 실 상세는 **읽기만** |
 | `categories` | `CREATE TABLE`만 | CRUD·품목 연결 없음 |
 | `inventory_check_lines.expected_qty` | 스냅샷 + 종료 후 보정 | 미확인 장비 위치/상태·품목 수량. 사유·승인자 |
 | `stock_lots` | 위치+수량만 | 유통기한·입고단가·거래처 없음 |
@@ -170,11 +170,11 @@
 | 내용연한 만료 예정 표시 | 있음 | 장비 상세·현황 한 줄 + `assets/aging` | 임박/초과 필터 있음 |
 | 노후 기자재 처리 | 부분 | 일괄 표시(`assets/aging`) + 장비 상세 파기 | 보드에서 일괄 파기는 없음 |
 | 파기(사유·일자·증빙) | 있음 | `retired` + 이력, manager 이상 | — |
-| 수리비·처리 비용 | 없음 | `reports`에 금액 컬럼 없음 | M7 #54 (M5 수리 워크플로 선행) |
+| 수리비·처리 비용 | 있음 | `reports` 금액·업체·예산과목·비용일. 상세 저장 + `reports/costs` 월·연 합계 | `canWrite`. 에듀파인·감가상각 없음 |
 | 에듀파인 번호 | 부분 | 옵션 필드·검색·CSV | 파일 동기화 없음 (PRD P2, 이번 로드맵 밖) |
 | 감가상각 엔진 | 없음 | PRD 비목표 | 만들지 않음 |
 
-**판정:** 예산 라벨과 재물조사 리포트·노후 보드·보정·파기는 있다. 수리비(#54)는 아직 없다.
+**판정:** 예산 라벨과 재물조사 리포트·노후 보드·보정·파기·수리비는 있다. 에듀파인 동기화·감가상각은 범위 밖.
 
 ---
 

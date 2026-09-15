@@ -9,6 +9,7 @@ use Inni\Auth;
 use Inni\Csrf;
 use Inni\Database;
 use Inni\Report;
+use Inni\ReportCost;
 use Inni\Support;
 use Inni\View;
 
@@ -51,6 +52,58 @@ final class ReportController
         }
 
         View::render('reports/show', compact('user', 'report', 'logs', 'path'));
+    }
+
+    public function costs(): void
+    {
+        $user = Auth::requireLogin();
+        if (!Auth::canWrite($user)) {
+            App::flash('error', '수리비 합계 권한이 없습니다.');
+            App::redirect('home');
+        }
+        $pdo = Database::pdo();
+        $filters = ReportCost::filtersFromRequest($_GET);
+        $year = $filters['year'] ?? ReportCost::currentYear();
+        $month = $filters['month'];
+        $period = ['year' => $year, 'month' => $month];
+        $summary = ReportCost::totals($pdo, $period);
+        $months = ReportCost::monthly($pdo, $year);
+        $years = ReportCost::yearly($pdo);
+        $cases = ReportCost::cases($pdo, $period);
+
+        View::render('reports/costs', compact('user', 'filters', 'year', 'month', 'summary', 'months', 'years', 'cases'));
+    }
+
+    public function updateCost(): void
+    {
+        $user = Auth::requireLogin();
+        $reportId = (string) ($_POST['report_id'] ?? '');
+        $after = $reportId !== ''
+            ? ['route' => 'reports/show', 'query' => ['id' => $reportId]]
+            : ['route' => 'reports', 'query' => []];
+        if (!Auth::canWrite($user)) {
+            App::flash('error', '수리비 기록 권한이 없습니다.');
+            App::redirect($after['route'], $after['query']);
+        }
+        Csrf::requirePost();
+        try {
+            ReportCost::save(
+                Database::pdo(),
+                $user,
+                $reportId,
+                $_POST['cost_amount'] ?? null,
+                $_POST['cost_vendor'] ?? null,
+                $_POST['cost_budget_line'] ?? null,
+                $_POST['cost_at'] ?? null,
+            );
+            App::flash('ok', '수리비를 저장했습니다.');
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '수리비를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
+        App::redirect($after['route'], $after['query']);
     }
 
     public function updateStatus(): void

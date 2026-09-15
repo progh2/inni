@@ -215,7 +215,11 @@ Unique: `(catalogItemId, locationId)`
 | title | string | |
 | body | string | |
 | photoUrls | string[] | |
-| status | `open` \| `in_progress` \| `done` | |
+| status | `open` \| `in_progress` \| `done` \| `rejected` | |
+| costAmount | number? | 수리비(원) |
+| costVendor | string? | 업체 |
+| costBudgetLine | string? | 예산과목 |
+| costAt | date? | 비용일(YYYY-MM-DD). 월·연 합계 |
 | createdAt, updatedAt | timestamp | |
 
 ### `categories/{id}`
@@ -241,7 +245,7 @@ Unique: `(catalogItemId, locationId)`
 - `activityLogs`: entityId + createdAt DESC, createdAt DESC
 - `stock_issue_cancels`: catalogItemId + createdAt, issueLogId UNIQUE
 - `locations`: kind + name, parentId + sortOrder
-- `reports`: status + createdAt, targetType + targetId
+- `reports`: status + createdAt, targetType + targetId, costAt
 - `inventory_checks`: status UNIQUE WHERE active
 - `inventory_check_lines`: checkId + confirmedAt, (checkId, assetId) UNIQUE, (checkId, stockLotId) UNIQUE
 

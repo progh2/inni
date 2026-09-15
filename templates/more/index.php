@@ -39,6 +39,12 @@ use Inni\Support;
     <a class="list-row" href="<?= Support::e(App::url('reports')) ?>">
       <div class="title">수리 대기</div>
     </a>
+    <a class="list-row" href="<?= Support::e(App::url('reports/costs')) ?>">
+      <div>
+        <div class="title">수리비 합계</div>
+        <div class="meta">월·연 수리비 · 업체·예산과목</div>
+      </div>
+    </a>
   <?php endif; ?>
   <a class="list-row" href="<?= Support::e(App::url('loans')) ?>">
     <div class="title">대여 현황</div>

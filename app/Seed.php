@@ -150,11 +150,12 @@ final class Seed
         ]);
 
         $pdo->prepare(
-            'INSERT INTO reports(id,target_type,target_id,reporter_user_id,reporter_name,title,body,status,created_at,updated_at)
-             VALUES(?,?,?,?,?,?,?,?,?,?)'
+            'INSERT INTO reports(id,target_type,target_id,reporter_user_id,reporter_name,title,body,status,cost_amount,cost_vendor,cost_budget_line,cost_at,created_at,updated_at)
+             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
         )->execute([
             'rep-1', 'asset', 'ast-weld-1', $ownerId, '김담당', '송급 불량',
-            '용접 중 와이어 송급이 끊깁니다. 점검 필요.', 'open', $t, $t,
+            '용접 중 와이어 송급이 끊깁니다. 점검 필요.', 'open',
+            85000, '대한용접', '시설유지비', '2026-09-10', $t, $t,
         ]);
     }
 }
