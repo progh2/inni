@@ -24,6 +24,7 @@
 - 재입고(owner/manager): 기존 로트 증가 또는 새 위치에 `stock_lots` 생성. 선택 로트/유통기한. `activity_logs.action=restock`.
 - 출고 취소(owner/manager/teacher): `stock_issue_cancels.issue_log_id` UNIQUE로 이중 취소 실패 폐쇄. 수량 복원과 `cancel_issue` 이력을 같은 트랜잭션으로.
 - 가벼운 실사(owner/manager): 실 선택 → 예상 장비·품목 목록 → #7과 같은 카메라/코드 입력으로 확인 → 종료 시 미확인 목록. 진행 중 세션은 1건. 이어하기·텔레그램·엑셀은 없음.
+- 사업예산별 실사 리포트(#51, owner/manager, `canInventory`): 기존 `inventory_*` 위에 GET 필터 `budget_program`/`budget_year`/`check_id`. 장부(예상 수량) vs 실물(확인=장부, 미확인=0) 차이 목록과 GET CSV(`inventory/report/csv`). 실사 흐름·수량 재입력·보정/파기는 없음.
 - 품목 CSV(owner/manager, `canWrite`): 더보기·설정에서 템플릿/목록 내려받기, POST+CSRF 업로드로 신규·수정. 충돌·오류 행은 건너뛰고 이유를 보여 줌. **CSV UTF-8** (Excel CP949도 읽음). xlsx/에듀파인 파일 동기화/실사 연동/텔레그램은 없음. 사업명·예산연도 열 포함.
 - 구입 사업예산(#32): `catalog_items`/`assets`에 `budget_program`(자유 입력) + `budget_year`(YYYY). 기존 DB는 `Database::migrate`/`ensureGuards`로 컬럼 추가. 빈 값 허용. 등록·수정·상세·CSV 라운드트립. #29 품목 목록과 #30 기자재 현황 보드에서 표시·GET 필터(`budget_program`, `budget_year`).
 - 도입일·내용연한(#39): `assets.purchase_date`를 UI에서 **도입일**로 노출·편집. `useful_life_years`(INTEGER, nullable) 추가. 기존 DB는 `Database::migrate`/`ensureGuards`. 빈 값 허용. 등록·장비 상세·현황 보드에 도입일·내용연한·(둘 다 있을 때) 만료 예정일=도입일+년. CSV 열 `도입일`/`내용연한`.
@@ -48,6 +49,7 @@
 - `php tests/loan.php`: 대여·반납 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위, 이력 실패 롤백.
 - `php tests/role_block.php`: 학생·pending·disabled의 등록·대여·출고·실사 차단, `demo_login` 키 생략 시 off.
 - `php tests/inventory.php`: 실 선택·스캔/코드 확인·미확인 목록·단일 진행 세션·권한·이력 롤백.
+- `php tests/inventory_report.php`: 사업명·예산연도 필터, 장부 vs 실물 차이 목록, CSV 열(사업명/예산연도/장부수량/실물수량/차이).
 - `php tests/catalog_csv.php`: 품목 CSV 템플릿·내보내기·가져오기, 충돌 건너뜀, 역할, xlsx 거부.
 - `php tests/alerts.php`: 재고 부족·연체 텔레그램(HTTP 스텁), 토큰 공백 실패 폐쇄, 이벤트 off, 중복 방지, 설정 CSRF, owner/manager. 실제 봇 토큰 없음.
 - `php tests/ai.php`: 프로바이더 미설정/불완전/미지원 실패 폐쇄, 설정 시 제안만, 재고·대여·대장 무변경, 쓰기 훅 없음, 설정 폼에 키 필드 없음. 실제 API 키 없음.
@@ -80,6 +82,7 @@
 8. ~~재료·품목 목록 (검색 없이 브라우즈).~~ issue #29. 찾기(검색어 필수)는 유지. 목록 UI 정돈은 후속.
 8b. ~~실험실습재료 현황 보드.~~ issue #38. 품목 목록(#29)·기자재 현황(#30)과 구분. 타입 확장은 없음.
 8c. ~~재료 담당 대시보드(부족·최근 분출·재입고 대기 + CTA).~~ issue #50. 기존 `materials` 보드 확장. 키트 BOM·에듀파인·수리는 별도.
+8d. ~~사업예산별 실사 리포트.~~ issue #51. 기존 `inventory_*` 위에 필터·차이 목록·CSV. 노후(#52)·보정/파기(#53)·수리비(#54)는 별도.
 
 ## 작업 환경 참고
 

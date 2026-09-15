@@ -63,6 +63,11 @@ check(str_contains($router, "'items' => [ItemController::class, 'index']"), 'ite
 check(str_contains($router, "'assets' => [AssetController::class, 'index']"), 'assets GET route is registered');
 check(str_contains($router, "'materials' => [MaterialController::class, 'index']"), 'materials GET route is registered');
 check(str_contains($router, "'reports' => [ReportController::class, 'index']"), 'reports GET route is registered');
+check(str_contains($router, "'inventory/report' => [InventoryController::class, 'report']"), 'inventory report GET route is registered');
+check(str_contains($router, "'inventory/report/csv' => [InventoryController::class, 'export']"), 'inventory report CSV GET route is registered');
+check(str_contains($more, '실사 리포트'), 'More menu must expose 실사 리포트');
+check(str_contains($more, "App::url('inventory/report')"), '실사 리포트 must link to inventory/report');
+check(str_contains($more, 'Auth::canInventory($user)'), '실사 리포트 is gated on canInventory');
 
 check(str_contains($itemCtl, 'Catalog::list'), 'ItemController index keeps the #29 catalog list');
 check(str_contains($itemsTpl, '<h1>품목 목록</h1>'), 'items/index.php keeps the #29 list title');

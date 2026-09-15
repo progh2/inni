@@ -6,9 +6,11 @@ namespace Inni\Controllers;
 
 use Inni\App;
 use Inni\Auth;
+use Inni\CatalogCsv;
 use Inni\Csrf;
 use Inni\Database;
 use Inni\Inventory;
+use Inni\InventoryReport;
 use Inni\View;
 use InvalidArgumentException;
 
@@ -117,6 +119,31 @@ final class InventoryController
         View::render('inventory/result', compact('user', 'check', 'unchecked', 'lines'));
     }
 
+    public function report(): void
+    {
+        $user = $this->requireManager();
+        $pdo = Database::pdo();
+        $filters = InventoryReport::filtersFromRequest($_GET);
+        $sessionOptions = InventoryReport::sessionOptions($pdo);
+        $sessions = InventoryReport::sessions($pdo, $filters);
+        $aggregates = InventoryReport::aggregates($pdo, $filters);
+        $differences = InventoryReport::differences($pdo, $filters);
+        $exportQuery = InventoryReport::queryParams($filters);
+        View::render(
+            'inventory/report',
+            compact('user', 'filters', 'sessionOptions', 'sessions', 'aggregates', 'differences', 'exportQuery')
+        );
+    }
+
+    public function export(): void
+    {
+        $this->requireManager();
+        $filters = InventoryReport::filtersFromRequest($_GET);
+        $exported = InventoryReport::export(Database::pdo(), $filters);
+        $stamp = gmdate('Ymd');
+        $this->sendCsv("inni-inventory-diff-{$stamp}.csv", $exported['csv']);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -128,5 +155,16 @@ final class InventoryController
             App::redirect('more');
         }
         return $user;
+    }
+
+    private function sendCsv(string $filename, string $csv): never
+    {
+        $filename = preg_replace('/[^A-Za-z0-9._-]/', '_', $filename) ?: 'inni-inventory-diff.csv';
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('X-Content-Type-Options: nosniff');
+        header('Cache-Control: no-store');
+        echo CatalogCsv::BOM . $csv;
+        exit;
     }
 }

@@ -44,6 +44,12 @@ use Inni\Support;
     <a class="list-row" href="<?= Support::e(App::url('inventory')) ?>">
       <div class="title">실사</div>
     </a>
+    <a class="list-row" href="<?= Support::e(App::url('inventory/report')) ?>">
+      <div>
+        <div class="title">실사 리포트</div>
+        <div class="meta">사업예산·구입년도로 차이 목록·CSV</div>
+      </div>
+    </a>
   <?php endif; ?>
   <?php if (Auth::canWrite($user)): ?>
     <a class="list-row" href="<?= Support::e(App::url('catalog/csv')) ?>">
