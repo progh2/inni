@@ -30,6 +30,9 @@ check(substr_count($more, "App::url('items')") === 1, 'More must not duplicate t
 check(str_contains($more, '기자재 현황'), 'More menu must expose 기자재 현황');
 check(str_contains($more, "App::url('assets')"), '기자재 현황 must link to assets');
 check(substr_count($more, "App::url('assets')") === 1, 'More must not duplicate the assets board link');
+check(str_contains($more, '연한·노후 기자재'), 'More menu must expose 연한·노후 기자재');
+check(str_contains($more, "App::url('assets/aging')"), '연한·노후 기자재 must link to assets/aging');
+check(substr_count($more, "App::url('assets/aging')") === 1, 'More must not duplicate the aging board link');
 check(str_contains($more, '실험실습재료 현황'), 'More menu must expose 실험실습재료 현황');
 check(str_contains($more, "App::url('materials')"), '실험실습재료 현황 must link to materials');
 check(substr_count($more, "App::url('materials')") === 1, 'More must not duplicate the materials board link');
@@ -38,6 +41,7 @@ check(!str_contains($more, "App::url('search')"), 'More must not replace the sea
 check(preg_match("/\\\$tabs = \\[\\s*\\['home', '홈'\\],\\s*\\['search', '찾기'\\],\\s*\\['scan', '스캔'\\],\\s*\\['rooms', '실'\\],\\s*\\['more', '더보기'\\],\\s*\\];/", $layout) === 1, 'Bottom nav stays 홈/찾기/스캔/실/더보기');
 check(substr_count($layout, "['home', '홈']") === 1 && substr_count($layout, "['more', '더보기']") === 1, 'Tab labels stay a single 5-tab set');
 check(str_contains($layout, "\$current === 'items' || \$current === 'assets' || \$current === 'materials'"), 'List/status screens keep the 더보기 tab active');
+check(str_contains($layout, "\$current === 'assets/aging'"), 'Aging board keeps the 더보기 tab active');
 check(str_contains($layout, "\$current === 'loans' || str_starts_with(\$current, 'loans/')"), 'Loan inbox/list keep the 더보기 tab active');
 check(str_contains($layout, "\$current === 'reports' || str_starts_with(\$current, 'reports/')"), 'Repair queue keeps the 더보기 tab active');
 check(str_contains($more, '내 대여함'), 'More menu must expose 내 대여함');
@@ -65,6 +69,7 @@ check(str_contains($searchCtl, "if (\$q !== '')"), 'Search results still require
 
 check(str_contains($router, "'items' => [ItemController::class, 'index']"), 'items GET route is registered');
 check(str_contains($router, "'assets' => [AssetController::class, 'index']"), 'assets GET route is registered');
+check(str_contains($router, "'assets/aging' => [AssetController::class, 'aging']"), 'assets/aging GET route is registered');
 check(str_contains($router, "'materials' => [MaterialController::class, 'index']"), 'materials GET route is registered');
 check(str_contains($router, "'reports' => [ReportController::class, 'index']"), 'reports GET route is registered');
 check(str_contains($router, "'inventory/report' => [InventoryController::class, 'report']"), 'inventory/report GET route is registered');

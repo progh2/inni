@@ -17,7 +17,7 @@
 
 - 라우트: `app/Router.php` (`public/index.php`의 `?r=` 디스패치)
 - 컨트롤러: `app/Controllers/*.php` (14개)
-- 도메인: `app/{Auth,Loan,Stock,Inventory,Catalog,CatalogCsv,Asset,AssetBoard,AssetLife,MaterialBoard,Budget,Alert,Scan,PpsUsefulLife}.php`
+- 도메인: `app/{Auth,Loan,Stock,Inventory,Catalog,CatalogCsv,Asset,AssetBoard,AssetLife,AssetLifeBoard,MaterialBoard,Budget,Alert,Scan,PpsUsefulLife}.php`
 - 뷰: `templates/` (레이아웃·홈·찾기·스캔·실·품목·장비·재료·대여·라벨·실사·CSV·설정)
 - 스키마: `sql/schema.sql` (+ `app/Database.php` 마이그레이션이 같은 컬럼을 맞춤)
 - 기획 대조: `docs/PRD.md`, `docs/ERD.md`, `docs/STATUS.md`, README
@@ -68,7 +68,7 @@
 | `settings` `settings/save` `settings/telegram` | Settings | `settings/index` | 알림: `canConfigureAlerts` / 학교명: `owner` | 학교명·텔레그램·AI 연결 상태·Google URI |
 | `settings/users` `settings/approve` | Settings | `settings/users` | `owner` | 역할·상태 승인 |
 
-없는 라우트(스키마만 있거나 기획만 있음): 장비 상태 전이, 파기, 실사 보정, 수리비, 내 대여함, 대여 데스크, 재료 전용 등록/분출 화면, 실 고장 신고 작성, 위치 수정·삭제, 분류 트리, 신고 큐, 실사 이력 목록, 노후 보드.
+없는 라우트(스키마만 있거나 기획만 있음): 장비 상태 전이, 파기, 실사 보정, 수리비, 내 대여함, 대여 데스크, 재료 전용 등록/분출 화면, 실 고장 신고 작성, 위치 수정·삭제, 분류 트리, 신고 큐, 실사 이력 목록.
 
 ### 2.2 스키마에 있고 UI가 약한 것
 
@@ -76,7 +76,7 @@
 |-------------|------|------|
 | `assets.status` (`available` `on_loan` `repair` `moving` `lost` `retired`) | 대여/반납만 상태 변경. 시드에 `repair` 1건 | 현황 보드 **필터·표시만** |
 | `assets.serial_number` | 검색 LIKE | 등록·수정·상세에 입력/표시 없음 |
-| `assets.purchase_date` `useful_life_years` | 등록·상세 저장, CSV, 조달청 제안 | 만료일 문구. **임박/초과 보드 없음** |
+| `assets.purchase_date` `useful_life_years` | 등록·상세 저장, CSV, 조달청 제안 | 만료일 문구 + **연한·노후 보드**(`assets/aging`, 임박/초과) |
 | `catalog_items` / `assets` `budget_program` `budget_year` | 자유 입력, 목록 필터, CSV | 사업 마스터·합계·재물조사 집계 없음 |
 | `loans.kind=consumable` | 컬럼만 | 소모품은 `loans`가 아니라 `activity_logs.action=issue` |
 | `reports` (`room` \| `asset`, `open`/`in_progress`/`done`) | 장비 상세에서 `asset`+`open` INSERT | 상태 변경·큐·실 신고 폼 없음. 실 상세는 **읽기만** |
@@ -89,7 +89,7 @@
 
 모바일 탭: **홈 / 찾기 / 스캔 / 실 / 더보기**. PC는 좌측 동일.
 
-더보기: 품목 목록, 기자재 현황, 실험실습재료 현황, 빠른 등록, 대여 현황, 라벨, (담당) 실사·CSV·학교 설정, (owner) 사용자 승인, (AI 키 있을 때) AI 자리.
+더보기: 품목 목록, 기자재 현황, 연한·노후 기자재, 실험실습재료 현황, 빠른 등록, 대여 현황, 라벨, (담당) 실사·CSV·학교 설정, (owner) 사용자 승인, (AI 키 있을 때) AI 자리.
 
 교사 전용 탭(내 대여함·수리함·분출함)은 없다.
 
@@ -105,13 +105,13 @@
 |----------------|:----:|------|-----|
 | 장비 빠른 등록 (이름·유형·실·관리번호·사진) | 있음 | `items/new` | 시리얼 입력 없음. 등록 후 장비 이름/관리번호 수정 화면 없음 |
 | 일괄 등록 (CSV) | 있음 | `catalog/csv` | xlsx·에듀파인 파일 동기화 없음 (의도적) |
-| 기자재 현황 (검색 없이 훑기) | 있음 | `assets` 상태·실·연체·사업예산 | 연한 임박/초과 필터 없음 → M7 #52 |
+| 기자재 현황 (검색 없이 훑기) | 있음 | `assets` 상태·실·연체·사업예산 | 연한 임박/초과는 `assets/aging` |
 | 실별 배치 열람 | 있음 | `rooms` `rooms/show` | 유형/대여가능 필터는 약함 |
 | 실 간 이동 | 있음 | `assets/move` | 이력이 한 줄. `moving` 미사용 |
 | 위치 계층 추가 | 부분 | `rooms/save` (건물/실/구역/보관함/칸) | **수정·삭제·담당교사 지정 없음**. 상위는 건물·실만 선택 |
 | 라벨/QR 인쇄 | 있음 | `labels` 브라우저 QR | 품목(`CAT:`) 라벨 없음. 용지 프리셋·로고·Code128 없음. 200건 |
 | 카메라 스캔 → 상세 | 있음 | `scan` | 스캔 직후 대여/수리 CTA 없음 → M5 #47 |
-| 도입일·내용연한·만료 예정일 | 있음 | 등록·장비 상세·CSV·현황 메타 | 담당자용 **노후 목록**은 없음 → M7 #52 |
+| 도입일·내용연한·만료 예정일 | 있음 | 등록·장비 상세·CSV·현황 메타 | 담당자용 **노후 목록**은 `assets/aging` |
 | 조달청 내용연수 제안 | 있음 | 등록/수정, 수락 시에만 저장 | 강제 아님 (유지) |
 | 장비 상태(수리중/분실/폐기) 변경 | 부분 | 필터·뱃지·시드 `repair` | 쓰기 UI 없음. 고장 신고가 상태를 안 바꿈 → M5 #46, M7 #53 |
 | 분류 트리 | 없음 | `categories` 테이블만 | P2 “있으면 좋음”. M5–M7 필수 아님 |
@@ -167,8 +167,8 @@
 | 재물조사(실사) | 부분 | 실 선택→스캔 확인→미확인 | 수량 차이·예상외·이어하기·엑셀·텔레그램 없음. **사업예산 필터/집계 없음** → M7 #51 |
 | 실사 이력·다시 보기 | 부분 | `inventory/result?id=` | 지난 실사 목록 화면 없음. 진행 중은 1건 |
 | 실사 후 장부 보정 | 없음 | 확인은 `confirmed_at`만 | 위치/수량/상태 쓰기 없음 → M7 #53 |
-| 내용연한 만료 예정 표시 | 부분 | 장비 상세·현황 한 줄 | 임박/초과 보드 없음 → M7 #52 |
-| 노후 기자재 처리 | 없음 | — | 일괄 표시·처리 큐 없음 → M7 #52 #53 |
+| 내용연한 만료 예정 표시 | 있음 | 장비 상세·현황 한 줄 + `assets/aging` | 임박/초과 필터 있음 |
+| 노후 기자재 처리 | 부분 | 일괄 표시(`assets/aging`) | 처리 큐(보정·파기) 없음 → M7 #53 |
 | 파기(사유·일자·증빙) | 없음 | `retired` 미연결 | manager 이상 파괴적 쓰기 없음 → M7 #53 |
 | 수리비·처리 비용 | 없음 | `reports`에 금액 컬럼 없음 | M7 #54 (M5 수리 워크플로 선행) |
 | 에듀파인 번호 | 부분 | 옵션 필드·검색·CSV | 파일 동기화 없음 (PRD P2, 이번 로드맵 밖) |

@@ -39,7 +39,7 @@ $budgetProgram = is_string($filters['budget_program'] ?? null) ? $filters['budge
 $budgetYear = isset($filters['budget_year']) && $filters['budget_year'] !== null ? (string) (int) $filters['budget_year'] : '';
 ?>
 <h1>기자재 현황</h1>
-<p class="muted">검색 없이 전체 장비를 훑습니다. 상태·실·연체·사업예산으로 거를 수 있습니다.</p>
+<p class="muted">검색 없이 전체 장비를 훑습니다. 상태·실·연체·사업예산으로 거를 수 있습니다. 내용연한 임박·초과는 <a href="<?= Support::e(App::url('assets/aging')) ?>">연한·노후 기자재</a>에서 봅니다.</p>
 
 <div class="stats" style="margin:1rem 0">
   <a class="stat" href="<?= Support::e(App::url('assets')) ?>">

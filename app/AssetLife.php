@@ -15,6 +15,9 @@ final class AssetLife
 {
     public const YEARS_MIN = 1;
     public const YEARS_MAX = 100;
+    public const IMMINENT_DAYS = 365;
+    public const BUCKET_IMMINENT = 'imminent';
+    public const BUCKET_EXCEEDED = 'exceeded';
 
     public static function parsePurchaseDate(mixed $value): ?string
     {
@@ -88,6 +91,78 @@ final class AssetLife
             return $purchaseDate;
         }
         return date('Y-m-d', $ts);
+    }
+
+    public static function today(?string $today = null): string
+    {
+        if ($today !== null) {
+            $text = trim($today);
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $text) === 1) {
+                return $text;
+            }
+        }
+        return date('Y-m-d');
+    }
+
+    /**
+     * 임박 = 만료일이 오늘부터 IMMINENT_DAYS일 이내. 초과 = 만료일이 오늘 이전.
+     * 도입일·내용연한이 없거나 만료가 더 멀면 null.
+     */
+    public static function bucket(?string $purchaseDate, mixed $years, ?string $today = null): ?string
+    {
+        $expiry = self::expiryDate($purchaseDate, $years);
+        if ($expiry === null) {
+            return null;
+        }
+        $today = self::today($today);
+        if ($expiry < $today) {
+            return self::BUCKET_EXCEEDED;
+        }
+        $horizon = DateTimeImmutable::createFromFormat('!Y-m-d', $today);
+        if ($horizon === false) {
+            return null;
+        }
+        $until = $horizon->modify('+' . self::IMMINENT_DAYS . ' days')->format('Y-m-d');
+        return $expiry <= $until ? self::BUCKET_IMMINENT : null;
+    }
+
+    public static function daysUntilExpiry(?string $purchaseDate, mixed $years, ?string $today = null): ?int
+    {
+        $expiry = self::expiryDate($purchaseDate, $years);
+        if ($expiry === null) {
+            return null;
+        }
+        $start = DateTimeImmutable::createFromFormat('!Y-m-d', self::today($today));
+        $end = DateTimeImmutable::createFromFormat('!Y-m-d', $expiry);
+        if ($start === false || $end === false) {
+            return null;
+        }
+        $diff = $start->diff($end);
+        $days = (int) $diff->format('%a');
+        return $diff->invert === 1 ? -$days : $days;
+    }
+
+    public static function bucketLabel(string $bucket): string
+    {
+        return match ($bucket) {
+            self::BUCKET_IMMINENT => '임박',
+            self::BUCKET_EXCEEDED => '초과',
+            default => $bucket,
+        };
+    }
+
+    public static function remainingLabel(?int $days): string
+    {
+        if ($days === null) {
+            return '';
+        }
+        if ($days < 0) {
+            return '초과 ' . abs($days) . '일';
+        }
+        if ($days === 0) {
+            return '오늘 만료';
+        }
+        return '잔여 ' . $days . '일';
     }
 
     /**
