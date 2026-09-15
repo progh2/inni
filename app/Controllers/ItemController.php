@@ -6,6 +6,7 @@ namespace Inni\Controllers;
 
 use Inni\Alert;
 use Inni\App;
+use Inni\AssetBoard;
 use Inni\Auth;
 use Inni\AssetLife;
 use Inni\Budget;
@@ -190,11 +191,8 @@ final class ItemController
         $lots->execute([$id]);
         $lots = $lots->fetchAll();
 
-        $logs = $pdo->prepare(
-            "SELECT * FROM activity_logs WHERE entity_type = 'catalog' AND entity_id = ? ORDER BY created_at DESC, rowid DESC LIMIT 20"
-        );
-        $logs->execute([$id]);
-        $logs = $logs->fetchAll();
+        $historyFilters = Stock::historyFiltersFromRequest($_GET);
+        $logs = Stock::catalogHistory($pdo, $id, $historyFilters);
 
         $cancels = [];
         $cancelStmt = $pdo->prepare(
@@ -207,6 +205,10 @@ final class ItemController
 
         $locations = [];
         $openLocations = [];
+        $rooms = [];
+        if (in_array((string) $item['type'], ['consumable', 'part'], true)) {
+            $rooms = AssetBoard::rooms($pdo);
+        }
         if (in_array((string) $item['type'], ['fixture', 'consumable', 'part'], true)) {
             $locations = $pdo->query(
                 'SELECT * FROM locations ORDER BY kind, name'
@@ -229,7 +231,18 @@ final class ItemController
         $item['stock_qty'] = $stockQty;
         $lowStock = Catalog::rowIsLowStock($item);
 
-        View::render('items/show', compact('item', 'assets', 'lots', 'logs', 'cancels', 'locations', 'openLocations', 'lowStock'));
+        View::render('items/show', compact(
+            'item',
+            'assets',
+            'lots',
+            'logs',
+            'cancels',
+            'locations',
+            'openLocations',
+            'rooms',
+            'historyFilters',
+            'lowStock'
+        ));
     }
 
     public function editForm(): void
@@ -322,7 +335,7 @@ final class ItemController
         Csrf::requirePost();
         if (!Auth::canLoan($user)) {
             http_response_code(403);
-            echo '출고 권한이 없습니다.';
+            echo '분출 권한이 없습니다.';
             return;
         }
 
@@ -333,13 +346,15 @@ final class ItemController
                 is_string($_POST['lot_id'] ?? null) ? $_POST['lot_id'] : '',
                 $_POST['quantity'] ?? null,
                 is_string($_POST['purpose'] ?? null) ? $_POST['purpose'] : '',
+                is_string($_POST['room_id'] ?? null) ? $_POST['room_id'] : '',
+                is_string($_POST['class_memo'] ?? null) ? $_POST['class_memo'] : '',
             );
-            App::flash('ok', '사용 출고를 처리했습니다.');
+            App::flash('ok', '분출을 처리했습니다.');
         } catch (\InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());
         } catch (\Throwable $e) {
             error_log((string) $e);
-            App::flash('error', '출고를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+            App::flash('error', '분출을 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
         }
         App::redirect('items/show', ['id' => $itemId]);
     }

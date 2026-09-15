@@ -13,8 +13,16 @@ final class Stock
 {
     private const STOCKABLE_TYPES = ['fixture', 'consumable', 'part'];
 
-    public static function issue(PDO $pdo, array $actor, string $itemId, string $lotId, mixed $quantity, string $purpose): void
-    {
+    public static function issue(
+        PDO $pdo,
+        array $actor,
+        string $itemId,
+        string $lotId,
+        mixed $quantity,
+        string $purpose,
+        string $roomId = '',
+        string $classMemo = '',
+    ): void {
         if (!Auth::canLoan($actor) || ($actor['status'] ?? '') !== 'active') {
             throw new InvalidArgumentException('출고 권한이 없습니다.');
         }
@@ -23,6 +31,8 @@ final class Stock
         if ($purpose === '') {
             throw new InvalidArgumentException('사용 사유를 입력하세요.');
         }
+        $room = self::requireRoom($pdo, $roomId);
+        $classMemo = self::parseClassMemo($classMemo);
 
         self::beginImmediate($pdo);
         try {
@@ -47,13 +57,18 @@ final class Stock
             $meta = [
                 'lot_id' => $lotId, 'location_id' => $lot['location_id'],
                 'quantity' => $quantity, 'remaining_quantity' => (float) $lot['quantity'], 'purpose' => $purpose,
+                'room_id' => $room['id'], 'room_name' => $room['name'],
             ];
+            if ($classMemo !== '') {
+                $meta['class_memo'] = $classMemo;
+            }
+            $memoPart = $classMemo !== '' ? " · {$classMemo}" : '';
             $pdo->prepare(
                 'INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,meta_json,created_at)
                  VALUES(?,?,?,?,?,?,?,?,?)'
             )->execute([
                 Support::id('log'), 'issue', 'catalog', $itemId, $actor['id'], $actor['display_name'],
-                "«{$lot['name']}» {$quantity} {$lot['unit']} 사용 출고 · {$lot['location_name']} · {$purpose}",
+                "«{$lot['name']}» {$quantity} {$lot['unit']} 분출 · {$room['name']} · {$purpose}{$memoPart}",
                 json_encode($meta, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), Support::now(),
             ]);
             self::commitImmediate($pdo);
@@ -62,6 +77,40 @@ final class Stock
             throw $e;
         }
         Alert::notifyLowStock($pdo, $itemId);
+    }
+
+    /**
+     * @param array<string, mixed> $query
+     * @return array{room: ?string}
+     */
+    public static function historyFiltersFromRequest(array $query): array
+    {
+        $room = is_string($query['room'] ?? null) ? trim($query['room']) : '';
+        return ['room' => $room !== '' ? $room : null];
+    }
+
+    /**
+     * Catalog activity for an item. Room filter keeps 분출/취소 only.
+     *
+     * @param array{room?: ?string} $filters
+     * @return list<array<string, mixed>>
+     */
+    public static function catalogHistory(PDO $pdo, string $itemId, array $filters = [], int $limit = 20): array
+    {
+        $room = isset($filters['room']) && is_string($filters['room']) ? trim($filters['room']) : '';
+        $sql = "SELECT * FROM activity_logs WHERE entity_type = 'catalog' AND entity_id = ?";
+        $params = [$itemId];
+        if ($room !== '') {
+            $sql .= " AND action IN ('issue','cancel_issue')
+                      AND json_extract(COALESCE(meta_json, '{}'), '$.room_id') = ?";
+            $params[] = $room;
+        }
+        $limit = max(1, min(100, $limit));
+        $sql .= ' ORDER BY created_at DESC, rowid DESC LIMIT ' . $limit;
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $rows ?: [];
     }
 
     /**
@@ -342,6 +391,15 @@ final class Stock
                 'remaining_quantity' => (float) $lot['quantity'],
                 'reason' => $reason,
             ];
+            if (isset($meta['room_id']) && is_string($meta['room_id']) && $meta['room_id'] !== '') {
+                $cancelMeta['room_id'] = $meta['room_id'];
+            }
+            if (isset($meta['room_name']) && is_string($meta['room_name']) && $meta['room_name'] !== '') {
+                $cancelMeta['room_name'] = $meta['room_name'];
+            }
+            if (isset($meta['class_memo']) && is_string($meta['class_memo']) && $meta['class_memo'] !== '') {
+                $cancelMeta['class_memo'] = $meta['class_memo'];
+            }
             $pdo->prepare(
                 'INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,meta_json,created_at)
                  VALUES(?,?,?,?,?,?,?,?,?)'
@@ -362,6 +420,51 @@ final class Stock
             throw $e;
         }
         Alert::notifyLowStock($pdo, $itemId);
+    }
+
+    /**
+     * Destination 실 for 분출. kind=room only.
+     *
+     * @return array{id: string, name: string, kind: string}
+     */
+    private static function requireRoom(PDO $pdo, string $roomId): array
+    {
+        $roomId = trim($roomId);
+        if ($roomId === '') {
+            throw new InvalidArgumentException('실을 선택하세요.');
+        }
+        $stmt = $pdo->prepare('SELECT id, name, kind FROM locations WHERE id = ?');
+        $stmt->execute([$roomId]);
+        $room = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$room || ($room['kind'] ?? '') !== 'room') {
+            throw new InvalidArgumentException('분출할 실을 확인하세요.');
+        }
+        return [
+            'id' => (string) $room['id'],
+            'name' => (string) $room['name'],
+            'kind' => (string) $room['kind'],
+        ];
+    }
+
+    public static function parseClassMemo(mixed $memo): string
+    {
+        if ($memo === null) {
+            return '';
+        }
+        if (!is_string($memo) && !is_int($memo) && !is_float($memo)) {
+            throw new InvalidArgumentException('수업 메모를 확인하세요.');
+        }
+        $memo = trim((string) $memo);
+        if ($memo === '') {
+            return '';
+        }
+        if (preg_match('/[\x00-\x1F]/', $memo) === 1) {
+            throw new InvalidArgumentException('수업 메모를 확인하세요.');
+        }
+        if (mb_strlen($memo) > 200) {
+            throw new InvalidArgumentException('수업 메모는 200자 이내로 입력하세요.');
+        }
+        return $memo;
     }
 
     private static function parsePositiveQuantity(mixed $quantity, string $message): float

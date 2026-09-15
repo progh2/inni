@@ -12,6 +12,8 @@ $tags = Support::jsonDecode($item['tags'] ?? null);
 $stockable = in_array($item['type'], ['fixture', 'consumable', 'part'], true);
 $issueable = in_array($item['type'], ['consumable', 'part'], true);
 $lowStock = !empty($lowStock);
+$rooms = $rooms ?? [];
+$historyFilters = $historyFilters ?? ['room' => null];
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('items')) ?>">← 품목 목록</a> · <a href="<?= Support::e(App::url('search')) ?>">찾기</a><?php if ($issueable): ?> · <a href="<?= Support::e(App::url('materials')) ?>">실험실습재료</a><?php endif; ?></p>
 <h1>
@@ -124,18 +126,35 @@ $budgetLabel = Budget::format(
       <input type="hidden" name="item_id" value="<?= Support::e($item['id']) ?>">
       <input type="hidden" name="lot_id" value="<?= Support::e($lot['id']) ?>">
       <div class="field">
-        <label for="quantity-<?= Support::e($lot['id']) ?>">출고 수량 (<?= Support::e($item['unit']) ?>)</label>
+        <label for="quantity-<?= Support::e($lot['id']) ?>">분출 수량 (<?= Support::e($item['unit']) ?>)</label>
         <input id="quantity-<?= Support::e($lot['id']) ?>" name="quantity" type="number" min="0" max="<?= Support::e((string) $lot['quantity']) ?>" step="any" inputmode="decimal" required>
+      </div>
+      <div class="field">
+        <label for="room-<?= Support::e($lot['id']) ?>">실</label>
+        <select id="room-<?= Support::e($lot['id']) ?>" name="room_id" required>
+          <option value="">실 선택</option>
+          <?php foreach ($rooms as $room): ?>
+            <option value="<?= Support::e((string) $room['id']) ?>">
+              <?= Support::e((string) $room['name']) ?>
+              <?= !empty($room['parent_name']) ? ' · ' . Support::e((string) $room['parent_name']) : '' ?>
+              <?= !empty($room['code']) ? ' · ' . Support::e((string) $room['code']) : '' ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
       </div>
       <div class="field">
         <label for="purpose-<?= Support::e($lot['id']) ?>">사용 사유</label>
         <input id="purpose-<?= Support::e($lot['id']) ?>" name="purpose" placeholder="예: 5교시 실습, 프로젝트 제작" required>
       </div>
-      <button class="btn btn-primary btn-block" type="submit">사용 출고</button>
-      <p class="muted">선택한 위치의 재고에서 차감됩니다.</p>
+      <div class="field">
+        <label for="class-memo-<?= Support::e($lot['id']) ?>">수업 메모 (선택)</label>
+        <input id="class-memo-<?= Support::e($lot['id']) ?>" name="class_memo" maxlength="200" placeholder="예: 2학년 3반">
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">분출</button>
+      <p class="muted">선택한 위치의 재고에서 차감되고, 분출 실에 기록됩니다.</p>
     </form>
     <?php elseif ($issueable && (float) $lot['quantity'] <= 0): ?>
-      <p class="muted">출고할 재고가 없습니다.</p>
+      <p class="muted">분출할 재고가 없습니다.</p>
     <?php endif; ?>
     <?php if ($stockable && Auth::canWrite($user)): ?>
     <form method="post" action="<?= Support::e(App::url('items/restock')) ?>">
@@ -206,12 +225,40 @@ $budgetLabel = Budget::format(
 
 <div class="card">
   <h2 class="section-title" style="margin-top:0">이력</h2>
+  <?php if ($issueable): ?>
+  <form method="get" action="<?= Support::e(App::url('items/show')) ?>" class="history-filter">
+    <input type="hidden" name="r" value="items/show">
+    <input type="hidden" name="id" value="<?= Support::e((string) $item['id']) ?>">
+    <div class="field">
+      <label for="history-room">분출 실</label>
+      <select id="history-room" name="room">
+        <option value="">전체 이력</option>
+        <?php foreach ($rooms as $room): ?>
+          <option value="<?= Support::e((string) $room['id']) ?>" <?= ($historyFilters['room'] ?? null) === $room['id'] ? 'selected' : '' ?>>
+            <?= Support::e((string) $room['name']) ?>
+            <?= !empty($room['parent_name']) ? ' · ' . Support::e((string) $room['parent_name']) : '' ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <button class="btn btn-ghost" type="submit">걸러보기</button>
+  </form>
+  <?php endif; ?>
   <?php foreach ($logs as $log): ?>
-    <?php $cancel = $cancels[$log['id']] ?? null; ?>
+    <?php
+      $cancel = $cancels[$log['id']] ?? null;
+      $logMeta = Support::jsonDecode(isset($log['meta_json']) ? (string) $log['meta_json'] : null);
+    ?>
     <div class="list-row">
       <div>
         <div class="title"><?= Support::e($log['summary']) ?></div>
         <div class="meta"><?= Support::e($log['actor_name']) ?> · <?= Support::e(Support::formatWhen($log['created_at'])) ?></div>
+        <?php if (!empty($logMeta['room_name']) && in_array((string) $log['action'], ['issue', 'cancel_issue'], true)): ?>
+          <div class="meta">
+            실 <?= Support::e((string) $logMeta['room_name']) ?>
+            <?php if (!empty($logMeta['class_memo'])): ?> · <?= Support::e((string) $logMeta['class_memo']) ?><?php endif; ?>
+          </div>
+        <?php endif; ?>
         <?php if ($log['action'] === 'issue' && $cancel): ?>
           <div class="meta">취소됨 · <?= Support::e($cancel['actor_name']) ?> · <?= Support::e($cancel['reason']) ?></div>
         <?php endif; ?>

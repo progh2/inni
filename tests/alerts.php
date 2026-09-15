@@ -202,18 +202,18 @@ Telegram::setHttpHandler(static function (string $url, array $fields) use (&$cal
     return ['ok' => true];
 });
 
-Stock::issue($pdo, $teacher, 'solder', 'lot-1', 1, '수업');
+Stock::issue($pdo, $teacher, 'solder', 'lot-1', 1, '수업', 'room');
 check(Alert::lowStockItem($pdo, 'solder') === null, 'qty 5 is not below min 5');
 check($calls === [], 'stock at min_stock does not notify');
 
-Stock::issue($pdo, $teacher, 'solder', 'lot-1', 1, '수업');
+Stock::issue($pdo, $teacher, 'solder', 'lot-1', 1, '수업', 'room');
 $low = Alert::lowStockItem($pdo, 'solder');
 check(is_array($low) && (float) $low['qty'] === 4.0, 'qty 4 is below min 5');
 check(count($calls) === 1, 'crossing below min_stock sends once');
 check(str_contains((string) $calls[0]['fields']['text'], '재고 부족'), 'low-stock text mentions 재고 부족');
 check((string) $calls[0]['fields']['chat_id'] === '999', 'low-stock uses config default chat id');
 
-Stock::issue($pdo, $teacher, 'solder', 'lot-1', 1, '수업');
+Stock::issue($pdo, $teacher, 'solder', 'lot-1', 1, '수업', 'room');
 check(count($calls) === 1, 'still-low item is not sent again');
 
 Stock::restock($pdo, $owner, 'solder', 'room', 3, '입고');
@@ -221,7 +221,7 @@ check(Alert::lowStockItem($pdo, 'solder') === null, 'restock above min clears lo
 $dispatched = (int) $pdo->query("SELECT COUNT(*) FROM alert_dispatches WHERE event_key = 'low_stock'")->fetchColumn();
 check($dispatched === 0, 'recovered item clears dispatch');
 
-Stock::issue($pdo, $teacher, 'solder', 'lot-1', 3, '수업');
+Stock::issue($pdo, $teacher, 'solder', 'lot-1', 3, '수업', 'room');
 check(count($calls) === 2, 'falling below min again sends a new alert');
 
 Alert::saveSettings($pdo, $manager, '-1001', [
@@ -231,7 +231,7 @@ Alert::saveSettings($pdo, $manager, '-1001', [
 check(Alert::chatId($pdo) === '-1001', 'settings chat id wins over config default');
 check(Alert::eventEnabled($pdo, Alert::EVENT_LOW_STOCK) === false, 'low_stock can be turned off');
 Stock::restock($pdo, $owner, 'solder', 'room', 5, '채움');
-Stock::issue($pdo, $teacher, 'solder', 'lot-1', 5, '다시');
+Stock::issue($pdo, $teacher, 'solder', 'lot-1', 5, '다시', 'room');
 check(count($calls) === 2, 'disabled low_stock event does not send');
 
 try {
@@ -307,7 +307,7 @@ Telegram::setHttpHandler(static function (string $url, array $fields) use (&$cal
 });
 $emptyDb = memoryDb();
 seedStock($emptyDb);
-Stock::issue($emptyDb, $teacher, 'solder', 'lot-1', 2, '수업');
+Stock::issue($emptyDb, $teacher, 'solder', 'lot-1', 2, '수업', 'room');
 check(Alert::listLowStock($emptyDb) !== [], 'low stock list works without telegram');
 check($calls === [], 'empty token never hits Telegram HTTP on stock trigger');
 

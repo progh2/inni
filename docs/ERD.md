@@ -175,7 +175,7 @@ Unique: `(catalogItemId, locationId)`
 | actorUid | string | |
 | actorName | string | |
 | summary | string | 한국어 한 줄 |
-| meta | map | before/after 등 |
+| meta | map | before/after 등. 분출(`issue`)은 `room_id`·`room_name`·선택 `class_memo` |
 | createdAt | timestamp | |
 
 ### `inventory_checks/{id}` (P1 가벼운 실사)

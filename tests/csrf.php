@@ -420,7 +420,7 @@ if (is_string($p['csrf'])) {
 
 if (!empty($p['issue_first'])) {
     $actor = ['id' => 'demo-owner', 'display_name' => '김담당', 'role' => 'owner', 'status' => 'active'];
-    Stock::issue(\Inni\Database::pdo(), $actor, 'ci-solder', 'lot-solder', '2', 'CSRF 출고');
+    Stock::issue(\Inni\Database::pdo(), $actor, 'ci-solder', 'lot-solder', '2', 'CSRF 출고', 'loc-elec');
     $logId = \Inni\Database::pdo()->query("SELECT id FROM activity_logs WHERE action='issue' ORDER BY rowid DESC LIMIT 1")->fetchColumn();
     if (empty($_POST['issue_log_id'])) {
         $_POST['issue_log_id'] = (string) $logId;
