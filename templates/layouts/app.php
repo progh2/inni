@@ -25,6 +25,7 @@ $tabActive = static function (string $tab, string $current): bool {
     if ($tab === 'more') {
         return $current === 'more' || str_starts_with($current, 'more/')
             || $current === 'items' || $current === 'assets' || $current === 'materials'
+            || $current === 'assets/aging'
             || $current === 'loans' || str_starts_with($current, 'loans/')
             || $current === 'reports' || str_starts_with($current, 'reports/')
             || $current === 'inventory' || str_starts_with($current, 'inventory/')

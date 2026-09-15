@@ -8,6 +8,7 @@ use Inni\Alert;
 use Inni\App;
 use Inni\Asset;
 use Inni\AssetBoard;
+use Inni\AssetLifeBoard;
 use Inni\Auth;
 use Inni\Csrf;
 use Inni\Database;
@@ -33,6 +34,17 @@ final class AssetController
         $summary = AssetBoard::summary($pdo);
 
         View::render('assets/index', compact('assets', 'rooms', 'filters', 'summary'));
+    }
+
+    public function aging(): void
+    {
+        Auth::requireLogin();
+        $pdo = Database::pdo();
+        $filters = AssetLifeBoard::filtersFromRequest($_GET);
+        $assets = AssetLifeBoard::list($pdo, $filters);
+        $summary = AssetLifeBoard::summary($pdo);
+
+        View::render('assets/aging', compact('assets', 'filters', 'summary'));
     }
 
     public function show(): void
