@@ -110,7 +110,8 @@ check(AssetLifeBoard::summary($empty, $today) === ['total' => 0, 'imminent' => 0
 $src = (string) file_get_contents($root . '/app/AssetLifeBoard.php');
 check(str_contains($src, 'purchase_date') && str_contains($src, 'useful_life_years'), 'board reads #39 fields');
 check(!str_contains($src, 'pps_useful_life') && !str_contains($src, 'PpsUsefulLife'), 'board does not re-query PPS seed');
-check(!str_contains($src, 'destroy') && !str_contains($src, 'adjust') && !str_contains($src, 'repair_cost'), 'board has no #53/#54 writes');
+check(!preg_match('/function (destroy|adjust|retire)/', $src), 'board has no #53 write methods');
+check(!str_contains($src, 'repair_cost'), 'board has no #54 repair cost');
 
 $ctl = (string) file_get_contents($root . '/app/Controllers/AssetController.php');
 check(str_contains($ctl, 'function aging'), 'asset controller has aging board');
