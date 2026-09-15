@@ -54,7 +54,10 @@ check(substr_count($more, "App::url('loans/desk')") === 1, 'More must not duplic
 check(str_contains($more, '수리 대기'), 'More menu must expose 수리 대기');
 check(str_contains($more, "App::url('reports')"), '수리 대기 must link to reports');
 check(str_contains($more, 'Auth::canWrite($user)'), '수리 대기 is gated on canWrite');
-check(substr_count($more, "App::url('reports')") === 1, 'More must not duplicate the repair queue link');
+check(substr_count($more, "App::url('reports'))") === 1, 'More must not duplicate the repair queue link');
+check(str_contains($more, '수리비 합계'), 'More menu must expose 수리비 합계');
+check(str_contains($more, "App::url('reports/costs')"), '수리비 합계 must link to reports/costs');
+check(substr_count($more, "App::url('reports/costs')") === 1, 'More must not duplicate the repair cost totals link');
 check(str_contains($more, '사업예산 실사'), 'More menu must expose 사업예산 실사');
 check(str_contains($more, "App::url('inventory/report')"), '사업예산 실사 must link to inventory/report');
 check(str_contains($more, 'Auth::canInventory($user)'), '사업예산 실사 is gated on canInventory');
@@ -72,6 +75,7 @@ check(str_contains($router, "'assets' => [AssetController::class, 'index']"), 'a
 check(str_contains($router, "'assets/aging' => [AssetController::class, 'aging']"), 'assets/aging GET route is registered');
 check(str_contains($router, "'materials' => [MaterialController::class, 'index']"), 'materials GET route is registered');
 check(str_contains($router, "'reports' => [ReportController::class, 'index']"), 'reports GET route is registered');
+check(str_contains($router, "'reports/costs' => [ReportController::class, 'costs']"), 'reports/costs GET route is registered');
 check(str_contains($router, "'inventory/report' => [InventoryController::class, 'report']"), 'inventory/report GET route is registered');
 
 check(str_contains($itemCtl, 'Catalog::list'), 'ItemController index keeps the #29 catalog list');

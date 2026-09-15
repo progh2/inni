@@ -95,6 +95,16 @@ final class Database
              ON stock_issue_cancels(catalog_item_id, created_at)'
         );
         self::ensureReportsRejectedStatus($pdo);
+        self::ensureColumn($pdo, 'reports', 'cost_amount', 'REAL');
+        self::ensureColumn($pdo, 'reports', 'cost_vendor', 'TEXT');
+        self::ensureColumn($pdo, 'reports', 'cost_budget_line', 'TEXT');
+        self::ensureColumn($pdo, 'reports', 'cost_at', 'TEXT');
+        $reportsExists = $pdo->query(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'reports'"
+        )->fetchColumn();
+        if ($reportsExists !== false && $reportsExists !== null) {
+            $pdo->exec('CREATE INDEX IF NOT EXISTS idx_reports_cost_at ON reports(cost_at)');
+        }
         $pdo->exec(
             'CREATE TABLE IF NOT EXISTS alert_dispatches (
               event_key TEXT NOT NULL,
@@ -161,7 +171,7 @@ final class Database
     }
 
     /**
-     * @param 'catalog_items'|'assets'|'stock_lots'|'inventory_check_lines' $table
+     * @param 'catalog_items'|'assets'|'stock_lots'|'inventory_check_lines'|'reports' $table
      */
     private static function ensureColumn(PDO $pdo, string $table, string $column, string $type): void
     {
@@ -184,6 +194,12 @@ final class Database
                 'adjusted_by' => 'TEXT',
                 'adjust_reason' => 'TEXT',
                 'adjust_approver' => 'TEXT',
+            ],
+            'reports' => [
+                'cost_amount' => 'REAL',
+                'cost_vendor' => 'TEXT',
+                'cost_budget_line' => 'TEXT',
+                'cost_at' => 'TEXT',
             ],
         ];
         if (!isset($allowed[$table][$column]) || $allowed[$table][$column] !== $type) {

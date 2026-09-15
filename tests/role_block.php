@@ -209,6 +209,8 @@ check(str_contains($asset, 'Auth::canWrite($user)') && str_contains($asset, 'fun
 $reportCtl = (string) file_get_contents($root . '/app/Controllers/ReportController.php');
 check(str_contains($reportCtl, 'Auth::canWrite($user)') && str_contains($reportCtl, 'function index'), 'repair queue requires canWrite');
 check(str_contains($reportCtl, 'function updateStatus') && str_contains($reportCtl, 'Csrf::requirePost()'), 'repair status change is POST+CSRF and canWrite');
+check(str_contains($reportCtl, 'function updateCost') && str_contains($reportCtl, 'function costs'), 'repair cost save and totals exist');
+check(str_contains($reportCtl, 'Auth::canWrite($user)') && str_contains($reportCtl, 'ReportCost::save'), 'repair cost save requires canWrite');
 
 $room = (string) file_get_contents($root . '/app/Controllers/RoomController.php');
 check(str_contains($room, 'Auth::canWrite($user)') && str_contains($room, 'function save'), 'room register requires canWrite');

@@ -19,7 +19,7 @@ $chips = [
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('home')) ?>">← 홈</a></p>
 <h1>수리 대기</h1>
-<p class="muted">접수된 고장·수리 요청을 수리중·완료·불가로 넘깁니다.</p>
+<p class="muted">접수된 고장·수리 요청을 수리중·완료·불가로 넘깁니다. <a href="<?= Support::e(App::url('reports/costs')) ?>">수리비 월·연 합계</a></p>
 
 <div class="actions" style="margin:1rem 0">
   <?php foreach ($chips as [$status, $label, $n]): ?>

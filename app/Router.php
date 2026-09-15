@@ -86,6 +86,8 @@ final class Router
             'reports' => [ReportController::class, 'index'],
             'reports/show' => [ReportController::class, 'show'],
             'reports/status' => [ReportController::class, 'updateStatus'],
+            'reports/costs' => [ReportController::class, 'costs'],
+            'reports/cost' => [ReportController::class, 'updateCost'],
 
             'labels' => [LabelController::class, 'index'],
             'labels/print' => [LabelController::class, 'print'],
