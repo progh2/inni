@@ -268,8 +268,13 @@ $old->exec('CREATE TABLE users (id TEXT PRIMARY KEY, email TEXT NOT NULL, displa
 $old->exec('CREATE TABLE locations (id TEXT PRIMARY KEY, name TEXT NOT NULL, kind TEXT NOT NULL, qr_code TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)');
 $old->exec('CREATE TABLE catalog_items (id TEXT PRIMARY KEY, name TEXT NOT NULL, type TEXT NOT NULL, qr_code TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)');
 $old->exec('CREATE TABLE assets (id TEXT PRIMARY KEY, catalog_item_id TEXT NOT NULL REFERENCES catalog_items(id), name TEXT NOT NULL, management_number TEXT NOT NULL, status TEXT NOT NULL, location_id TEXT NOT NULL, qr_code TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)');
+$old->exec("CREATE TABLE loans (id TEXT PRIMARY KEY, kind TEXT NOT NULL, asset_id TEXT, status TEXT NOT NULL DEFAULT 'active')");
 $old->exec("CREATE TABLE inventory_checks (id TEXT PRIMARY KEY, location_id TEXT NOT NULL, location_name TEXT NOT NULL, status TEXT NOT NULL, started_by TEXT NOT NULL, started_at TEXT NOT NULL)");
-$old->exec("CREATE TABLE inventory_check_lines (id TEXT PRIMARY KEY, check_id TEXT NOT NULL, kind TEXT NOT NULL, asset_id TEXT, catalog_item_id TEXT, stock_lot_id TEXT, location_id TEXT NOT NULL, name TEXT NOT NULL, expected_qty REAL NOT NULL DEFAULT 1)");
+$old->exec("CREATE TABLE inventory_check_lines (
+  id TEXT PRIMARY KEY, check_id TEXT NOT NULL, kind TEXT NOT NULL, asset_id TEXT, catalog_item_id TEXT,
+  stock_lot_id TEXT, location_id TEXT NOT NULL, name TEXT NOT NULL, expected_qty REAL NOT NULL DEFAULT 1,
+  confirmed_at TEXT, confirmed_by TEXT
+)");
 Database::migrate($old);
 $astCols = array_column($old->query('PRAGMA table_info(assets)')->fetchAll(PDO::FETCH_ASSOC), 'name');
 $lineCols = array_column($old->query('PRAGMA table_info(inventory_check_lines)')->fetchAll(PDO::FETCH_ASSOC), 'name');
@@ -292,11 +297,8 @@ check(str_contains($invCtl, 'Auth::canWrite($user)'), 'adjust is canWrite-gated'
 
 $assetCtl = (string) file_get_contents($root . '/app/Controllers/AssetController.php');
 check(str_contains($assetCtl, 'function retire') && str_contains($assetCtl, 'Csrf::requirePost()'), 'retire is POST+CSRF');
-if (preg_match('/function retire\(\): void\s*\{(.*?)\n    public function |\n}\s*$/s', $assetCtl, $m)) {
-    check(str_contains($m[1], 'Auth::canWrite($user)'), 'retire method requires canWrite');
-} else {
-    check(str_contains($assetCtl, '파기 권한이 없습니다.'), 'retire flashes a permission error');
-}
+$retirePos = strpos($assetCtl, 'function retire(): void');
+check($retirePos !== false && str_contains(substr($assetCtl, $retirePos), 'Auth::canWrite($user)'), 'retire method requires canWrite');
 
 $resultTpl = (string) file_get_contents($root . '/templates/inventory/result.php');
 $reportTpl = (string) file_get_contents($root . '/templates/inventory/report.php');
