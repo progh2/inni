@@ -205,6 +205,32 @@ Unique: `(catalogItemId, locationId)`
 | confirmedAt | timestamp? | |
 | confirmedBy | string? | |
 
+### `inventory_adjustments/{id}` (M7 #53)
+종료된 실사 미확인 라인 1건당 보정 0~1건. UNIQUE(`lineId`). 품목은 `stockLots.quantity`를 실물 수량으로, 장비(실물 0)는 `assets.status=lost`.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| lineId | string | inventory_check_lines.id |
+| checkId | string | |
+| kind | `asset` \| `item` | |
+| bookQty, physicalQty | number | |
+| reason | string | |
+| approverName | string | |
+| actorUid, actorName | string | |
+| createdAt | timestamp | |
+
+### `asset_retirements/{id}` (M7 #53)
+장비 1건당 파기 0~1건. UNIQUE(`assetId`). 되돌릴 수 없음. `assets.status=retired`.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| assetId | string | |
+| reason | string | |
+| retiredOn | string | YYYY-MM-DD |
+| evidencePath | string? | 증빙 사진 |
+| actorUid, actorName | string | |
+| createdAt | timestamp | |
+
 ### `reports/{id}` (Phase3 스키마 선반영)
 | Field | Type | Notes |
 |-------|------|-------|

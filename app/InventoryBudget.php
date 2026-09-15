@@ -10,7 +10,7 @@ use PDO;
  * Budget-program inventory (재물조사) report.
  * Read-only: joins check lines to current asset/catalog budget fields.
  * Book vs physical: confirmed => physical = expected; missing => physical = 0.
- * Quantity re-entry and ledger adjust are out of scope (#53).
+ * Quantity re-entry stays out of this read model. Ledger adjust is #53 (`Inventory::adjust`).
  */
 final class InventoryBudget
 {

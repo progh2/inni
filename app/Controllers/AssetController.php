@@ -105,7 +105,50 @@ final class AssetController
             $lifeSuggestions = PpsUsefulLife::suggest((string) ($asset['name'] ?? ''));
         }
 
-        View::render('assets/show', compact('user', 'asset', 'path', 'locations', 'loan', 'logs', 'reports', 'lifeSuggestions'));
+        $retirement = Asset::retirement($pdo, (string) $asset['id']);
+
+        View::render('assets/show', compact('user', 'asset', 'path', 'locations', 'loan', 'logs', 'reports', 'lifeSuggestions', 'retirement'));
+    }
+
+    public function retire(): void
+    {
+        $user = Auth::requireLogin();
+        if (!Auth::canWrite($user)) {
+            App::flash('error', '파기 권한이 없습니다.');
+            App::redirect('home');
+        }
+        Csrf::requirePost();
+        $assetId = is_string($_POST['asset_id'] ?? null) ? $_POST['asset_id'] : '';
+        if (trim((string) ($_POST['confirm_irreversible'] ?? '')) !== '1') {
+            App::flash('error', '되돌릴 수 없음을 확인해야 파기할 수 있습니다.');
+            App::redirect('assets/show', ['id' => $assetId]);
+        }
+        $evidencePath = null;
+        try {
+            if (!empty($_FILES['evidence']['name'])) {
+                $evidencePath = Uploader::store($_FILES['evidence'], 'retire');
+            }
+        } catch (\Throwable $e) {
+            App::flash('error', $e->getMessage());
+            App::redirect('assets/show', ['id' => $assetId]);
+        }
+        try {
+            Asset::retire(
+                Database::pdo(),
+                $user,
+                $assetId,
+                $_POST['reason'] ?? '',
+                $_POST['retired_on'] ?? '',
+                $evidencePath,
+            );
+            App::flash('ok', '장비를 파기 처리했습니다. 이 쓰기는 되돌릴 수 없습니다.');
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '파기를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
+        App::redirect('assets/show', ['id' => $assetId]);
     }
 
     public function suggestLife(): void
@@ -184,6 +227,10 @@ final class AssetController
         $asset = $stmt->fetch();
         if (!$asset) {
             App::redirect('home');
+        }
+        if (($asset['status'] ?? '') === 'retired') {
+            App::flash('error', '파기된 장비는 이동할 수 없습니다.');
+            App::redirect('assets/show', ['id' => $assetId]);
         }
         $from = Support::locationPath($pdo, $asset['location_id']);
         $to = Support::locationPath($pdo, $locationId);

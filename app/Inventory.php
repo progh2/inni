@@ -338,6 +338,274 @@ final class Inventory
         return $done;
     }
 
+    public const REASON_MAX = 200;
+    public const APPROVER_MAX = 80;
+
+    /**
+     * Book-vs-physical ledger correction from a finished-check missing line.
+     * Item lots get quantity = physical. Missing assets become lost (not retired).
+     *
+     * @param array<string, mixed> $actor
+     * @return array<string, mixed>
+     */
+    public static function adjust(
+        PDO $pdo,
+        array $actor,
+        string $lineId,
+        mixed $physicalQty,
+        string $reason,
+        string $approverName,
+    ): array {
+        self::requireAdjustActor($actor);
+        $lineId = trim($lineId);
+        if ($lineId === '') {
+            throw new InvalidArgumentException('보정할 실사 항목이 없습니다.');
+        }
+        $reason = self::parseRequiredText($reason, '보정 사유를 입력하세요.', self::REASON_MAX, '보정 사유는 200자 이내로 입력하세요.');
+        $approverName = self::parseRequiredText(
+            $approverName,
+            '승인자를 입력하세요.',
+            self::APPROVER_MAX,
+            '승인자는 80자 이내로 입력하세요.',
+        );
+
+        $itemId = null;
+        self::beginImmediate($pdo);
+        try {
+            $stmt = $pdo->prepare(
+                'SELECT l.*, c.status AS check_status, c.location_id AS check_location_id,
+                        c.location_name AS check_location_name
+                 FROM inventory_check_lines l
+                 JOIN inventory_checks c ON c.id = l.check_id
+                 WHERE l.id = ?'
+            );
+            $stmt->execute([$lineId]);
+            $line = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$line) {
+                throw new InvalidArgumentException('보정할 실사 항목이 없습니다.');
+            }
+            if (($line['check_status'] ?? '') !== 'done') {
+                throw new InvalidArgumentException('종료된 실사만 보정할 수 있습니다.');
+            }
+            if (($line['confirmed_at'] ?? null) !== null && (string) $line['confirmed_at'] !== '') {
+                throw new InvalidArgumentException('확인된 항목은 보정하지 않습니다.');
+            }
+
+            $exists = $pdo->prepare('SELECT id FROM inventory_adjustments WHERE line_id = ?');
+            $exists->execute([$lineId]);
+            if ($exists->fetchColumn()) {
+                throw new InvalidArgumentException('이미 보정한 항목입니다.');
+            }
+
+            $kind = (string) ($line['kind'] ?? '');
+            $physical = self::parsePhysicalQty($physicalQty, $kind);
+            $book = (float) ($line['expected_qty'] ?? 0);
+            $t = Support::now();
+            $adjId = Support::id('iad');
+
+            try {
+                $pdo->prepare(
+                    'INSERT INTO inventory_adjustments(
+                        id,line_id,check_id,kind,asset_id,catalog_item_id,stock_lot_id,
+                        book_qty,physical_qty,reason,approver_name,actor_id,actor_name,created_at
+                     ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                )->execute([
+                    $adjId,
+                    $lineId,
+                    $line['check_id'],
+                    $kind,
+                    $line['asset_id'] ?? null,
+                    $line['catalog_item_id'] ?? null,
+                    $line['stock_lot_id'] ?? null,
+                    $book,
+                    $physical,
+                    $reason,
+                    $approverName,
+                    $actor['id'],
+                    $actor['display_name'],
+                    $t,
+                ]);
+            } catch (PDOException $e) {
+                if (self::isUniqueConflict($e)) {
+                    throw new InvalidArgumentException('이미 보정한 항목입니다.', 0, $e);
+                }
+                throw $e;
+            }
+
+            $applied = null;
+            if ($kind === 'item') {
+                $lotId = (string) ($line['stock_lot_id'] ?? '');
+                $catalogId = (string) ($line['catalog_item_id'] ?? '');
+                if ($lotId === '' || $catalogId === '') {
+                    throw new InvalidArgumentException('보정할 재고를 찾을 수 없습니다.');
+                }
+                $upd = $pdo->prepare(
+                    'UPDATE stock_lots SET quantity = CAST(? AS REAL), updated_at = ?
+                     WHERE id = ? AND catalog_item_id = ?'
+                );
+                $upd->execute([$physical, $t, $lotId, $catalogId]);
+                if ($upd->rowCount() !== 1) {
+                    throw new InvalidArgumentException('보정할 재고를 찾을 수 없습니다.');
+                }
+                $itemId = $catalogId;
+                $applied = 'stock';
+            } elseif ($kind === 'asset') {
+                $assetId = (string) ($line['asset_id'] ?? '');
+                if ($assetId === '') {
+                    throw new InvalidArgumentException('보정할 장비를 찾을 수 없습니다.');
+                }
+                if ($physical === 0.0) {
+                    $lost = $pdo->prepare(
+                        "UPDATE assets SET status = 'lost', updated_at = ?
+                         WHERE id = ? AND status IN ('available','moving','repair')"
+                    );
+                    $lost->execute([$t, $assetId]);
+                    if ($lost->rowCount() === 1) {
+                        $applied = 'lost';
+                    }
+                }
+            } else {
+                throw new InvalidArgumentException('보정할 실사 항목이 없습니다.');
+            }
+
+            $bookLabel = InventoryBudget::formatQty($book);
+            $physLabel = InventoryBudget::formatQty($physical);
+            $entityType = $kind === 'asset' ? 'asset' : 'catalog';
+            $entityId = $kind === 'asset'
+                ? (string) $line['asset_id']
+                : (string) $line['catalog_item_id'];
+            $summary = "실사 보정 «{$line['name']}» 장부 {$bookLabel} → 실물 {$physLabel} · {$reason} · 승인자 {$approverName}";
+            $pdo->prepare(
+                'INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,meta_json,created_at)
+                 VALUES(?,?,?,?,?,?,?,?,?)'
+            )->execute([
+                Support::id('log'),
+                'inventory_adjust',
+                $entityType,
+                $entityId,
+                $actor['id'],
+                $actor['display_name'],
+                $summary,
+                json_encode([
+                    'adjustment_id' => $adjId,
+                    'check_id' => $line['check_id'],
+                    'line_id' => $lineId,
+                    'book_qty' => $book,
+                    'physical_qty' => $physical,
+                    'reason' => $reason,
+                    'approver_name' => $approverName,
+                    'applied' => $applied,
+                ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+                $t,
+            ]);
+
+            self::commitImmediate($pdo);
+        } catch (Throwable $e) {
+            self::rollBackImmediate($pdo);
+            throw $e;
+        }
+
+        if ($itemId !== null) {
+            Alert::notifyLowStock($pdo, $itemId);
+        }
+
+        $row = self::adjustmentForLine($pdo, $lineId);
+        if (!$row) {
+            throw new InvalidArgumentException('보정을 저장하지 못했습니다.');
+        }
+        return $row;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public static function adjustmentForLine(PDO $pdo, string $lineId): ?array
+    {
+        $stmt = $pdo->prepare('SELECT * FROM inventory_adjustments WHERE line_id = ?');
+        $stmt->execute([$lineId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    /**
+     * @param list<string> $lineIds
+     * @return array<string, array<string, mixed>>
+     */
+    public static function adjustmentsForLines(PDO $pdo, array $lineIds): array
+    {
+        $ids = [];
+        foreach ($lineIds as $id) {
+            $id = trim((string) $id);
+            if ($id !== '') {
+                $ids[$id] = $id;
+            }
+        }
+        if ($ids === []) {
+            return [];
+        }
+        $ids = array_values($ids);
+        $in = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $pdo->prepare("SELECT * FROM inventory_adjustments WHERE line_id IN ($in)");
+        $stmt->execute($ids);
+        $out = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $out[(string) $row['line_id']] = $row;
+        }
+        return $out;
+    }
+
+    public static function parsePhysicalQty(mixed $quantity, string $kind): float
+    {
+        if ((!is_string($quantity) && !is_int($quantity) && !is_float($quantity)) || !is_numeric($quantity)) {
+            throw new InvalidArgumentException('실물 수량은 0 이상 숫자로 입력하세요.');
+        }
+        $quantity = (float) $quantity;
+        if (!is_finite($quantity) || $quantity < 0) {
+            throw new InvalidArgumentException('실물 수량은 0 이상 숫자로 입력하세요.');
+        }
+        if ($kind === 'asset' && $quantity !== 0.0 && $quantity !== 1.0) {
+            throw new InvalidArgumentException('장비 실물 수량은 0 또는 1입니다.');
+        }
+        return $quantity;
+    }
+
+    /**
+     * @param array<string, mixed> $actor
+     */
+    private static function requireAdjustActor(array $actor): void
+    {
+        if (
+            !Auth::canInventory($actor)
+            || !Auth::canWrite($actor)
+            || ($actor['status'] ?? '') !== 'active'
+        ) {
+            throw new InvalidArgumentException('보정 권한이 없습니다.');
+        }
+        $id = $actor['id'] ?? null;
+        $name = $actor['display_name'] ?? null;
+        if (!is_string($id) || $id === '' || !is_string($name) || $name === '') {
+            throw new InvalidArgumentException('보정 권한이 없습니다.');
+        }
+    }
+
+    private static function parseRequiredText(mixed $value, string $emptyMessage, int $max, string $maxMessage): string
+    {
+        if (!is_string($value) && !is_int($value)) {
+            throw new InvalidArgumentException($emptyMessage);
+        }
+        $text = trim((string) $value);
+        if ($text === '') {
+            throw new InvalidArgumentException($emptyMessage);
+        }
+        if (str_contains($text, "\n") || str_contains($text, "\r")) {
+            throw new InvalidArgumentException($emptyMessage);
+        }
+        if (function_exists('mb_strlen') ? mb_strlen($text) > $max : strlen($text) > $max) {
+            throw new InvalidArgumentException($maxMessage);
+        }
+        return $text;
+    }
+
     /**
      * @param array<string, mixed> $actor
      */

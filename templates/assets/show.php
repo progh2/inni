@@ -6,6 +6,9 @@ use Inni\Auth;
 use Inni\Budget;
 use Inni\Csrf;
 use Inni\Support;
+
+/** @var array<string, mixed>|null $retirement */
+$retirement = $retirement ?? null;
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('search')) ?>">← 찾기</a></p>
 <h1><?= Support::e($asset['name']) ?></h1>
@@ -85,6 +88,7 @@ $lifeLabel = AssetLife::format(
 </div>
 <?php endif; ?>
 
+<?php if ($asset['status'] !== 'retired'): ?>
 <div class="card">
   <h2 class="section-title" style="margin-top:0">위치 이동</h2>
   <form method="post" action="<?= Support::e(App::url('assets/move')) ?>">
@@ -103,6 +107,7 @@ $lifeLabel = AssetLife::format(
     <button class="btn btn-ghost" type="submit">이동</button>
   </form>
 </div>
+<?php endif; ?>
 
 <?php if (Auth::canWrite($user)): ?>
 <div class="card">
@@ -167,6 +172,48 @@ $lifeLabel = AssetLife::format(
     </div>
     <button class="btn btn-ghost" type="submit">업로드</button>
   </form>
+</div>
+<?php endif; ?>
+
+<?php if (Auth::canWrite($user)): ?>
+<div class="card">
+  <h2 class="section-title" style="margin-top:0">파기</h2>
+  <?php if ($asset['status'] === 'retired' && is_array($retirement ?? null)): ?>
+    <p>사유 <?= Support::e((string) ($retirement['reason'] ?? '')) ?></p>
+    <p class="muted">일자 <?= Support::e((string) ($retirement['retired_on'] ?? '')) ?>
+      · <?= Support::e((string) ($retirement['actor_name'] ?? '')) ?></p>
+    <?php if (!empty($retirement['evidence_path'])): ?>
+      <p><img class="thumb" src="<?= Support::e(App::baseUrl() . $retirement['evidence_path']) ?>" alt="파기 증빙"></p>
+    <?php endif; ?>
+    <p class="muted">파기는 되돌릴 수 없습니다.</p>
+  <?php elseif ($asset['status'] === 'retired'): ?>
+    <p class="muted">파기된 장비입니다. 되돌릴 수 없습니다.</p>
+  <?php elseif ($asset['status'] === 'on_loan'): ?>
+    <p class="muted">대여 중인 장비는 반납 후 파기하세요.</p>
+  <?php else: ?>
+    <p class="muted">파기는 되돌릴 수 없습니다. 담당교사(manager 이상)만 처리할 수 있습니다.</p>
+    <form method="post" action="<?= Support::e(App::url('assets/retire')) ?>" enctype="multipart/form-data">
+      <?= Csrf::field() ?>
+      <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
+      <div class="field">
+        <label>파기 일자</label>
+        <input name="retired_on" type="date" required value="<?= Support::e(date('Y-m-d')) ?>">
+      </div>
+      <div class="field">
+        <label>파기 사유</label>
+        <input name="reason" maxlength="200" required placeholder="내용연한 만료 · 실사 미확인">
+      </div>
+      <div class="field">
+        <label>증빙 사진 (선택)</label>
+        <input type="file" name="evidence" accept="image/*" capture="environment">
+      </div>
+      <div class="check-row">
+        <input id="retire-confirm" type="checkbox" name="confirm_irreversible" value="1" required>
+        <label for="retire-confirm">되돌릴 수 없음을 확인합니다</label>
+      </div>
+      <button class="btn btn-ink btn-block" type="submit">파기 처리</button>
+    </form>
+  <?php endif; ?>
 </div>
 <?php endif; ?>
 

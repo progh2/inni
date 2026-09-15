@@ -144,11 +144,12 @@ docker compose start
 - 품목 목록·실험실습재료 현황·홈의 **부족** 뱃지 (수량 < 최소재고, 알림과 동일)  
 - 소모품·부품 상세: 위치별 사용 출고(수량·사유), 출고 이력
 - 라벨 인쇄 (브라우저 QR + 인쇄)  
-- 실사 (담당교사·관리자): 실 선택 → 스캔/코드 확인 → 미확인 목록  
-- 사업예산 실사 (담당교사·관리자): 종료·진행 중 실사를 사업명·예산연도로 필터/집계. 장부 vs 실물(확인=장부, 미확인=0) 목록과 UTF-8 CSV. 수량 재입력·장부 보정 없음
+- 실사 (담당교사·관리자): 실 선택 → 스캔/코드 확인 → 미확인 목록. 종료 후 미확인 차이는 사유·승인자로 장부 보정(POST+CSRF, `canInventory`/`canWrite`). 품목은 로트 수량, 장비는 분실(`lost`)  
+- 파기 (담당교사·관리자): 장비 상세에서 사유·일자·선택 증빙으로 `retired`. 되돌릴 수 없음. 대여 중은 거부  
+- 사업예산 실사 (담당교사·관리자): 종료·진행 중 실사를 사업명·예산연도로 필터/집계. 장부 vs 실물(확인=장부, 미확인=0) 목록과 UTF-8 CSV. 종료된 미확인 라인은 결과/리포트에서 보정 가능
 - 품목 CSV (담당교사·관리자): 템플릿/목록 내려받기, 업로드로 신규·수정. **CSV UTF-8만** (xlsx 없음). 충돌 행은 건너뛰고 보고. 에듀파인 파일 동기화·실사 연동 없음. 사업명·예산연도·도입일·내용연한 열 포함  
 - 구입 사업예산: 품목·장비에 사업명(자유 입력)과 예산 연도(YYYY). 빈 값 허용. 학교별 프리셋 없음
-- 도입일·내용연한: 장비에 도입일(`purchase_date`)과 내용연한(년). 둘 다 있으면 만료 예정일 표시. 빈 값 허용. 등록·수정 시 이름/물품분류번호로 **조달청고시 제2024-30호** 내용연수를 제안(수락 시에만 `useful_life_years` 채움, 강제 아님). 시드는 `app/data/pps_useful_life.json` (고시 개정 시 items·notice만 교체). **연한·노후 보드**(`assets/aging`)는 만료 365일 이내(임박)와 만료일 지남(초과)을 일괄 표시. 보정·파기는 없음
+- 도입일·내용연한: 장비에 도입일(`purchase_date`)과 내용연한(년). 둘 다 있으면 만료 예정일 표시. 빈 값 허용. 등록·수정 시 이름/물품분류번호로 **조달청고시 제2024-30호** 내용연수를 제안(수락 시에만 `useful_life_years` 채움, 강제 아님). 시드는 `app/data/pps_useful_life.json` (고시 개정 시 items·notice만 교체). **연한·노후 보드**(`assets/aging`)는 만료 365일 이내(임박)와 만료일 지남(초과)을 일괄 표시. 파기는 장비 상세에서
 - 설정·사용자 승인
 - 알림: 홈의 재고 부족·연체 대여. 담당교사(owner/manager)가 설정에서 텔레그램 채팅 ID·이벤트 on/off. 봇 토큰은 서버 `config.php`에만 (비면 연결 필요, 발송 안 함)
 - AI 자리: 설정에 OpenAI / Upstage / Ollama 연결 상태. 키는 서버 `config.php`의 `ai.api_key`만 (비면 연결 필요, 더보기 메뉴 숨김). **제안만** — 재고·대여·대장을 자동으로 바꾸지 않음. 챗봇 없음
@@ -182,7 +183,9 @@ php tests/google_oauth.php
 php tests/role_block.php
 php tests/scan_labels.php
 php tests/inventory.php
+php tests/inventory_adjust.php
 php tests/inventory_budget.php
+php tests/asset_retire.php
 php tests/catalog_csv.php
 php tests/alerts.php
 php tests/ai.php

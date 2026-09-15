@@ -204,6 +204,8 @@ $asset = (string) file_get_contents($root . '/app/Controllers/AssetController.ph
 check(str_contains($asset, 'Auth::canLoan($user)') && str_contains($asset, 'function loan'), 'asset loan requires canLoan');
 check(str_contains($asset, 'Auth::canLoan($user)') && str_contains($asset, 'function report'), 'asset repair request requires canLoan');
 check(str_contains($asset, 'Auth::canWrite($user)') && str_contains($asset, 'function photo'), 'asset photo requires canWrite');
+check(str_contains($asset, 'function retire') && str_contains($asset, 'Csrf::requirePost()'), 'asset retire is POST+CSRF');
+check(str_contains($asset, 'Auth::canWrite($user)') && str_contains($asset, 'function retire'), 'asset retire requires canWrite');
 
 $reportCtl = (string) file_get_contents($root . '/app/Controllers/ReportController.php');
 check(str_contains($reportCtl, 'Auth::canWrite($user)') && str_contains($reportCtl, 'function index'), 'repair queue requires canWrite');
@@ -216,6 +218,8 @@ $inventory = (string) file_get_contents($root . '/app/Controllers/InventoryContr
 check(str_contains($inventory, 'Auth::canInventory($user)'), 'inventory controller requires canInventory');
 check(str_contains($inventory, 'function start') && str_contains($inventory, 'function confirm') && str_contains($inventory, 'function finish'), 'inventory has start/confirm/finish');
 check(str_contains($inventory, 'function report') && str_contains($inventory, 'function reportCsv'), 'inventory report is gated with the same canInventory helper');
+check(str_contains($inventory, 'function adjust') && str_contains($inventory, 'Csrf::requirePost()'), 'inventory adjust is POST+CSRF');
+check(str_contains($inventory, 'Auth::canWrite($user)') && str_contains($inventory, 'function adjust'), 'inventory adjust also requires canWrite');
 
 $catalogCsv = (string) file_get_contents($root . '/app/Controllers/CatalogCsvController.php');
 check(str_contains($catalogCsv, 'Auth::canWrite($user)'), 'catalog csv requires canWrite (owner/manager)');

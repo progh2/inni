@@ -5,6 +5,8 @@ use Inni\Budget;
 use Inni\InventoryBudget;
 use Inni\Support;
 
+/** @var array<string, array<string, mixed>> $adjustments */
+
 /** @var list<array<string, mixed>> $checks */
 /** @var list<array<string, mixed>> $aggregates */
 /** @var list<array<string, mixed>> $lines */
@@ -24,7 +26,7 @@ $csvQuery = InventoryBudget::query($filters);
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('inventory')) ?>">← 실사</a></p>
 <h1>사업예산 실사</h1>
-<p class="muted">종료·진행 중 실사를 사업명·예산연도로 거릅니다. 장부는 실사 시작 수량, 실물은 확인이면 장부와 같고 미확인이면 0입니다. 수량 재입력·장부 보정은 없습니다.</p>
+<p class="muted">종료·진행 중 실사를 사업명·예산연도로 거릅니다. 장부는 실사 시작 수량, 실물은 확인이면 장부와 같고 미확인이면 0입니다. 종료된 실사의 미확인 차이는 아래에서 사유·승인자로 장부 보정할 수 있습니다.</p>
 
 <div class="stats" style="margin:1rem 0">
   <a class="stat" href="<?= Support::e(App::url('inventory/report', $filterQuery(['diff' => 'all']))) ?>">
@@ -163,6 +165,14 @@ $csvQuery = InventoryBudget::query($filters);
                   <?php if (!empty($line['code'])): ?> · <?= Support::e((string) $line['code']) ?><?php endif; ?>
                   <?php if (!empty($line['unit'])): ?> · <?= Support::e((string) $line['unit']) ?><?php endif; ?>
                 </div>
+                <?php if (!empty($line['is_missing']) && ($line['check_status'] ?? '') === 'done'): ?>
+                  <?php
+                    $adjustment = ($adjustments ?? [])[$line['id']] ?? null;
+                    $returnTo = 'report';
+                    $returnQuery = InventoryBudget::query($filters);
+                    require dirname(__DIR__) . '/partials/inventory_adjust.php';
+                  ?>
+                <?php endif; ?>
               </td>
               <td>
                 <?= Support::e((string) ($line['check_location_name'] ?? '')) ?>

@@ -710,6 +710,168 @@ $invFinishGet = invokeInventoryAction('finish', 'GET', [
 ], $sessionToken, true);
 check($invFinishGet['status'] === 405 && $invFinishGet['active'] === 1, 'GET must be rejected for inventory finish');
 
+function invokeAdjustRetire(string $class, string $methodName, string $httpMethod, array $post, ?string $sessionToken, string $mode): array
+{
+    $root = dirname(__DIR__);
+    $tmp = sys_get_temp_dir() . '/inni-csrf-adj-' . bin2hex(random_bytes(4));
+    mkdir($tmp, 0700);
+    $dbPath = $tmp . '/inni.sqlite';
+    $runner = $tmp . '/run.php';
+    $resultFile = $tmp . '/result.json';
+    $payload = [
+        'root' => $root,
+        'db' => $dbPath,
+        'class' => $class,
+        'method_name' => $methodName,
+        'method' => $httpMethod,
+        'post' => $post,
+        'csrf' => $sessionToken,
+        'mode' => $mode,
+        'result' => $resultFile,
+    ];
+    file_put_contents($tmp . '/payload.json', json_encode($payload, JSON_THROW_ON_ERROR));
+    file_put_contents($runner, <<<'PHP'
+<?php
+declare(strict_types=1);
+$p = json_decode(file_get_contents(__DIR__ . '/payload.json'), true, 512, JSON_THROW_ON_ERROR);
+require $p['root'] . '/app/bootstrap.php';
+
+use Inni\App;
+use Inni\Csrf;
+use Inni\Inventory;
+
+$ref = new ReflectionClass(App::class);
+$rootProp = $ref->getProperty('root');
+$rootProp->setAccessible(true);
+$rootProp->setValue(null, $p['root']);
+$configProp = $ref->getProperty('config');
+$configProp->setAccessible(true);
+$configProp->setValue(null, [
+    'app_name' => 'inni',
+    'school_name' => 'csrf-test',
+    'timezone' => 'UTC',
+    'demo_login' => true,
+    'session_name' => 'inni_csrf_adj_test',
+    'base_url' => 'http://localhost',
+    'db_path' => $p['db'],
+]);
+
+$_SERVER['REQUEST_METHOD'] = $p['method'];
+$_POST = $p['post'];
+$_FILES = [];
+$_SESSION = ['user_id' => 'demo-owner'];
+if (is_string($p['csrf'])) {
+    $_SESSION[Csrf::SESSION_KEY] = $p['csrf'];
+}
+
+$pdo = \Inni\Database::pdo();
+if ($p['mode'] === 'adjust') {
+    $actor = ['id' => 'demo-owner', 'display_name' => '김담당', 'role' => 'owner', 'status' => 'active'];
+    $check = Inventory::start($pdo, $actor, 'loc-elec');
+    Inventory::finish($pdo, $actor, (string) $check['id']);
+    $lineId = $pdo->query(
+        "SELECT id FROM inventory_check_lines WHERE check_id = " . $pdo->quote($check['id']) . " AND kind = 'item' LIMIT 1"
+    )->fetchColumn();
+    if (empty($_POST['line_id'])) {
+        $_POST['line_id'] = (string) $lineId;
+    }
+    if (empty($_POST['check_id'])) {
+        $_POST['check_id'] = (string) $check['id'];
+    }
+}
+
+register_shutdown_function(static function () use ($p): void {
+    $qty = null;
+    $adjusts = 0;
+    $retired = 0;
+    $status = null;
+    if (is_file($p['db'])) {
+        $pdo = new PDO('sqlite:' . $p['db']);
+        $qty = $pdo->query("SELECT quantity FROM stock_lots WHERE id = 'lot-solder'")->fetchColumn();
+        $adjusts = (int) $pdo->query('SELECT COUNT(*) FROM inventory_adjustments')->fetchColumn();
+        $retired = (int) $pdo->query('SELECT COUNT(*) FROM asset_retirements')->fetchColumn();
+        $status = $pdo->query("SELECT status FROM assets WHERE id = 'ast-dmm-1'")->fetchColumn();
+    }
+    file_put_contents($p['result'], json_encode([
+        'status' => http_response_code(),
+        'quantity' => $qty === false ? null : (is_numeric($qty) ? (float) $qty : $qty),
+        'adjusts' => $adjusts,
+        'retired' => $retired,
+        'asset_status' => $status === false ? null : $status,
+        'body' => (string) ob_get_contents(),
+    ], JSON_UNESCAPED_UNICODE));
+});
+
+ob_start();
+$controller = new $p['class']();
+$controller->{$p['method_name']}();
+PHP);
+
+    exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($runner) . ' 2>' . escapeshellarg($tmp . '/stderr.txt'));
+    $raw = is_file($resultFile) ? (string) file_get_contents($resultFile) : '';
+    $stderr = is_file($tmp . '/stderr.txt') ? (string) file_get_contents($tmp . '/stderr.txt') : '';
+    $decoded = json_decode($raw, true);
+    foreach (glob($tmp . '/*') ?: [] as $file) {
+        @unlink($file);
+    }
+    @rmdir($tmp);
+    if (!is_array($decoded)) {
+        throw new RuntimeException('Adjust/retire harness failed: ' . $raw . $stderr);
+    }
+    return $decoded;
+}
+
+$adjOk = invokeAdjustRetire('Inni\\Controllers\\InventoryController', 'adjust', 'POST', [
+    'csrf_token' => $sessionToken,
+    'physical_qty' => '0',
+    'reason' => '실사 미확인',
+    'approver_name' => '김담당',
+], $sessionToken, 'adjust');
+check(($adjOk['status'] === 302 || $adjOk['status'] === 200) && $adjOk['adjusts'] === 1 && (float) $adjOk['quantity'] === 0.0, 'Valid CSRF should adjust a missing line');
+
+$adjBad = invokeAdjustRetire('Inni\\Controllers\\InventoryController', 'adjust', 'POST', [
+    'csrf_token' => 'wrong-token',
+    'physical_qty' => '0',
+    'reason' => '실사 미확인',
+    'approver_name' => '김담당',
+], $sessionToken, 'adjust');
+check($adjBad['status'] === 403 && $adjBad['adjusts'] === 0 && (float) $adjBad['quantity'] === 18.0, 'Bad CSRF must fail closed without adjusting');
+
+$adjGet = invokeAdjustRetire('Inni\\Controllers\\InventoryController', 'adjust', 'GET', [
+    'csrf_token' => $sessionToken,
+    'physical_qty' => '0',
+    'reason' => '실사 미확인',
+    'approver_name' => '김담당',
+], $sessionToken, 'adjust');
+check($adjGet['status'] === 405 && $adjGet['adjusts'] === 0 && (float) $adjGet['quantity'] === 18.0, 'GET must be rejected for inventory adjust');
+
+$retOk = invokeAdjustRetire('Inni\\Controllers\\AssetController', 'retire', 'POST', [
+    'csrf_token' => $sessionToken,
+    'asset_id' => 'ast-dmm-1',
+    'reason' => '내용연한 만료',
+    'retired_on' => '2026-09-15',
+    'confirm_irreversible' => '1',
+], $sessionToken, 'retire');
+check(($retOk['status'] === 302 || $retOk['status'] === 200) && $retOk['retired'] === 1 && $retOk['asset_status'] === 'retired', 'Valid CSRF should retire an asset');
+
+$retBad = invokeAdjustRetire('Inni\\Controllers\\AssetController', 'retire', 'POST', [
+    'csrf_token' => 'wrong-token',
+    'asset_id' => 'ast-dmm-1',
+    'reason' => '내용연한 만료',
+    'retired_on' => '2026-09-15',
+    'confirm_irreversible' => '1',
+], $sessionToken, 'retire');
+check($retBad['status'] === 403 && $retBad['retired'] === 0 && $retBad['asset_status'] === 'available', 'Bad CSRF must fail closed without retiring');
+
+$retGet = invokeAdjustRetire('Inni\\Controllers\\AssetController', 'retire', 'GET', [
+    'csrf_token' => $sessionToken,
+    'asset_id' => 'ast-dmm-1',
+    'reason' => '내용연한 만료',
+    'retired_on' => '2026-09-15',
+    'confirm_irreversible' => '1',
+], $sessionToken, 'retire');
+check($retGet['status'] === 405 && $retGet['retired'] === 0 && $retGet['asset_status'] === 'available', 'GET must be rejected for asset retire');
+
 function invokeCatalogCsvImport(string $httpMethod, array $post, ?string $sessionToken, ?string $csvBody): array
 {
     $root = dirname(__DIR__);

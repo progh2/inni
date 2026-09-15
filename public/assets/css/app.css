@@ -141,7 +141,7 @@ h1 { font-size: clamp(1.5rem, 3vw, 1.9rem); }
 }
 .badge.available { background: rgba(31,107,74,0.12); color: var(--ok); }
 .badge.on_loan, .badge.active { background: rgba(216,90,26,0.15); color: var(--accent); }
-.badge.overdue, .badge.lost, .badge.exceeded { background: rgba(161,29,46,0.12); color: var(--err); }
+.badge.overdue, .badge.lost, .badge.retired, .badge.exceeded { background: rgba(161,29,46,0.12); color: var(--err); }
 .badge.repair, .badge.in_progress, .badge.imminent { background: rgba(180,120,20,0.18); color: #7a4e00; }
 .badge.open { background: rgba(61,90,92,0.14); color: var(--steel); }
 .badge.done { background: rgba(31,107,74,0.12); color: var(--ok); }

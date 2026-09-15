@@ -147,6 +147,44 @@ final class Database
              ON inventory_check_lines(check_id, stock_lot_id)
              WHERE stock_lot_id IS NOT NULL'
         );
+        $pdo->exec(
+            'CREATE TABLE IF NOT EXISTS inventory_adjustments (
+              id TEXT PRIMARY KEY,
+              line_id TEXT NOT NULL UNIQUE REFERENCES inventory_check_lines(id) ON DELETE CASCADE,
+              check_id TEXT NOT NULL REFERENCES inventory_checks(id) ON DELETE CASCADE,
+              kind TEXT NOT NULL CHECK(kind IN (\'asset\',\'item\')),
+              asset_id TEXT REFERENCES assets(id),
+              catalog_item_id TEXT REFERENCES catalog_items(id),
+              stock_lot_id TEXT,
+              book_qty REAL NOT NULL,
+              physical_qty REAL NOT NULL,
+              reason TEXT NOT NULL,
+              approver_name TEXT NOT NULL,
+              actor_id TEXT,
+              actor_name TEXT NOT NULL,
+              created_at TEXT NOT NULL
+            )'
+        );
+        $pdo->exec(
+            'CREATE INDEX IF NOT EXISTS idx_inventory_adjustments_check
+             ON inventory_adjustments(check_id, created_at)'
+        );
+        $pdo->exec(
+            'CREATE TABLE IF NOT EXISTS asset_retirements (
+              id TEXT PRIMARY KEY,
+              asset_id TEXT NOT NULL UNIQUE REFERENCES assets(id),
+              reason TEXT NOT NULL,
+              retired_on TEXT NOT NULL,
+              evidence_path TEXT,
+              actor_id TEXT,
+              actor_name TEXT NOT NULL,
+              created_at TEXT NOT NULL
+            )'
+        );
+        $pdo->exec(
+            'CREATE INDEX IF NOT EXISTS idx_asset_retirements_on
+             ON asset_retirements(retired_on, created_at)'
+        );
     }
 
     /**
