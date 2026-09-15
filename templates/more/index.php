@@ -23,6 +23,11 @@ use Inni\Support;
       <div class="title">내 대여함</div>
     </a>
   <?php endif; ?>
+  <?php if (Auth::canWrite($user)): ?>
+    <a class="list-row" href="<?= Support::e(App::url('reports')) ?>">
+      <div class="title">수리 대기</div>
+    </a>
+  <?php endif; ?>
   <a class="list-row" href="<?= Support::e(App::url('loans')) ?>">
     <div class="title">대여 현황</div>
   </a>

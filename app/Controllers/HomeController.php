@@ -9,6 +9,7 @@ use Inni\Auth;
 use Inni\Database;
 use Inni\Inventory;
 use Inni\Loan;
+use Inni\Report;
 use Inni\Telegram;
 use Inni\View;
 
@@ -29,7 +30,7 @@ final class HomeController
              LIMIT 8"
         )->fetchAll();
 
-        $openReports = (int) $pdo->query("SELECT COUNT(*) FROM reports WHERE status = 'open'")->fetchColumn();
+        $openReports = Report::openCount($pdo);
         $assetCount = (int) $pdo->query('SELECT COUNT(*) FROM assets')->fetchColumn();
         $roomCount = (int) $pdo->query("SELECT COUNT(*) FROM locations WHERE kind = 'room'")->fetchColumn();
         $lowStock = Alert::listLowStock($pdo, 6);

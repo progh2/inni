@@ -171,32 +171,43 @@ $lifeLabel = AssetLife::format(
 <?php endif; ?>
 
 <div class="card">
-  <h2 class="section-title" style="margin-top:0">고장 · 이상 신고</h2>
-  <form method="post" action="<?= Support::e(App::url('assets/report')) ?>" enctype="multipart/form-data">
-    <?= Csrf::field() ?>
-    <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
-    <div class="field">
-      <label>제목</label>
-      <input name="title" required placeholder="전원 안 켜짐">
-    </div>
-    <div class="field">
-      <label>내용</label>
-      <textarea name="body" rows="3" required></textarea>
-    </div>
-    <div class="field">
-      <label>사진</label>
-      <input type="file" name="photo" accept="image/*" capture="environment">
-    </div>
-    <button class="btn btn-ghost" type="submit">신고</button>
-  </form>
+  <h2 class="section-title" style="margin-top:0">수리 요청</h2>
+  <?php if (Auth::canLoan($user) && !in_array($asset['status'], ['lost', 'retired'], true)): ?>
+    <form method="post" action="<?= Support::e(App::url('assets/report')) ?>" enctype="multipart/form-data">
+      <?= Csrf::field() ?>
+      <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
+      <div class="field">
+        <label>증상</label>
+        <textarea name="body" rows="3" required placeholder="전원 안 켜짐, 화면이 깜빡임 등"></textarea>
+      </div>
+      <div class="field">
+        <label>사진 (선택)</label>
+        <input type="file" name="photo" accept="image/*" capture="environment">
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">수리 요청</button>
+    </form>
+  <?php elseif (Auth::canLoan($user)): ?>
+    <p class="muted">폐기·분실 장비는 수리 요청할 수 없습니다.</p>
+  <?php endif; ?>
   <?php foreach ($reports as $r): ?>
     <div class="list-row">
       <div>
-        <div class="title"><?= Support::e($r['title']) ?></div>
-        <div class="meta"><?= Support::e(Support::statusLabel($r['status'])) ?> · <?= Support::e(Support::formatWhen($r['created_at'])) ?></div>
+        <?php if (Auth::canWrite($user)): ?>
+          <a class="title" href="<?= Support::e(App::url('reports/show', ['id' => $r['id']])) ?>"><?= Support::e($r['title']) ?></a>
+        <?php else: ?>
+          <div class="title"><?= Support::e($r['title']) ?></div>
+        <?php endif; ?>
+        <div class="meta"><?= Support::e(Support::statusLabel($r['status'])) ?> · <?= Support::e($r['reporter_name']) ?> · <?= Support::e(Support::formatWhen($r['created_at'])) ?></div>
       </div>
+      <span class="badge <?= Support::e($r['status']) ?>"><?= Support::e(Support::statusLabel($r['status'])) ?></span>
     </div>
+    <?php
+      $report = $r;
+      $returnTo = 'asset';
+      require dirname(__DIR__) . '/partials/report_status.php';
+    ?>
   <?php endforeach; ?>
+  <?php if (!$reports): ?><p class="muted">아직 수리 요청이 없습니다.</p><?php endif; ?>
 </div>
 
 <div class="card">

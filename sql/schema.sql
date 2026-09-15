@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS reports (
   title TEXT NOT NULL,
   body TEXT NOT NULL,
   image_path TEXT,
-  status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','in_progress','done')),
+  status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','in_progress','done','rejected')),
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -196,6 +196,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_loans_one_open_asset
   WHERE asset_id IS NOT NULL AND status IN ('active','overdue');
 CREATE INDEX IF NOT EXISTS idx_logs_entity ON activity_logs(entity_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
+CREATE INDEX IF NOT EXISTS idx_reports_target ON reports(target_type, target_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_inventory_checks_one_active
   ON inventory_checks(status)
   WHERE status = 'active';

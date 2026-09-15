@@ -89,6 +89,7 @@ final class Database
             'CREATE INDEX IF NOT EXISTS idx_stock_issue_cancels_item
              ON stock_issue_cancels(catalog_item_id, created_at)'
         );
+        self::ensureReportsRejectedStatus($pdo);
         $pdo->exec(
             'CREATE TABLE IF NOT EXISTS alert_dispatches (
               event_key TEXT NOT NULL,
@@ -170,5 +171,58 @@ final class Database
             }
         }
         $pdo->exec('ALTER TABLE ' . $table . ' ADD COLUMN ' . $column . ' ' . $type);
+    }
+
+    /**
+     * Existing DBs created before #46 only allow open/in_progress/done.
+     * SQLite cannot ALTER a CHECK, so rebuild when `rejected` is missing.
+     */
+    private static function ensureReportsRejectedStatus(PDO $pdo): void
+    {
+        $exists = $pdo->query(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'reports'"
+        )->fetchColumn();
+        if ($exists === false || $exists === null) {
+            return;
+        }
+        $sql = $pdo->query(
+            "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'reports'"
+        )->fetchColumn();
+        if (is_string($sql) && str_contains($sql, "'rejected'")) {
+            $pdo->exec('CREATE INDEX IF NOT EXISTS idx_reports_target ON reports(target_type, target_id)');
+            return;
+        }
+
+        $pdo->exec('PRAGMA foreign_keys = OFF');
+        try {
+            $pdo->exec(
+                "CREATE TABLE reports__new (
+                  id TEXT PRIMARY KEY,
+                  target_type TEXT NOT NULL CHECK(target_type IN ('room','asset')),
+                  target_id TEXT NOT NULL,
+                  reporter_user_id TEXT REFERENCES users(id),
+                  reporter_name TEXT NOT NULL,
+                  title TEXT NOT NULL,
+                  body TEXT NOT NULL,
+                  image_path TEXT,
+                  status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','in_progress','done','rejected')),
+                  created_at TEXT NOT NULL,
+                  updated_at TEXT NOT NULL
+                )"
+            );
+            $pdo->exec(
+                'INSERT INTO reports__new(
+                    id,target_type,target_id,reporter_user_id,reporter_name,title,body,image_path,status,created_at,updated_at
+                 )
+                 SELECT id,target_type,target_id,reporter_user_id,reporter_name,title,body,image_path,status,created_at,updated_at
+                 FROM reports'
+            );
+            $pdo->exec('DROP TABLE reports');
+            $pdo->exec('ALTER TABLE reports__new RENAME TO reports');
+            $pdo->exec('CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status)');
+            $pdo->exec('CREATE INDEX IF NOT EXISTS idx_reports_target ON reports(target_type, target_id)');
+        } finally {
+            $pdo->exec('PRAGMA foreign_keys = ON');
+        }
     }
 }

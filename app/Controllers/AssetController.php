@@ -14,6 +14,7 @@ use Inni\Database;
 use Inni\Loan;
 use Inni\Logger;
 use Inni\PpsUsefulLife;
+use Inni\Report;
 use Inni\Support;
 use Inni\Uploader;
 use Inni\View;
@@ -70,10 +71,15 @@ final class AssetController
         }
 
         $logs = $pdo->prepare(
-            'SELECT * FROM activity_logs WHERE entity_id = ? OR (entity_type = ? AND entity_id IN (SELECT id FROM loans WHERE asset_id = ?))
-             ORDER BY created_at DESC LIMIT 20'
+            "SELECT * FROM activity_logs
+             WHERE entity_id = ?
+                OR (entity_type = 'loan' AND entity_id IN (SELECT id FROM loans WHERE asset_id = ?))
+                OR (entity_type = 'report' AND entity_id IN (
+                    SELECT id FROM reports WHERE target_type = 'asset' AND target_id = ?
+                ))
+             ORDER BY created_at DESC LIMIT 20"
         );
-        $logs->execute([$id, 'loan', $id]);
+        $logs->execute([$id, $id, $id]);
         $logs = $logs->fetchAll();
 
         $reports = $pdo->prepare(
@@ -182,12 +188,16 @@ final class AssetController
     public function report(): void
     {
         $user = Auth::requireLogin();
+        if (!Auth::canLoan($user)) {
+            App::flash('error', '수리 요청 권한이 없습니다.');
+            App::redirect('home');
+        }
         Csrf::requirePost();
         $assetId = (string) ($_POST['asset_id'] ?? '');
-        $title = trim((string) ($_POST['title'] ?? ''));
-        $body = trim((string) ($_POST['body'] ?? ''));
-        if ($title === '' || $body === '') {
-            App::flash('error', '제목과 내용을 입력하세요.');
+        $symptom = trim((string) ($_POST['body'] ?? ''));
+        $title = trim((string) ($_POST['title'] ?? '')) ?: null;
+        if ($symptom === '') {
+            App::flash('error', '증상을 입력하세요.');
             App::redirect('assets/show', ['id' => $assetId]);
         }
         $imagePath = null;
@@ -199,17 +209,15 @@ final class AssetController
             App::flash('error', $e->getMessage());
             App::redirect('assets/show', ['id' => $assetId]);
         }
-        $id = Support::id('rep');
-        $t = Support::now();
-        Database::pdo()->prepare(
-            'INSERT INTO reports(id,target_type,target_id,reporter_user_id,reporter_name,title,body,image_path,status,created_at,updated_at)
-             VALUES(?,?,?,?,?,?,?,?,?,?,?)'
-        )->execute([
-            $id, 'asset', $assetId, $user['id'], $user['display_name'], $title, $body,
-            $imagePath, 'open', $t, $t,
-        ]);
-        Logger::write('report', 'report', $id, "고장 신고: {$title}");
-        App::flash('ok', '신고가 접수되었습니다.');
+        try {
+            Report::file(Database::pdo(), $user, $assetId, $symptom, $title, $imagePath);
+            App::flash('ok', '수리 요청이 접수되었습니다.');
+        } catch (\InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '수리 요청을 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
         App::redirect('assets/show', ['id' => $assetId]);
     }
 
