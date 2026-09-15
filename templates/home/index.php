@@ -1,6 +1,7 @@
 <?php
 
 use Inni\App;
+use Inni\Auth;
 use Inni\Support;
 ?>
 <h1>홈</h1>
@@ -21,8 +22,35 @@ use Inni\Support;
   <a class="btn btn-ghost" href="<?= Support::e(App::url('items/new')) ?>">빠른 등록</a>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('assets')) ?>">기자재 현황</a>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('materials')) ?>">실험실습재료</a>
+  <?php if (Auth::canLoan($user)): ?>
+    <a class="btn btn-ghost" href="<?= Support::e(App::url('loans/mine')) ?>">내 대여함</a>
+  <?php endif; ?>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('loans')) ?>">대여 현황</a>
 </div>
+
+<?php if (Auth::canLoan($user)): ?>
+<div class="card">
+  <a class="list-row<?= !empty($myOverdueCount) ? ' is-overdue' : '' ?>" href="<?= Support::e(App::url('loans/mine')) ?>">
+    <div>
+      <div class="title">내 대여함</div>
+      <div class="meta">
+        <?php if (!$myLoans): ?>
+          내가 빌린 진행 중 대여가 없습니다.
+        <?php elseif (!empty($myOverdueCount)): ?>
+          연체 <?= (int) $myOverdueCount ?>건 · 진행 <?= count($myLoans) ?>건
+        <?php else: ?>
+          진행 <?= count($myLoans) ?>건
+        <?php endif; ?>
+      </div>
+    </div>
+    <?php if (!empty($myOverdueCount)): ?>
+      <span class="badge overdue">연체</span>
+    <?php else: ?>
+      <span class="badge active">내 대여</span>
+    <?php endif; ?>
+  </a>
+</div>
+<?php endif; ?>
 
 <?php if (!empty($activeCheck)): ?>
 <div class="card">

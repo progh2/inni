@@ -221,6 +221,11 @@ check(str_contains($more, 'Auth::canConfigureAlerts($user)') && str_contains($mo
 check(str_contains($more, '!empty($aiReady)'), 'more menu hides AI helper when not connected');
 check(str_contains($more, '재료·품목 목록') && str_contains($more, "App::url('items')"), 'more menu links to 재료·품목 목록');
 check(str_contains($more, '기자재 현황') && str_contains($more, "App::url('assets')"), 'more menu links to 기자재 현황');
+check(str_contains($more, '내 대여함') && str_contains($more, 'Auth::canLoan($user)'), 'more menu gates 내 대여함 on canLoan');
+
+$loanCtl = (string) file_get_contents($root . '/app/Controllers/LoanController.php');
+check(str_contains($loanCtl, 'function mine') && str_contains($loanCtl, 'Auth::requireLogin()'), 'loan inbox requires login');
+check(str_contains($loanCtl, 'Auth::canReturn($user)') && str_contains($loanCtl, 'Csrf::requirePost()'), 'loan return keeps canReturn and POST+CSRF');
 
 $settings = (string) file_get_contents($root . '/app/Controllers/SettingsController.php');
 check(str_contains($settings, 'Auth::canConfigureAlerts($user)'), 'telegram settings allow owner/manager');

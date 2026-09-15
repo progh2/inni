@@ -31,18 +31,34 @@ final class LoanController
         View::render('loans/index', compact('loans'));
     }
 
+    public function mine(): void
+    {
+        $user = Auth::requireLogin();
+        $pdo = Database::pdo();
+        Alert::refreshOverdue($pdo);
+
+        $loans = Loan::inboxForUser($pdo, (string) ($user['id'] ?? ''));
+        $recentReturns = Loan::recentReturnsForUser($pdo, (string) ($user['id'] ?? ''));
+
+        View::render('loans/mine', compact('user', 'loans', 'recentReturns'));
+    }
+
     public function returnLoan(): void
     {
         $user = Auth::requireLogin();
+        $after = self::returnToRoute();
         if (!Auth::canReturn($user)) {
             App::flash('error', '반납 권한이 없습니다.');
-            App::redirect('loans');
+            App::redirect($after);
         }
         Csrf::requirePost();
         $loanId = (string) ($_POST['loan_id'] ?? '');
         try {
             $assetId = Loan::checkin(Database::pdo(), $user, $loanId);
             App::flash('ok', '반납 처리되었습니다.');
+            if ($after === 'loans/mine') {
+                App::redirect('loans/mine');
+            }
             if ($assetId) {
                 App::redirect('assets/show', ['id' => $assetId]);
             }
@@ -52,6 +68,12 @@ final class LoanController
             error_log((string) $e);
             App::flash('error', '반납을 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
         }
-        App::redirect('loans');
+        App::redirect($after);
+    }
+
+    /** Allowlisted post-return landing. Default stays the school-wide list. */
+    private static function returnToRoute(): string
+    {
+        return (string) ($_POST['return_to'] ?? '') === 'mine' ? 'loans/mine' : 'loans';
     }
 }
