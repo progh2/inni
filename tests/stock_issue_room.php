@@ -60,7 +60,7 @@ reject(static fn () => Stock::parseClassMemo(str_repeat('가', 201)), memoryDb()
 $pdo = memoryDb();
 $pdo->exec("INSERT INTO locations(id,name,kind,parent_id,qr_code,created_at,updated_at) VALUES('bldg','실습동','building',null,'LOC:bldg','t','t')");
 $pdo->exec("INSERT INTO locations(id,name,kind,parent_id,code,qr_code,created_at,updated_at) VALUES('elec','전자실습실','room','bldg','E-201','LOC:elec','t','t')");
-$pdo->exec("INSERT INTO locations(id,name,kind,parent_id,qr_code,created_at,updated_at) VALUES('cab','계측기 캐비닛','storage','elec',null,'LOC:cab','t','t')");
+$pdo->exec("INSERT INTO locations(id,name,kind,parent_id,code,qr_code,created_at,updated_at) VALUES('cab','계측기 캐비닛','storage','elec',null,'LOC:cab','t','t')");
 $pdo->exec("INSERT INTO locations(id,name,kind,parent_id,code,qr_code,created_at,updated_at) VALUES('weld','용접실','room','bldg','W-103','LOC:weld','t','t')");
 $pdo->prepare('INSERT INTO catalog_items(id,name,type,unit,min_stock,qr_code,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)')
     ->execute(['solder', '납땜', 'consumable', 'm', 5, 'CAT:solder', 't', 't']);
