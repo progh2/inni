@@ -3,6 +3,7 @@
 use Inni\App;
 use Inni\AssetBoard;
 use Inni\AssetLife;
+use Inni\Auth;
 use Inni\Budget;
 use Inni\Support;
 
@@ -40,6 +41,9 @@ $budgetYear = isset($filters['budget_year']) && $filters['budget_year'] !== null
 ?>
 <h1>기자재 현황</h1>
 <p class="muted">검색 없이 전체 장비를 훑습니다. 상태·실·연체·사업예산으로 거를 수 있습니다.</p>
+<?php if (Auth::canWrite($user ?? Auth::user())): ?>
+  <p class="muted"><a href="<?= Support::e(App::url('assets/aging')) ?>">내용연한 임박·초과 보기</a></p>
+<?php endif; ?>
 
 <div class="stats" style="margin:1rem 0">
   <a class="stat" href="<?= Support::e(App::url('assets')) ?>">

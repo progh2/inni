@@ -7,6 +7,7 @@ namespace Inni\Controllers;
 use Inni\Alert;
 use Inni\App;
 use Inni\Asset;
+use Inni\AssetAging;
 use Inni\AssetBoard;
 use Inni\Auth;
 use Inni\Csrf;
@@ -33,6 +34,21 @@ final class AssetController
         $summary = AssetBoard::summary($pdo);
 
         View::render('assets/index', compact('assets', 'rooms', 'filters', 'summary'));
+    }
+
+    public function aging(): void
+    {
+        $user = Auth::requireLogin();
+        if (!Auth::canWrite($user)) {
+            App::flash('error', '연한 보드는 담당교사만 볼 수 있습니다.');
+            App::redirect('more');
+        }
+
+        $filters = AssetAging::filtersFromRequest($_GET);
+        $assets = AssetAging::list(Database::pdo(), $filters);
+        $summary = AssetAging::summary(Database::pdo());
+
+        View::render('assets/aging', compact('user', 'assets', 'filters', 'summary'));
     }
 
     public function show(): void

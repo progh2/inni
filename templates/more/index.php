@@ -12,6 +12,14 @@ use Inni\Support;
   <a class="list-row" href="<?= Support::e(App::url('assets')) ?>">
     <div class="title">기자재 현황</div>
   </a>
+  <?php if (Auth::canWrite($user)): ?>
+    <a class="list-row" href="<?= Support::e(App::url('assets/aging')) ?>">
+      <div>
+        <div class="title">연한·노후 기자재</div>
+        <div class="meta">내용연한 임박·초과</div>
+      </div>
+    </a>
+  <?php endif; ?>
   <a class="list-row" href="<?= Support::e(App::url('materials')) ?>">
     <div class="title">실험실습재료 현황</div>
   </a>

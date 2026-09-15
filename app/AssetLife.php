@@ -16,6 +16,13 @@ final class AssetLife
     public const YEARS_MIN = 1;
     public const YEARS_MAX = 100;
 
+    public const BAND_DUE = 'due';
+    public const BAND_OVER = 'over';
+    public const BAND_OK = 'ok';
+
+    /** Calendar days before expiry that count as 임박 (inclusive of today and the horizon). */
+    public const IMMINENT_DAYS = 365;
+
     public static function parsePurchaseDate(mixed $value): ?string
     {
         if ($value === null) {
@@ -108,5 +115,84 @@ final class AssetLife
             $parts[] = '만료 예정 ' . $expiry;
         }
         return implode(' · ', $parts);
+    }
+
+    /**
+     * Classify useful life: 초과 (past expiry), 임박 (today through +IMMINENT_DAYS), 잔여, or null.
+     */
+    public static function band(?string $purchaseDate, mixed $years, ?string $onDate = null): ?string
+    {
+        $expiry = self::expiryDate($purchaseDate, $years);
+        if ($expiry === null) {
+            return null;
+        }
+        $today = self::normalizeOnDate($onDate);
+        if ($expiry < $today) {
+            return self::BAND_OVER;
+        }
+        $horizon = self::horizonDate($today);
+        if ($expiry <= $horizon) {
+            return self::BAND_DUE;
+        }
+        return self::BAND_OK;
+    }
+
+    public static function daysUntilExpiry(?string $purchaseDate, mixed $years, ?string $onDate = null): ?int
+    {
+        $expiry = self::expiryDate($purchaseDate, $years);
+        if ($expiry === null) {
+            return null;
+        }
+        $today = DateTimeImmutable::createFromFormat('!Y-m-d', self::normalizeOnDate($onDate));
+        $end = DateTimeImmutable::createFromFormat('!Y-m-d', $expiry);
+        if ($today === false || $end === false) {
+            return null;
+        }
+        return (int) $today->diff($end)->format('%r%a');
+    }
+
+    public static function bandLabel(string $band): string
+    {
+        return match ($band) {
+            self::BAND_DUE => '임박',
+            self::BAND_OVER => '초과',
+            self::BAND_OK => '잔여',
+            default => $band,
+        };
+    }
+
+    public static function formatRemaining(?int $days): string
+    {
+        if ($days === null) {
+            return '';
+        }
+        if ($days < 0) {
+            return '초과 ' . abs($days) . '일';
+        }
+        if ($days === 0) {
+            return '오늘 만료';
+        }
+        return '잔여 ' . $days . '일';
+    }
+
+    public static function normalizeOnDate(?string $onDate): string
+    {
+        $text = $onDate !== null ? trim($onDate) : '';
+        if ($text !== '') {
+            $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', $text);
+            if ($parsed !== false) {
+                return $parsed->format('Y-m-d');
+            }
+        }
+        return (new DateTimeImmutable('today'))->format('Y-m-d');
+    }
+
+    public static function horizonDate(string $onDate): string
+    {
+        $start = DateTimeImmutable::createFromFormat('!Y-m-d', self::normalizeOnDate($onDate));
+        if ($start === false) {
+            $start = new DateTimeImmutable('today');
+        }
+        return $start->modify('+' . self::IMMINENT_DAYS . ' days')->format('Y-m-d');
     }
 }

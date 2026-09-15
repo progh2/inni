@@ -65,6 +65,7 @@ final class Router
             'materials' => [MaterialController::class, 'index'],
 
             'assets' => [AssetController::class, 'index'],
+            'assets/aging' => [AssetController::class, 'aging'],
             'assets/show' => [AssetController::class, 'show'],
             'assets/loan' => [AssetController::class, 'loan'],
             'assets/move' => [AssetController::class, 'move'],

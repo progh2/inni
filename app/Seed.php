@@ -113,6 +113,19 @@ final class Seed
             $insAst->execute([$a[0], $a[1], $a[2], $a[3], $a[6], $a[5], $a[4], Support::qr('AST', $a[0]), $t, $t]);
         }
 
+        $today = new \DateTimeImmutable('today');
+        $lifeUpdates = [
+            'ast-cnc-1' => [$today->modify('-8 years')->format('Y-m-d'), 5],
+            'ast-weld-1' => [$today->modify('-6 years')->format('Y-m-d'), 5],
+            'ast-scope-1' => [$today->modify('-5 years')->modify('+90 days')->format('Y-m-d'), 5],
+            'ast-dmm-1' => [$today->modify('-5 years')->modify('+200 days')->format('Y-m-d'), 5],
+            'ast-drill-1' => [$today->modify('-1 year')->format('Y-m-d'), 5],
+        ];
+        $updLife = $pdo->prepare('UPDATE assets SET purchase_date = ?, useful_life_years = ? WHERE id = ?');
+        foreach ($lifeUpdates as $id => [$purchaseDate, $years]) {
+            $updLife->execute([$purchaseDate, $years, $id]);
+        }
+
         $lots = [
             ['lot-solder', 'ci-solder', 'loc-elec', 18, 'SN-2025-11', '2028-11-30'],
             ['lot-wire', 'ci-wire', 'loc-store', 12, 'W-2026-03', '2027-03-31'],

@@ -120,7 +120,8 @@ h1 { font-size: clamp(1.5rem, 3vw, 1.9rem); }
 .list-row .title { font-weight: 600; }
 .list-row .meta { font-size: 0.85rem; color: rgba(26,42,40,0.55); }
 .list-row.is-low-stock,
-.list-row.is-overdue {
+.list-row.is-overdue,
+.list-row.is-over {
   background: rgba(161,29,46,0.06);
   margin: 0 -1rem;
   padding-left: 1rem;
@@ -142,6 +143,8 @@ h1 { font-size: clamp(1.5rem, 3vw, 1.9rem); }
 .badge.cancelled { background: rgba(26,42,40,0.08); color: rgba(26,42,40,0.55); }
 .badge.confirmed { background: rgba(31,107,74,0.12); color: var(--ok); }
 .badge.unchecked { background: rgba(161,29,46,0.12); color: var(--err); }
+.badge.due { background: rgba(180,120,20,0.18); color: #7a4e00; }
+.badge.over { background: rgba(161,29,46,0.12); color: var(--err); }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;

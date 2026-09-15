@@ -204,6 +204,7 @@ $asset = (string) file_get_contents($root . '/app/Controllers/AssetController.ph
 check(str_contains($asset, 'Auth::canLoan($user)') && str_contains($asset, 'function loan'), 'asset loan requires canLoan');
 check(str_contains($asset, 'Auth::canLoan($user)') && str_contains($asset, 'function report'), 'asset repair request requires canLoan');
 check(str_contains($asset, 'Auth::canWrite($user)') && str_contains($asset, 'function photo'), 'asset photo requires canWrite');
+check(str_contains($asset, 'function aging') && str_contains($asset, 'Auth::canWrite($user)'), 'aging board requires canWrite');
 
 $reportCtl = (string) file_get_contents($root . '/app/Controllers/ReportController.php');
 check(str_contains($reportCtl, 'Auth::canWrite($user)') && str_contains($reportCtl, 'function index'), 'repair queue requires canWrite');
@@ -231,6 +232,7 @@ check(str_contains($more, '재료·품목 목록') && str_contains($more, "App::
 check(str_contains($more, '기자재 현황') && str_contains($more, "App::url('assets')"), 'more menu links to 기자재 현황');
 check(str_contains($more, '내 대여함') && str_contains($more, 'Auth::canLoan($user)'), 'more menu gates 내 대여함 on canLoan');
 check(str_contains($more, '수리 대기') && str_contains($more, 'Auth::canWrite($user)'), 'more menu gates 수리 대기 on canWrite');
+check(str_contains($more, '연한·노후 기자재') && str_contains($more, "App::url('assets/aging')"), 'more menu gates aging board on canWrite');
 
 $loanCtl = (string) file_get_contents($root . '/app/Controllers/LoanController.php');
 check(str_contains($loanCtl, 'function mine') && str_contains($loanCtl, 'Auth::requireLogin()'), 'loan inbox requires login');

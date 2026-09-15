@@ -37,7 +37,7 @@ check(!str_contains($more, "App::url('search')"), 'More must not replace the sea
 
 check(preg_match("/\\\$tabs = \\[\\s*\\['home', '홈'\\],\\s*\\['search', '찾기'\\],\\s*\\['scan', '스캔'\\],\\s*\\['rooms', '실'\\],\\s*\\['more', '더보기'\\],\\s*\\];/", $layout) === 1, 'Bottom nav stays 홈/찾기/스캔/실/더보기');
 check(substr_count($layout, "['home', '홈']") === 1 && substr_count($layout, "['more', '더보기']") === 1, 'Tab labels stay a single 5-tab set');
-check(str_contains($layout, "\$current === 'items' || \$current === 'assets' || \$current === 'materials'"), 'List/status screens keep the 더보기 tab active');
+check(str_contains($layout, "\$current === 'items' || \$current === 'assets' || \$current === 'assets/aging' || \$current === 'materials'"), 'List/status screens keep the 더보기 tab active');
 check(str_contains($layout, "\$current === 'loans' || str_starts_with(\$current, 'loans/')"), 'Loan inbox/list keep the 더보기 tab active');
 check(str_contains($layout, "\$current === 'reports' || str_starts_with(\$current, 'reports/')"), 'Repair queue keeps the 더보기 tab active');
 check(str_contains($more, '내 대여함'), 'More menu must expose 내 대여함');
@@ -55,6 +55,10 @@ check(str_contains($more, '사업예산 실사'), 'More menu must expose 사업�
 check(str_contains($more, "App::url('inventory/report')"), '사업예산 실사 must link to inventory/report');
 check(str_contains($more, 'Auth::canInventory($user)'), '사업예산 실사 is gated on canInventory');
 check(substr_count($more, "App::url('inventory/report')") === 1, 'More must not duplicate the inventory report link');
+check(str_contains($more, '연한·노후 기자재'), 'More menu must expose 연한·노후 기자재');
+check(str_contains($more, "App::url('assets/aging')"), '연한·노후 기자재 must link to assets/aging');
+check(str_contains($more, 'Auth::canWrite($user)'), '연한·노후 기자재 is gated on canWrite');
+check(substr_count($more, "App::url('assets/aging')") === 1, 'More must not duplicate the aging board link');
 check(!str_contains($layout, "str_starts_with(\$current, 'items/')"), 'Item detail/new must not steal the 더보기 tab');
 check(!str_contains($layout, "str_starts_with(\$current, 'assets/')"), 'Asset detail must not steal the 더보기 tab');
 
@@ -68,6 +72,7 @@ check(str_contains($router, "'assets' => [AssetController::class, 'index']"), 'a
 check(str_contains($router, "'materials' => [MaterialController::class, 'index']"), 'materials GET route is registered');
 check(str_contains($router, "'reports' => [ReportController::class, 'index']"), 'reports GET route is registered');
 check(str_contains($router, "'inventory/report' => [InventoryController::class, 'report']"), 'inventory/report GET route is registered');
+check(str_contains($router, "'assets/aging' => [AssetController::class, 'aging']"), 'assets/aging GET route is registered');
 
 check(str_contains($itemCtl, 'Catalog::list'), 'ItemController index keeps the #29 catalog list');
 check(str_contains($itemsTpl, '<h1>품목 목록</h1>'), 'items/index.php keeps the #29 list title');
