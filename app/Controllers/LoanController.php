@@ -59,6 +59,9 @@ final class LoanController
             if ($after === 'loans/mine') {
                 App::redirect('loans/mine');
             }
+            if ($after === 'loans/desk') {
+                App::redirect('loans/desk', $assetId ? ['id' => $assetId] : []);
+            }
             if ($assetId) {
                 App::redirect('assets/show', ['id' => $assetId]);
             }
@@ -74,6 +77,11 @@ final class LoanController
     /** Allowlisted post-return landing. Default stays the school-wide list. */
     private static function returnToRoute(): string
     {
-        return (string) ($_POST['return_to'] ?? '') === 'mine' ? 'loans/mine' : 'loans';
+        $to = (string) ($_POST['return_to'] ?? '');
+        return match ($to) {
+            'mine' => 'loans/mine',
+            'desk' => 'loans/desk',
+            default => 'loans',
+        };
     }
 }

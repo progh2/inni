@@ -19,6 +19,7 @@ final class Loan
         ?string $borrowerNote,
         ?string $purpose,
         ?string $dueAt,
+        ?string $borrowerUserId = null,
     ): string {
         if (!Auth::canLoan($actor) || ($actor['status'] ?? '') !== 'active') {
             throw new InvalidArgumentException('대여 권한이 없습니다.');
@@ -30,6 +31,22 @@ final class Loan
         }
 
         $borrowerName = trim($borrowerName);
+        $borrowerId = isset($actor['id']) && is_string($actor['id']) && $actor['id'] !== ''
+            ? $actor['id']
+            : null;
+
+        $borrowerUserId = self::nullableTrim($borrowerUserId);
+        if ($borrowerUserId !== null) {
+            $borrower = self::staffBorrower($pdo, $borrowerUserId);
+            if ($borrower === null) {
+                throw new InvalidArgumentException('빌리는 교사를 확인하세요.');
+            }
+            $borrowerId = (string) $borrower['id'];
+            if ($borrowerName === '') {
+                $borrowerName = trim((string) ($borrower['display_name'] ?? ''));
+            }
+        }
+
         if ($borrowerName === '') {
             $borrowerName = trim((string) ($actor['display_name'] ?? ''));
         }
@@ -67,7 +84,7 @@ final class Loan
                     'INSERT INTO loans(id,kind,asset_id,quantity,borrower_user_id,borrower_name,borrower_note,from_location_id,due_at,status,purpose,created_at,created_by)
                      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'
                 )->execute([
-                    $loanId, 'asset', $assetId, 1, $actor['id'] ?? null, $borrowerName, $borrowerNote,
+                    $loanId, 'asset', $assetId, 1, $borrowerId, $borrowerName, $borrowerNote,
                     $asset['location_id'], $dueAt, 'active', $purpose, $t, $actor['id'],
                 ]);
             } catch (PDOException $e) {
@@ -218,6 +235,22 @@ final class Loan
         );
         $stmt->execute([$userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Active owner/manager/teacher who can be named as the desk counterparty.
+     *
+     * @return array<string, mixed>|null
+     */
+    private static function staffBorrower(PDO $pdo, string $userId): ?array
+    {
+        $stmt = $pdo->prepare('SELECT id, display_name, role, status FROM users WHERE id = ?');
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!is_array($user) || !Auth::canLoan($user)) {
+            return null;
+        }
+        return $user;
     }
 
     private static function nullableTrim(?string $value): ?string

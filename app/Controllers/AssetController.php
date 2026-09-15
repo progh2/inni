@@ -11,6 +11,7 @@ use Inni\AssetBoard;
 use Inni\Auth;
 use Inni\Csrf;
 use Inni\Database;
+use Inni\Desk;
 use Inni\Loan;
 use Inni\Logger;
 use Inni\PpsUsefulLife;
@@ -127,12 +128,13 @@ final class AssetController
 
         $assetId = (string) ($_POST['asset_id'] ?? '');
         $borrowerName = trim((string) ($_POST['borrower_name'] ?? ''));
+        $borrowerUserId = trim((string) ($_POST['borrower_user_id'] ?? '')) ?: null;
         $borrowerNote = trim((string) ($_POST['borrower_note'] ?? '')) ?: null;
         $purpose = trim((string) ($_POST['purpose'] ?? '')) ?: null;
         $dueAt = trim((string) ($_POST['due_at'] ?? ''));
         $dueIso = $dueAt !== '' ? date('c', strtotime($dueAt)) : null;
 
-        if ($borrowerName === '') {
+        if ($borrowerName === '' && $borrowerUserId === null) {
             $borrowerName = $user['display_name'];
         }
 
@@ -145,13 +147,20 @@ final class AssetController
                 $borrowerNote,
                 $purpose,
                 $dueIso,
+                $borrowerUserId,
             );
+            if ($borrowerUserId !== null) {
+                Desk::rememberBorrower($borrowerUserId);
+            }
             App::flash('ok', '대여 처리되었습니다.');
         } catch (\InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());
         } catch (\Throwable $e) {
             error_log((string) $e);
             App::flash('error', '대여를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
+        if ((string) ($_POST['return_to'] ?? '') === 'desk') {
+            App::redirect('loans/desk', $assetId !== '' ? ['id' => $assetId] : []);
         }
         App::redirect('assets/show', ['id' => $assetId]);
     }

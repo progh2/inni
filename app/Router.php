@@ -7,6 +7,7 @@ namespace Inni;
 use Inni\Controllers\AssetController;
 use Inni\Controllers\AuthController;
 use Inni\Controllers\CatalogCsvController;
+use Inni\Controllers\DeskController;
 use Inni\Controllers\HomeController;
 use Inni\Controllers\InventoryController;
 use Inni\Controllers\ItemController;
@@ -74,6 +75,8 @@ final class Router
 
             'loans' => [LoanController::class, 'index'],
             'loans/mine' => [LoanController::class, 'mine'],
+            'loans/desk' => [DeskController::class, 'index'],
+            'loans/desk/resolve' => [DeskController::class, 'resolve'],
             'loans/return' => [LoanController::class, 'returnLoan'],
 
             'reports' => [ReportController::class, 'index'],

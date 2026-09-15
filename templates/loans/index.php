@@ -6,6 +6,11 @@ use Inni\Csrf;
 use Inni\Support;
 ?>
 <h1>대여 현황</h1>
+<?php if (Auth::canLoan($user ?? Auth::user())): ?>
+  <div class="actions" style="margin:1rem 0">
+    <a class="btn btn-primary" href="<?= Support::e(App::url('loans/desk')) ?>">대여 데스크</a>
+  </div>
+<?php endif; ?>
 <div class="card" style="margin-top:1rem">
   <?php foreach ($loans as $loan): ?>
     <div class="list-row">
