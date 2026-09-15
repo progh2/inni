@@ -98,7 +98,7 @@ final class Seed
             ['ast-scope-1', 'ci-scope', '오실로스코프 #1', '전장-2023-001', 'loc-elec-cab', 'available', null],
             ['ast-scope-2', 'ci-scope', '오실로스코프 #2', '전장-2023-002', 'loc-elec', 'on_loan', null],
             ['ast-dmm-1', 'ci-dmm', '멀티미터 #1', '전장-2024-017', 'loc-elec-cab', 'available', '87V-SN-1001'],
-            ['ast-dmm-2', 'ci-dmm', '멀티미터 #2', '전장-2024-018', 'loc-elec', 'available', null],
+            ['ast-dmm-2', 'ci-dmm', '멀티미터 #2', '전장-2024-018', 'loc-elec', 'on_loan', null],
             ['ast-cnc-1', 'ci-cnc', 'CNC 밀링 1호기', '기공-2021-001', 'loc-store', 'available', null],
             ['ast-weld-1', 'ci-welder', 'CO2 용접기 A', '용접-2022-004', 'loc-weld', 'repair', null],
             ['ast-torque-1', 'ci-torque', '토크렌치 1/2"', '자차-2024-009', 'loc-tool-b', 'available', null],
@@ -130,12 +130,15 @@ final class Seed
 
         $dueSoon = gmdate('c', time() + 4 * 3600);
         $duePast = gmdate('c', time() - 26 * 3600);
+        $returnedAt = gmdate('c', time() - 3 * 3600);
         $pdo->prepare(
-            'INSERT INTO loans(id,kind,asset_id,quantity,borrower_user_id,borrower_name,borrower_note,from_location_id,due_at,status,purpose,created_at,created_by)
-             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?,?,?,?,?)'
+            'INSERT INTO loans(id,kind,asset_id,quantity,borrower_user_id,borrower_name,borrower_note,from_location_id,due_at,returned_at,status,purpose,created_at,created_by)
+             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?,?,?,?,?,?), (?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
         )->execute([
-            'loan-1', 'asset', 'ast-scope-2', 1, $teacherId, '이수업', '2학년 전자회로', 'loc-elec', $dueSoon, 'active', '5교시 실습', $t, $teacherId,
-            'loan-2', 'asset', 'ast-drill-2', 1, null, '박학생', '3-2 / 프로젝트', 'loc-auto', $duePast, 'overdue', '야간자율 프로젝트', $t, $ownerId,
+            'loan-1', 'asset', 'ast-scope-2', 1, $teacherId, '이수업', '2학년 전자회로', 'loc-elec', $dueSoon, null, 'active', '5교시 실습', $t, $teacherId,
+            'loan-2', 'asset', 'ast-drill-2', 1, null, '박학생', '3-2 / 프로젝트', 'loc-auto', $duePast, null, 'overdue', '야간자율 프로젝트', $t, $ownerId,
+            'loan-3', 'asset', 'ast-dmm-2', 1, $teacherId, '이수업', '1학년 측정', 'loc-elec', $duePast, null, 'overdue', '방과후 계측', $t, $teacherId,
+            'loan-4', 'asset', 'ast-torque-1', 1, $teacherId, '이수업', '반납 이력', 'loc-tool-b', $dueSoon, $returnedAt, 'returned', '수업 시연', $t, $teacherId,
         ]);
 
         $pdo->prepare(

@@ -172,6 +172,54 @@ final class Loan
         return $assetId;
     }
 
+    /**
+     * Open loans for one borrower (`borrower_user_id`), overdue first.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public static function inboxForUser(PDO $pdo, string $userId): array
+    {
+        $userId = trim($userId);
+        if ($userId === '') {
+            return [];
+        }
+        $stmt = $pdo->prepare(
+            "SELECT l.*, a.name AS asset_name, a.management_number
+             FROM loans l
+             LEFT JOIN assets a ON a.id = l.asset_id
+             WHERE l.status IN ('active','overdue')
+               AND l.borrower_user_id = ?
+             ORDER BY CASE l.status WHEN 'overdue' THEN 0 ELSE 1 END, l.due_at ASC, l.created_at ASC"
+        );
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Recently closed loans for one borrower.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public static function recentReturnsForUser(PDO $pdo, string $userId, int $limit = 8): array
+    {
+        $userId = trim($userId);
+        if ($userId === '') {
+            return [];
+        }
+        $limit = max(1, min(20, $limit));
+        $stmt = $pdo->prepare(
+            "SELECT l.*, a.name AS asset_name, a.management_number
+             FROM loans l
+             LEFT JOIN assets a ON a.id = l.asset_id
+             WHERE l.status = 'returned'
+               AND l.borrower_user_id = ?
+             ORDER BY l.returned_at DESC, l.created_at DESC
+             LIMIT {$limit}"
+        );
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     private static function nullableTrim(?string $value): ?string
     {
         if ($value === null) {
