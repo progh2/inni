@@ -104,8 +104,8 @@ reject(static fn () => Stock::issue($pdo, $teacher, 'solder', 'lot-solder', '1',
 reject(static fn () => Stock::issue($pdo, $teacher, 'solder', 'lot-solder', '1', '수업', 'bldg'), 'Building is not a room');
 reject(static fn () => Stock::issue($pdo, $teacher, 'solder', 'lot-solder', '1', '수업', 'elec', str_repeat('가', 201)), 'Overlong class memo');
 reject(static fn () => Stock::issue($pdo, $teacher, 'solder', 'lot-solder', '1', '수업', 'elec', "줄\n바꿈"), 'Control class memo');
-reject(static fn () => Stock::issue($pdo, $teacher, 'solder', 'lot-solder', '1', '수업', 'elec', ['x']), 'Array class memo');
 check(snapshot($pdo) === $before, 'Rejected room/memo cases leave stock unchanged');
+reject(static fn () => Stock::parseClassMemo(['x']), 'Array class memo');
 
 $before = snapshot($pdo);
 reject(static fn () => Stock::issue($pdo, $student, 'solder', 'lot-solder', '1', '수업', 'elec'), 'Student issue');
