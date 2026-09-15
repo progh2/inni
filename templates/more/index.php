@@ -18,6 +18,11 @@ use Inni\Support;
   <a class="list-row" href="<?= Support::e(App::url('items/new')) ?>">
     <div class="title">빠른 등록</div>
   </a>
+  <?php if (Auth::canLoan($user)): ?>
+    <a class="list-row" href="<?= Support::e(App::url('loans/mine')) ?>">
+      <div class="title">내 대여함</div>
+    </a>
+  <?php endif; ?>
   <a class="list-row" href="<?= Support::e(App::url('loans')) ?>">
     <div class="title">대여 현황</div>
   </a>

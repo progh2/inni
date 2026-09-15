@@ -8,6 +8,7 @@ use Inni\Alert;
 use Inni\Auth;
 use Inni\Database;
 use Inni\Inventory;
+use Inni\Loan;
 use Inni\Telegram;
 use Inni\View;
 
@@ -39,9 +40,16 @@ final class HomeController
         )->fetchAll();
 
         $activeCheck = Auth::canInventory($user) ? Inventory::active($pdo) : null;
+        $myLoans = Auth::canLoan($user) ? Loan::listMine($pdo, (string) ($user['id'] ?? '')) : [];
+        $myOverdueCount = 0;
+        foreach ($myLoans as $loan) {
+            if (Loan::isOverdue($loan)) {
+                $myOverdueCount++;
+            }
+        }
 
         View::render('home/index', compact(
-            'user', 'activeLoans', 'openReports', 'assetCount', 'roomCount', 'lowStock', 'recent', 'activeCheck', 'telegramConnectNeeded'
+            'user', 'activeLoans', 'openReports', 'assetCount', 'roomCount', 'lowStock', 'recent', 'activeCheck', 'telegramConnectNeeded', 'myLoans', 'myOverdueCount'
         ));
     }
 }

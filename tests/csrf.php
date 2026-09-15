@@ -249,6 +249,7 @@ $forms = [
     'templates/rooms/index.php' => 'rooms/save',
     'templates/assets/show.php' => 'assets/loan',
     'templates/loans/index.php' => 'loans/return',
+    'templates/loans/mine.php' => 'loans/return',
     'templates/settings/index.php' => 'settings/save',
     'templates/settings/users.php' => 'settings/approve',
     'templates/partials/scan_input.php' => 'scan-manual-form',

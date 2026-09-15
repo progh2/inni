@@ -72,6 +72,7 @@ final class Router
             'assets/photo' => [AssetController::class, 'photo'],
 
             'loans' => [LoanController::class, 'index'],
+            'loans/mine' => [LoanController::class, 'mine'],
             'loans/return' => [LoanController::class, 'returnLoan'],
 
             'labels' => [LabelController::class, 'index'],

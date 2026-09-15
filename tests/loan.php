@@ -300,9 +300,13 @@ check(str_contains($loanSource, 'BEGIN IMMEDIATE'), 'Loan writes must start BEGI
 check(substr_count($loanSource, 'rowCount() !== 1') >= 3, 'Loan writes must fail closed on rowCount');
 $returnLoan = (string) file_get_contents($root . '/app/Controllers/LoanController.php');
 check(str_contains($returnLoan, 'Csrf::requirePost()') && str_contains($returnLoan, 'Auth::canReturn'), 'Return route must keep POST+CSRF and canReturn');
+check(str_contains($returnLoan, 'loans/mine') && str_contains($returnLoan, 'return_to'), 'Return from inbox can land back on loans/mine');
 $loanRoute = (string) file_get_contents($root . '/app/Controllers/AssetController.php');
 check(str_contains($loanRoute, 'Csrf::requirePost()') && str_contains($loanRoute, 'Loan::checkout'), 'Loan route must keep POST+CSRF and use Loan::checkout');
 check(str_contains((string) file_get_contents($root . '/templates/loans/index.php'), 'Auth::canReturn'), 'Loan list return button must use canReturn');
 check(str_contains((string) file_get_contents($root . '/templates/assets/show.php'), 'Auth::canReturn'), 'Asset return button must use canReturn');
+$mineTpl = (string) file_get_contents($root . '/templates/loans/mine.php');
+check(str_contains($mineTpl, 'Auth::canReturn') && str_contains($mineTpl, 'Csrf::field()'), 'Inbox return button must use canReturn and CSRF');
+check(str_contains((string) file_get_contents($root . '/app/Router.php'), "'loans/mine'"), 'Inbox GET route is registered');
 
 echo "PASS: {$checks} loan checks\n";

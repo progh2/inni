@@ -172,6 +172,34 @@ final class Loan
         return $assetId;
     }
 
+    /**
+     * Open loans for one borrower (`borrower_user_id`), overdue first.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public static function listMine(PDO $pdo, string $userId): array
+    {
+        $userId = trim($userId);
+        if ($userId === '') {
+            return [];
+        }
+        $stmt = $pdo->prepare(
+            "SELECT l.*, a.name AS asset_name, a.management_number
+             FROM loans l
+             LEFT JOIN assets a ON a.id = l.asset_id
+             WHERE l.status IN ('active','overdue')
+               AND l.borrower_user_id = ?
+             ORDER BY CASE l.status WHEN 'overdue' THEN 0 ELSE 1 END, l.due_at ASC, l.created_at ASC"
+        );
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function isOverdue(array $loan): bool
+    {
+        return ($loan['status'] ?? '') === 'overdue';
+    }
+
     private static function nullableTrim(?string $value): ?string
     {
         if ($value === null) {
