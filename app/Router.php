@@ -74,6 +74,7 @@ final class Router
             'assets/life' => [AssetController::class, 'updateLife'],
             'assets/life-suggest' => [AssetController::class, 'suggestLife'],
             'assets/photo' => [AssetController::class, 'photo'],
+            'assets/retire' => [AssetController::class, 'retire'],
 
             'loans' => [LoanController::class, 'index'],
             'loans/mine' => [LoanController::class, 'mine'],
@@ -97,6 +98,7 @@ final class Router
             'inventory/result' => [InventoryController::class, 'result'],
             'inventory/report' => [InventoryController::class, 'report'],
             'inventory/report/csv' => [InventoryController::class, 'reportCsv'],
+            'inventory/adjust' => [InventoryController::class, 'adjust'],
 
             'more' => [MoreController::class, 'index'],
             'settings' => [SettingsController::class, 'index'],

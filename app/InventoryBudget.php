@@ -10,7 +10,7 @@ use PDO;
  * Budget-program inventory (재물조사) report.
  * Read-only: joins check lines to current asset/catalog budget fields.
  * Book vs physical: confirmed => physical = expected; missing => physical = 0.
- * Quantity re-entry and ledger adjust are out of scope (#53).
+ * Ledger writes (qty/location/status) are #53 InventoryAdjust, not this report.
  */
 final class InventoryBudget
 {
@@ -123,6 +123,7 @@ final class InventoryBudget
         [$where, $params] = self::whereSql($filters);
         $sql = 'SELECT l.id, l.check_id, l.kind, l.asset_id, l.catalog_item_id, l.stock_lot_id,
                        l.location_id, l.name, l.code, l.expected_qty, l.unit, l.confirmed_at, l.confirmed_by,
+                       l.adjusted_at, l.adjusted_by, l.adjust_reason, l.adjust_approver,
                        c.status AS check_status, c.location_name AS check_location_name,
                        c.started_at, c.finished_at,
                        loc.name AS location_name,
@@ -277,6 +278,7 @@ final class InventoryBudget
         $row['diff_qty'] = $expected - $physical;
         $row['is_confirmed'] = $confirmed;
         $row['is_missing'] = !$confirmed;
+        $row['is_adjusted'] = ($row['adjusted_at'] ?? null) !== null && (string) $row['adjusted_at'] !== '';
         return $row;
     }
 

@@ -20,7 +20,7 @@ $filterQuery = static function (array $extra = []) use ($filters): array {
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('assets')) ?>">← 기자재 현황</a></p>
 <h1>연한·노후 기자재</h1>
-<p class="muted">도입일·내용연한(#39)으로 만료일을 계산합니다. 내용연한은 장비 상세에서 직접 입력하거나 조달청 제안(#40)을 수락해 채웁니다. 보정·파기는 이 화면에서 하지 않습니다.</p>
+<p class="muted">도입일·내용연한(#39)으로 만료일을 계산합니다. 내용연한은 장비 상세에서 직접 입력하거나 조달청 제안(#40)을 수락해 채웁니다. 파기는 장비 상세에서, 실사 보정은 실사 결과·사업예산 실사에서 합니다.</p>
 
 <div class="stats" style="margin:1rem 0">
   <a class="stat" href="<?= Support::e(App::url('assets/aging')) ?>">

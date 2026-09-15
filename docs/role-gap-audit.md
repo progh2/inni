@@ -56,34 +56,34 @@
 | `catalog/csv` `…/template` `…/export` `…/import` | CatalogCsv | `catalog/csv` | `canWrite` | UTF-8 CSV 템플릿·내보내기·가져오기 |
 | `materials` | Material | `materials/index` | 로그인 | 소모품·부품 현황. 부족·재입고 대기·최근 분출. 분출/재입고 CTA |
 | `assets` | Asset | `assets/index` | 로그인 | 장비 현황. 상태·실·연체·사업예산 |
-| `assets/show` | Asset | `assets/show` | 로그인 | 대여·반납·이동·사진·고장 신고·연한·예산·이력 |
+| `assets/show` `assets/retire` | Asset | `assets/show` | 로그인 / 파기: `canWrite` | 대여·반납·이동·사진·고장 신고·연한·예산·파기·이력 |
 | `assets/loan` | Asset | (장비 상세 POST) | `canLoan` | 장비 대여 (`available` → `on_loan`) |
 | `loans` `loans/return` | Loan | `loans/index` | 로그인 / `canReturn` | **전체** 진행 대여. 반납 |
 | `assets/move` | Asset | (장비 상세 POST) | `canWrite` 또는 `canLoan` | 위치만 변경. `moving` 상태는 쓰지 않음 |
 | `assets/report` | Asset | (장비 상세 POST) | 로그인 | `reports` 접수(`open`). 장비 상태를 `repair`로 바꾸지 않음 |
 | `assets/budget` `assets/life` `assets/life-suggest` `assets/photo` | Asset | (장비 상세) | `canWrite` | 사업예산·도입일·내용연한·조달청 제안·사진 |
 | `labels` `labels/print` | Label | `labels/index` `print` | 로그인 | 장비·실·보관함 QR 브라우저 인쇄. 장비 **200건** 상한 |
-| `inventory` `…/start` `…/show` `…/confirm` `…/finish` `…/result` | Inventory | `inventory/*` | `canInventory` | 실 1곳·진행 세션 1건. 스캔 확인 → 미확인 목록 |
+| `inventory` `…/start` `…/show` `…/confirm` `…/finish` `…/result` `…/adjust` | Inventory | `inventory/*` | `canInventory` / 보정은 `canWrite` | 실 1곳·진행 세션 1건. 스캔 확인 → 미확인 목록. 종료 후 장부 보정 |
 | `more` | More | `more/index` | 로그인 | 목록·등록·대여·라벨·실사·CSV·설정 진입 |
 | `settings` `settings/save` `settings/telegram` | Settings | `settings/index` | 알림: `canConfigureAlerts` / 학교명: `owner` | 학교명·텔레그램·AI 연결 상태·Google URI |
 | `settings/users` `settings/approve` | Settings | `settings/users` | `owner` | 역할·상태 승인 |
 
-없는 라우트(스키마만 있거나 기획만 있음): 장비 상태 전이, 파기, 실사 보정, 수리비, 내 대여함, 대여 데스크, 재료 전용 등록/분출 화면, 실 고장 신고 작성, 위치 수정·삭제, 분류 트리, 신고 큐, 실사 이력 목록.
+없는 라우트(스키마만 있거나 기획만 있음): 수리비, 재료 전용 등록/분출 화면, 실 고장 신고 작성, 위치 수정·삭제, 분류 트리, 실사 이력 목록.
 
 ### 2.2 스키마에 있고 UI가 약한 것
 
 | 테이블/컬럼 | 구현 | 화면 |
 |-------------|------|------|
-| `assets.status` (`available` `on_loan` `repair` `moving` `lost` `retired`) | 대여/반납만 상태 변경. 시드에 `repair` 1건 | 현황 보드 **필터·표시만** |
+| `assets.status` (`available` `on_loan` `repair` `moving` `lost` `retired`) | 대여/반납·수리·파기(`retired`)가 상태 변경. 시드에 `repair` 1건 | 현황 보드 필터·표시 + 장비 상세 파기 |
 | `assets.serial_number` | 검색 LIKE | 등록·수정·상세에 입력/표시 없음 |
 | `assets.purchase_date` `useful_life_years` | 등록·상세 저장, CSV, 조달청 제안 | 만료일 문구 + **연한·노후 보드**(`assets/aging`, 임박/초과) |
 | `catalog_items` / `assets` `budget_program` `budget_year` | 자유 입력, 목록 필터, CSV | 사업 마스터·합계·재물조사 집계 없음 |
 | `loans.kind=consumable` | 컬럼만 | 소모품은 `loans`가 아니라 `activity_logs.action=issue` |
 | `reports` (`room` \| `asset`, `open`/`in_progress`/`done`) | 장비 상세에서 `asset`+`open` INSERT | 상태 변경·큐·실 신고 폼 없음. 실 상세는 **읽기만** |
 | `categories` | `CREATE TABLE`만 | CRUD·품목 연결 없음 |
-| `inventory_check_lines.expected_qty` | 스냅샷 | 수량 재입력·불일치·예상외 발견 없음 |
+| `inventory_check_lines.expected_qty` | 스냅샷 + 종료 후 보정 | 미확인 장비 위치/상태·품목 수량. 사유·승인자 |
 | `stock_lots` | 위치+수량만 | 유통기한·입고단가·거래처 없음 |
-| ERD `retire` 액션 | 주석만 | 파기 쓰기 경로 없음 |
+| ERD `retire` 액션 | `assets/retire` POST+CSRF, `canWrite` | 사유·일자·증빙, `activity_logs.action=retire` |
 
 ### 2.3 하단 탭·더보기 (현재 IA)
 
@@ -113,10 +113,10 @@
 | 카메라 스캔 → 상세 | 있음 | `scan` | 스캔 직후 대여/수리 CTA 없음 → M5 #47 |
 | 도입일·내용연한·만료 예정일 | 있음 | 등록·장비 상세·CSV·현황 메타 | 담당자용 **노후 목록**은 `assets/aging` |
 | 조달청 내용연수 제안 | 있음 | 등록/수정, 수락 시에만 저장 | 강제 아님 (유지) |
-| 장비 상태(수리중/분실/폐기) 변경 | 부분 | 필터·뱃지·시드 `repair` | 쓰기 UI 없음. 고장 신고가 상태를 안 바꿈 → M5 #46, M7 #53 |
+| 장비 상태(수리중/분실/폐기) 변경 | 있음 | 수리 요청이 `repair`, 파기가 `retired`, 실사 보정이 `lost` 등 | 분실 전용 화면은 없음. 실사 보정·장비 상세에서 처리 |
 | 분류 트리 | 없음 | `categories` 테이블만 | P2 “있으면 좋음”. M5–M7 필수 아님 |
 | 즐겨찾기·최근 본·내 담당 실 | 부분 | `favorite` 체크만 | 목록/홈 바로가기 없음 |
-| 폐기/파기 처리 | 없음 | `retired` 값만 | M7 #53 |
+| 폐기/파기 처리 | 있음 | `assets/retire`, 사유·일자·증빙 | 대여 중은 반납 후 |
 
 **판정:** 등록·현황·실 열람·라벨·연한 **필드는 P3까지 채워졌다.** 담당자가 매일 쓰는 **상태 처리(수리·폐기)·노후 보드·위치 편집**이 비어 있다.
 
@@ -166,15 +166,15 @@
 | 목록을 사업으로 거르기 | 있음 | 품목·기자재·재료 보드 GET | 예산 **합계·대수 리포트** 없음 |
 | 재물조사(실사) | 부분 | 실 선택→스캔 확인→미확인 | 수량 차이·예상외·이어하기·엑셀·텔레그램 없음. **사업예산 필터/집계 없음** → M7 #51 |
 | 실사 이력·다시 보기 | 부분 | `inventory/result?id=` | 지난 실사 목록 화면 없음. 진행 중은 1건 |
-| 실사 후 장부 보정 | 없음 | 확인은 `confirmed_at`만 | 위치/수량/상태 쓰기 없음 → M7 #53 |
+| 실사 후 장부 보정 | 있음 | 종료 세션 미확인, 사유·승인자, `inventory_adjust` | 진행 중 실사는 종료 후 |
 | 내용연한 만료 예정 표시 | 있음 | 장비 상세·현황 한 줄 + `assets/aging` | 임박/초과 필터 있음 |
-| 노후 기자재 처리 | 부분 | 일괄 표시(`assets/aging`) | 처리 큐(보정·파기) 없음 → M7 #53 |
-| 파기(사유·일자·증빙) | 없음 | `retired` 미연결 | manager 이상 파괴적 쓰기 없음 → M7 #53 |
+| 노후 기자재 처리 | 부분 | 일괄 표시(`assets/aging`) + 장비 상세 파기 | 보드에서 일괄 파기는 없음 |
+| 파기(사유·일자·증빙) | 있음 | `retired` + 이력, manager 이상 | — |
 | 수리비·처리 비용 | 없음 | `reports`에 금액 컬럼 없음 | M7 #54 (M5 수리 워크플로 선행) |
 | 에듀파인 번호 | 부분 | 옵션 필드·검색·CSV | 파일 동기화 없음 (PRD P2, 이번 로드맵 밖) |
 | 감가상각 엔진 | 없음 | PRD 비목표 | 만들지 않음 |
 
-**판정:** 예산 **라벨(사업명·연도·연한)** 은 P2–P3에 있다. 예산 담당 업무(재물조사 차이, 노후, 파기, 수리비)는 **아직 대장 필드 수준**이다.
+**판정:** 예산 라벨과 재물조사 리포트·노후 보드·보정·파기는 있다. 수리비(#54)는 아직 없다.
 
 ---
 

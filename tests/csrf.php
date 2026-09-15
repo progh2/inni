@@ -225,7 +225,7 @@ check(str_contains($field, 'name="csrf_token"') && str_contains($field, $token),
 check(str_contains((string) file_get_contents($root . '/app/Csrf.php'), 'Support::e(self::token())'), 'Hidden field value must be escaped');
 $mutations = [
     'app/Controllers/ItemController.php' => ['save', 'update', 'issue', 'restock', 'cancelIssue'],
-    'app/Controllers/AssetController.php' => ['loan', 'move', 'report', 'photo', 'updateBudget', 'updateLife'],
+    'app/Controllers/AssetController.php' => ['loan', 'move', 'report', 'photo', 'updateBudget', 'updateLife', 'retire'],
     'app/Controllers/LoanController.php' => ['returnLoan'],
     'app/Controllers/DeskController.php' => ['resolve', 'loan'],
     'app/Controllers/ReportController.php' => ['updateStatus'],
@@ -233,7 +233,7 @@ $mutations = [
     'app/Controllers/SettingsController.php' => ['save', 'saveTelegram', 'approve'],
     'app/Controllers/ScanController.php' => ['resolve'],
     'app/Controllers/LabelController.php' => ['print'],
-    'app/Controllers/InventoryController.php' => ['start', 'confirm', 'finish'],
+    'app/Controllers/InventoryController.php' => ['start', 'confirm', 'finish', 'adjust'],
     'app/Controllers/CatalogCsvController.php' => ['import'],
 ];
 foreach ($mutations as $file => $methods) {
@@ -260,6 +260,7 @@ $forms = [
     'templates/labels/index.php' => 'labels/print',
     'templates/inventory/index.php' => 'inventory/start',
     'templates/inventory/show.php' => 'inventory/finish',
+    'templates/partials/inventory_adjust.php' => 'inventory/adjust',
     'templates/rooms/show.php' => 'inventory/start',
     'templates/catalog/csv.php' => 'catalog/csv/import',
 ];
@@ -268,6 +269,10 @@ foreach ($forms as $file => $route) {
     check(is_string($source) && str_contains($source, 'Csrf::field()'), $file . ' form for ' . $route . ' must include Csrf::field()');
     check(str_contains($source, $route), $file . ' must post to ' . $route);
 }
+$assetShow = (string) file_get_contents($root . '/templates/assets/show.php');
+check(str_contains($assetShow, 'Csrf::field()') && str_contains($assetShow, 'assets/retire'), 'Asset show posts 파기 with CSRF');
+$invResult = (string) file_get_contents($root . '/templates/inventory/result.php');
+check(str_contains($invResult, 'inventory_adjust.php'), 'Inventory result includes the adjust form');
 $scanPage = (string) file_get_contents($root . '/templates/scan/index.php')
     . (string) file_get_contents($root . '/templates/partials/scan_input.php');
 check(str_contains($scanPage, 'scan/resolve') && str_contains($scanPage, 'Csrf::field()'), 'Scan page + partial post to scan/resolve with CSRF');

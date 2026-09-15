@@ -63,6 +63,9 @@ final class Database
         self::ensureColumn($pdo, 'assets', 'budget_program', 'TEXT');
         self::ensureColumn($pdo, 'assets', 'budget_year', 'INTEGER');
         self::ensureColumn($pdo, 'assets', 'useful_life_years', 'INTEGER');
+        self::ensureColumn($pdo, 'assets', 'retired_at', 'TEXT');
+        self::ensureColumn($pdo, 'assets', 'retire_reason', 'TEXT');
+        self::ensureColumn($pdo, 'assets', 'retire_evidence', 'TEXT');
         self::ensureColumn($pdo, 'stock_lots', 'lot_code', 'TEXT');
         self::ensureColumn($pdo, 'stock_lots', 'expires_at', 'TEXT');
         $pdo->exec('CREATE INDEX IF NOT EXISTS idx_catalog_budget ON catalog_items(budget_year, budget_program)');
@@ -125,7 +128,11 @@ final class Database
               expected_qty REAL NOT NULL DEFAULT 1,
               unit TEXT,
               confirmed_at TEXT,
-              confirmed_by TEXT REFERENCES users(id)
+              confirmed_by TEXT REFERENCES users(id),
+              adjusted_at TEXT,
+              adjusted_by TEXT REFERENCES users(id),
+              adjust_reason TEXT,
+              adjust_approver TEXT
             )'
         );
         $pdo->exec(
@@ -147,10 +154,14 @@ final class Database
              ON inventory_check_lines(check_id, stock_lot_id)
              WHERE stock_lot_id IS NOT NULL'
         );
+        self::ensureColumn($pdo, 'inventory_check_lines', 'adjusted_at', 'TEXT');
+        self::ensureColumn($pdo, 'inventory_check_lines', 'adjusted_by', 'TEXT');
+        self::ensureColumn($pdo, 'inventory_check_lines', 'adjust_reason', 'TEXT');
+        self::ensureColumn($pdo, 'inventory_check_lines', 'adjust_approver', 'TEXT');
     }
 
     /**
-     * @param 'catalog_items'|'assets'|'stock_lots' $table
+     * @param 'catalog_items'|'assets'|'stock_lots'|'inventory_check_lines' $table
      */
     private static function ensureColumn(PDO $pdo, string $table, string $column, string $type): void
     {
@@ -160,10 +171,19 @@ final class Database
                 'budget_program' => 'TEXT',
                 'budget_year' => 'INTEGER',
                 'useful_life_years' => 'INTEGER',
+                'retired_at' => 'TEXT',
+                'retire_reason' => 'TEXT',
+                'retire_evidence' => 'TEXT',
             ],
             'stock_lots' => [
                 'lot_code' => 'TEXT',
                 'expires_at' => 'TEXT',
+            ],
+            'inventory_check_lines' => [
+                'adjusted_at' => 'TEXT',
+                'adjusted_by' => 'TEXT',
+                'adjust_reason' => 'TEXT',
+                'adjust_approver' => 'TEXT',
             ],
         ];
         if (!isset($allowed[$table][$column]) || $allowed[$table][$column] !== $type) {
