@@ -190,6 +190,7 @@ check(str_contains($listTpl, 'name="type"') && str_contains($listTpl, 'name="low
 check(str_contains($listTpl, 'name="budget_program"') && str_contains($listTpl, 'name="budget_year"'), 'Browse UI has budget filters');
 check(str_contains($listTpl, 'Budget::format'), 'Browse UI displays budget on rows');
 check(str_contains($listTpl, 'method="get"') && !str_contains($listTpl, 'Csrf::field()'), 'Browse is a GET read; no CSRF write');
+check(str_contains($listTpl, 'badge overdue') && str_contains($listTpl, 'is-low-stock'), 'Browse shows shortage badge and highlight');
 
 $more = (string) file_get_contents($root . '/templates/more/index.php');
 check(str_contains($more, "App::url('items')") && str_contains($more, '품목 목록'), '더보기 exposes catalog browse to logged-in teachers');

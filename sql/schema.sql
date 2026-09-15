@@ -86,6 +86,8 @@ CREATE TABLE IF NOT EXISTS stock_lots (
   catalog_item_id TEXT NOT NULL REFERENCES catalog_items(id),
   location_id TEXT NOT NULL REFERENCES locations(id),
   quantity REAL NOT NULL DEFAULT 0,
+  lot_code TEXT,
+  expires_at TEXT,
   updated_at TEXT NOT NULL,
   UNIQUE(catalog_item_id, location_id)
 );

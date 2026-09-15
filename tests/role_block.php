@@ -191,6 +191,8 @@ check(str_contains($loginTpl, "App::url('auth/demo', ['as' => 'teacher'])"), 'lo
 $item = (string) file_get_contents($root . '/app/Controllers/ItemController.php');
 check(str_contains($item, 'function index') && str_contains($item, 'Auth::requireLogin()'), 'item browse requires login');
 check(str_contains($item, 'Auth::canWrite($user)') && str_contains($item, 'function save'), 'item register requires canWrite');
+check(str_contains($item, 'function updateLot') && str_contains($item, 'Csrf::requirePost()'), 'lot update is POST+CSRF');
+check(str_contains($item, 'Auth::canWrite($user)') && str_contains($item, 'function updateLot'), 'lot update requires canWrite');
 check(str_contains($item, 'Auth::canLoan($user)') && str_contains($item, 'function issue'), 'item issue requires canLoan');
 if (preg_match('/function index\(\): void\s*\{(.*?)\n    public function /s', $item, $indexMatch)) {
     check(str_contains($indexMatch[1], 'Auth::requireLogin()') && !str_contains($indexMatch[1], 'canWrite'), 'active teacher may browse catalog');

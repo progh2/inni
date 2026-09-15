@@ -52,7 +52,7 @@ $hasFilters = $type !== '' || !empty($lowStock) || $budgetProgram !== '' || $bud
 <div class="card">
   <h2 class="section-title" style="margin-top:0">품목 (<?= count($items) ?>)</h2>
   <?php foreach ($items as $c): ?>
-    <a class="list-row" href="<?= Support::e(App::url('items/show', ['id' => $c['id']])) ?>">
+    <a class="list-row<?= !empty($c['low_stock']) ? ' is-low-stock' : '' ?>" href="<?= Support::e(App::url('items/show', ['id' => $c['id']])) ?>">
       <div>
         <div class="title"><?= Support::e((string) $c['name']) ?></div>
         <div class="meta">

@@ -120,13 +120,15 @@ erDiagram
 | createdAt, updatedAt | timestamp | |
 
 ### `stockLots/{id}`
-비품·소모품·부품의 위치별 수량.
+비품·소모품·부품의 위치별 수량. 위치당 1행. 로트 번호·유통기한은 선택 속성(다중 로트 키 아님).
 
 | Field | Type | Notes |
 |-------|------|-------|
 | catalogItemId | string | |
 | locationId | string | |
 | quantity | number | |
+| lotCode | string? | 선택. 위치 재고에 붙는 로트 표시 |
+| expiresAt | string? | 선택. `YYYY-MM-DD` 유통기한 |
 | updatedAt | timestamp | |
 
 Unique: `(catalogItemId, locationId)`
@@ -167,7 +169,7 @@ Unique: `(catalogItemId, locationId)`
 ### `activityLogs/{id}`
 | Field | Type | Notes |
 |-------|------|-------|
-| action | string | `create` `update` `loan` `return` `move` `issue` `restock` `cancel_issue` `retire` `report` … |
+| action | string | `create` `update` `update_lot` `loan` `return` `move` `issue` `restock` `cancel_issue` `retire` `report` … |
 | entityType | `asset` \| `catalog` \| `location` \| `loan` \| `report` | |
 | entityId | string | |
 | actorUid | string | |

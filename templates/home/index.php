@@ -93,7 +93,7 @@ use Inni\Support;
 <div class="card">
   <h2 class="section-title" style="margin-top:0">재고 부족</h2>
   <?php foreach ($lowStock as $row): ?>
-    <a class="list-row" href="<?= Support::e(App::url('items/show', ['id' => $row['id']])) ?>">
+    <a class="list-row is-low-stock" href="<?= Support::e(App::url('items/show', ['id' => $row['id']])) ?>">
       <div>
         <div class="title"><?= Support::e($row['name']) ?></div>
         <div class="meta"><?= Support::e((string) $row['qty']) ?> / 최소 <?= Support::e((string) $row['min_stock']) ?> <?= Support::e($row['unit']) ?></div>
