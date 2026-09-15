@@ -44,6 +44,9 @@ check(str_contains($more, '내 대여함'), 'More menu must expose 내 대여함
 check(str_contains($more, "App::url('loans/mine')"), '내 대여함 must link to loans/mine');
 check(str_contains($more, 'Auth::canLoan($user)'), '내 대여함 is gated on canLoan');
 check(substr_count($more, "App::url('loans/mine')") === 1, 'More must not duplicate the inbox link');
+check(str_contains($more, '대여 데스크'), 'More menu must expose 대여 데스크');
+check(str_contains($more, "App::url('loans/desk')"), '대여 데스크 must link to loans/desk');
+check(substr_count($more, "App::url('loans/desk')") === 1, 'More must not duplicate the desk link');
 check(str_contains($more, '수리 대기'), 'More menu must expose 수리 대기');
 check(str_contains($more, "App::url('reports')"), '수리 대기 must link to reports');
 check(str_contains($more, 'Auth::canWrite($user)'), '수리 대기 is gated on canWrite');

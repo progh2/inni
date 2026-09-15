@@ -301,6 +301,7 @@ check(substr_count($loanSource, 'rowCount() !== 1') >= 3, 'Loan writes must fail
 $returnLoan = (string) file_get_contents($root . '/app/Controllers/LoanController.php');
 check(str_contains($returnLoan, 'Csrf::requirePost()') && str_contains($returnLoan, 'Auth::canReturn'), 'Return route must keep POST+CSRF and canReturn');
 check(str_contains($returnLoan, 'loans/mine') && str_contains($returnLoan, 'return_to'), 'Return from inbox can land back on loans/mine');
+check(str_contains($returnLoan, 'loans/desk'), 'Return from the desk can land back on loans/desk');
 $loanRoute = (string) file_get_contents($root . '/app/Controllers/AssetController.php');
 check(str_contains($loanRoute, 'Csrf::requirePost()') && str_contains($loanRoute, 'Loan::checkout'), 'Loan route must keep POST+CSRF and use Loan::checkout');
 check(str_contains((string) file_get_contents($root . '/templates/loans/index.php'), 'Auth::canReturn'), 'Loan list return button must use canReturn');

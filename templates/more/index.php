@@ -19,6 +19,12 @@ use Inni\Support;
     <div class="title">빠른 등록</div>
   </a>
   <?php if (Auth::canLoan($user)): ?>
+    <a class="list-row" href="<?= Support::e(App::url('loans/desk')) ?>">
+      <div>
+        <div class="title">대여 데스크</div>
+        <div class="meta">스캔·검색으로 빌려주기·받아주기</div>
+      </div>
+    </a>
     <a class="list-row" href="<?= Support::e(App::url('loans/mine')) ?>">
       <div class="title">내 대여함</div>
     </a>

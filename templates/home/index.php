@@ -27,6 +27,7 @@ use Inni\Support;
   <a class="btn btn-ghost" href="<?= Support::e(App::url('assets')) ?>">기자재 현황</a>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('materials')) ?>">실험실습재료</a>
   <?php if (Auth::canLoan($user)): ?>
+    <a class="btn btn-primary" href="<?= Support::e(App::url('loans/desk')) ?>">대여 데스크</a>
     <a class="btn btn-ghost" href="<?= Support::e(App::url('loans/mine')) ?>">내 대여함</a>
   <?php endif; ?>
   <?php if (Auth::canWrite($user)): ?>

@@ -56,8 +56,8 @@ final class LoanController
         try {
             $assetId = Loan::checkin(Database::pdo(), $user, $loanId);
             App::flash('ok', '반납 처리되었습니다.');
-            if ($after === 'loans/mine') {
-                App::redirect('loans/mine');
+            if (in_array($after, ['loans/mine', 'loans/desk'], true)) {
+                App::redirect($after);
             }
             if ($assetId) {
                 App::redirect('assets/show', ['id' => $assetId]);
@@ -74,6 +74,10 @@ final class LoanController
     /** Allowlisted post-return landing. Default stays the school-wide list. */
     private static function returnToRoute(): string
     {
-        return (string) ($_POST['return_to'] ?? '') === 'mine' ? 'loans/mine' : 'loans';
+        return match ((string) ($_POST['return_to'] ?? '')) {
+            'mine' => 'loans/mine',
+            'desk' => 'loans/desk',
+            default => 'loans',
+        };
     }
 }

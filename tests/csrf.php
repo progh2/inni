@@ -227,6 +227,7 @@ $mutations = [
     'app/Controllers/ItemController.php' => ['save', 'update', 'issue', 'restock', 'cancelIssue'],
     'app/Controllers/AssetController.php' => ['loan', 'move', 'report', 'photo', 'updateBudget', 'updateLife'],
     'app/Controllers/LoanController.php' => ['returnLoan'],
+    'app/Controllers/DeskController.php' => ['resolve', 'loan'],
     'app/Controllers/ReportController.php' => ['updateStatus'],
     'app/Controllers/RoomController.php' => ['save'],
     'app/Controllers/SettingsController.php' => ['save', 'saveTelegram', 'approve'],
@@ -251,6 +252,7 @@ $forms = [
     'templates/assets/show.php' => 'assets/loan',
     'templates/loans/index.php' => 'loans/return',
     'templates/loans/mine.php' => 'loans/return',
+    'templates/desk/index.php' => 'loans/desk/loan',
     'templates/partials/report_status.php' => 'reports/status',
     'templates/settings/index.php' => 'settings/save',
     'templates/settings/users.php' => 'settings/approve',
@@ -272,6 +274,10 @@ check(str_contains($scanPage, 'scan/resolve') && str_contains($scanPage, 'Csrf::
 $invShow = (string) file_get_contents($root . '/templates/inventory/show.php')
     . (string) file_get_contents($root . '/templates/partials/scan_input.php');
 check(str_contains($invShow, 'inventory/confirm') && str_contains($invShow, 'Csrf::field()'), 'Inventory confirm reuses scan CSRF POST');
+$deskPage = (string) file_get_contents($root . '/templates/desk/index.php')
+    . (string) file_get_contents($root . '/templates/partials/scan_input.php');
+check(str_contains($deskPage, 'loans/desk/resolve') && str_contains($deskPage, 'Csrf::field()'), 'Desk scan reuses scan CSRF POST');
+check(str_contains($deskPage, 'loans/return') && str_contains($deskPage, 'return_to'), 'Desk return posts to loans/return with CSRF');
 $show = (string) file_get_contents($root . '/templates/items/show.php');
 check(str_contains($show, 'items/restock') && str_contains($show, 'items/cancel-issue'), 'Item show must include restock and cancel-issue forms');
 $assetShow = (string) file_get_contents($root . '/templates/assets/show.php');

@@ -134,6 +134,7 @@ check(str_contains($homeTpl, "App::url('loans/mine')") && str_contains($homeTpl,
 check(str_contains($homeTpl, 'Auth::canLoan($user)'), 'home inbox entry is gated on canLoan');
 check(str_contains($moreTpl, "App::url('loans/mine')") && str_contains($moreTpl, '내 대여함'), 'more menu links teachers to inbox');
 check(str_contains($moreTpl, 'Auth::canLoan($user)'), 'more inbox entry is gated on canLoan');
+check(str_contains($moreTpl, "App::url('loans/desk')") && str_contains($moreTpl, '대여 데스크'), 'more menu also links teachers to the desk');
 check(str_contains($layout, "\$current === 'loans' || str_starts_with(\$current, 'loans/')"), 'inbox keeps the 더보기 tab active');
 check(preg_match("/\\\$tabs = \\[\\s*\\['home', '홈'\\],\\s*\\['search', '찾기'\\],\\s*\\['scan', '스캔'\\],\\s*\\['rooms', '실'\\],\\s*\\['more', '더보기'\\],\\s*\\];/", $layout) === 1, 'bottom nav stays 홈/찾기/스캔/실/더보기');
 check(str_contains($css, '.list-row.is-overdue'), 'CSS emphasizes overdue inbox rows');

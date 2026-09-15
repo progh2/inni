@@ -19,6 +19,7 @@ final class Loan
         ?string $borrowerNote,
         ?string $purpose,
         ?string $dueAt,
+        ?string $borrowerUserId = null,
     ): string {
         if (!Auth::canLoan($actor) || ($actor['status'] ?? '') !== 'active') {
             throw new InvalidArgumentException('대여 권한이 없습니다.');
@@ -29,7 +30,11 @@ final class Loan
             throw new InvalidArgumentException('대여할 수 없는 장비입니다.');
         }
 
+        $borrowerUserId = self::resolveBorrowerUserId($pdo, $actor, $borrowerUserId);
         $borrowerName = trim($borrowerName);
+        if ($borrowerName === '') {
+            $borrowerName = self::borrowerDisplayName($pdo, $borrowerUserId);
+        }
         if ($borrowerName === '') {
             $borrowerName = trim((string) ($actor['display_name'] ?? ''));
         }
@@ -67,7 +72,7 @@ final class Loan
                     'INSERT INTO loans(id,kind,asset_id,quantity,borrower_user_id,borrower_name,borrower_note,from_location_id,due_at,status,purpose,created_at,created_by)
                      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'
                 )->execute([
-                    $loanId, 'asset', $assetId, 1, $actor['id'] ?? null, $borrowerName, $borrowerNote,
+                    $loanId, 'asset', $assetId, 1, $borrowerUserId, $borrowerName, $borrowerNote,
                     $asset['location_id'], $dueAt, 'active', $purpose, $t, $actor['id'],
                 ]);
             } catch (PDOException $e) {
@@ -218,6 +223,32 @@ final class Loan
         );
         $stmt->execute([$userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private static function resolveBorrowerUserId(PDO $pdo, array $actor, ?string $borrowerUserId): ?string
+    {
+        $borrowerUserId = self::nullableTrim($borrowerUserId);
+        if ($borrowerUserId === null) {
+            $id = $actor['id'] ?? null;
+            return is_string($id) && $id !== '' ? $id : null;
+        }
+        $stmt = $pdo->prepare('SELECT id, status FROM users WHERE id = ?');
+        $stmt->execute([$borrowerUserId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row || ($row['status'] ?? '') !== 'active') {
+            throw new InvalidArgumentException('빌리는 사람을 확인하세요.');
+        }
+        return (string) $row['id'];
+    }
+
+    private static function borrowerDisplayName(PDO $pdo, ?string $userId): string
+    {
+        if ($userId === null || $userId === '') {
+            return '';
+        }
+        $stmt = $pdo->prepare('SELECT display_name FROM users WHERE id = ?');
+        $stmt->execute([$userId]);
+        return trim((string) ($stmt->fetchColumn() ?: ''));
     }
 
     private static function nullableTrim(?string $value): ?string
