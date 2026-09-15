@@ -224,7 +224,7 @@ $field = Csrf::field();
 check(str_contains($field, 'name="csrf_token"') && str_contains($field, $token), 'Hidden field should carry the session token');
 check(str_contains((string) file_get_contents($root . '/app/Csrf.php'), 'Support::e(self::token())'), 'Hidden field value must be escaped');
 $mutations = [
-    'app/Controllers/ItemController.php' => ['save', 'update', 'issue', 'restock', 'cancelIssue'],
+    'app/Controllers/ItemController.php' => ['save', 'update', 'updateLot', 'issue', 'restock', 'cancelIssue'],
     'app/Controllers/AssetController.php' => ['loan', 'move', 'report', 'photo', 'updateBudget', 'updateLife'],
     'app/Controllers/LoanController.php' => ['returnLoan'],
     'app/Controllers/DeskController.php' => ['resolve', 'loan'],
@@ -280,6 +280,7 @@ check(str_contains($deskPage, 'loans/desk/resolve') && str_contains($deskPage, '
 check(str_contains($deskPage, 'loans/return') && str_contains($deskPage, 'return_to'), 'Desk return posts to loans/return with CSRF');
 $show = (string) file_get_contents($root . '/templates/items/show.php');
 check(str_contains($show, 'items/restock') && str_contains($show, 'items/cancel-issue'), 'Item show must include restock and cancel-issue forms');
+check(str_contains($show, 'items/lot') && str_contains($show, '로트 정보 저장'), 'Item show must include CSRF lot-attribute form');
 $assetShow = (string) file_get_contents($root . '/templates/assets/show.php');
 check(str_contains($assetShow, 'assets/budget') && substr_count($assetShow, 'Csrf::field()') >= 2, 'Asset show must include CSRF budget form');
 check(str_contains($assetShow, 'assets/life') && str_contains($assetShow, '도입일'), 'Asset show must include CSRF 도입일 form');

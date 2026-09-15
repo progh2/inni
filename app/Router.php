@@ -52,6 +52,7 @@ final class Router
             'items/show' => [ItemController::class, 'show'],
             'items/edit' => [ItemController::class, 'editForm'],
             'items/update' => [ItemController::class, 'update'],
+            'items/lot' => [ItemController::class, 'updateLot'],
             'items/issue' => [ItemController::class, 'issue'],
             'items/restock' => [ItemController::class, 'restock'],
             'items/cancel-issue' => [ItemController::class, 'cancelIssue'],

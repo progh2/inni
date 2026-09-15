@@ -71,6 +71,9 @@ final class Stock
         string $locationId,
         mixed $quantity,
         string $note = '',
+        mixed $lotCode = null,
+        mixed $expiresAt = null,
+        mixed $receivedAt = null,
     ): void {
         if (!Auth::canWrite($actor) || ($actor['status'] ?? '') !== 'active') {
             throw new InvalidArgumentException('재입고 권한이 없습니다.');
@@ -82,6 +85,7 @@ final class Stock
         }
         $quantity = self::parsePositiveQuantity($quantity, '입고 수량은 0보다 큰 숫자로 입력하세요.');
         $note = trim($note);
+        $attrs = StockLot::parseAttributes($lotCode, $expiresAt, $receivedAt);
 
         self::beginImmediate($pdo);
         try {
@@ -107,21 +111,46 @@ final class Stock
             $lot = $lotStmt->fetch(PDO::FETCH_ASSOC);
             if ($lot) {
                 $lotId = (string) $lot['id'];
+                $sets = ['quantity = quantity + CAST(? AS REAL)', 'updated_at = ?'];
+                $params = [$quantity, $t];
+                if ($attrs['lot_code'] !== null) {
+                    $sets[] = 'lot_code = ?';
+                    $params[] = $attrs['lot_code'];
+                }
+                if ($attrs['expires_at'] !== null) {
+                    $sets[] = 'expires_at = ?';
+                    $params[] = $attrs['expires_at'];
+                }
+                if ($attrs['received_at'] !== null) {
+                    $sets[] = 'received_at = ?';
+                    $params[] = $attrs['received_at'];
+                }
+                $params[] = $lotId;
+                $params[] = $itemId;
+                $params[] = $quantity;
                 $add = $pdo->prepare(
-                    'UPDATE stock_lots SET quantity = quantity + CAST(? AS REAL), updated_at = ?
+                    'UPDATE stock_lots SET ' . implode(', ', $sets) . '
                      WHERE id = ? AND catalog_item_id = ?
                      AND quantity + CAST(? AS REAL) > quantity'
                 );
-                $add->execute([$quantity, $t, $lotId, $itemId, $quantity]);
+                $add->execute($params);
                 if ($add->rowCount() !== 1) {
                     throw new InvalidArgumentException('입고할 재고를 확인하세요.');
                 }
             } else {
                 $lotId = Support::id('lot');
                 try {
-                    $pdo->prepare(
-                        'INSERT INTO stock_lots(id,catalog_item_id,location_id,quantity,updated_at) VALUES(?,?,?,?,?)'
-                    )->execute([$lotId, $itemId, $locationId, $quantity, $t]);
+                    StockLot::insert(
+                        $pdo,
+                        $lotId,
+                        $itemId,
+                        $locationId,
+                        $quantity,
+                        $attrs['lot_code'],
+                        $attrs['expires_at'],
+                        $attrs['received_at'],
+                        $t,
+                    );
                 } catch (PDOException $e) {
                     if (self::isUniqueConflict($e)) {
                         throw new InvalidArgumentException('같은 위치에 대한 입고가 겹쳤습니다. 다시 시도하세요.', 0, $e);
@@ -139,6 +168,9 @@ final class Stock
                 'quantity' => $quantity,
                 'remaining_quantity' => $remaining,
                 'note' => $note,
+                'lot_code' => $attrs['lot_code'],
+                'expires_at' => $attrs['expires_at'],
+                'received_at' => $attrs['received_at'],
             ];
             $notePart = $note !== '' ? " · {$note}" : '';
             $pdo->prepare(

@@ -20,7 +20,8 @@
   - POST 및 세션 CSRF 토큰 검사(`Csrf::requirePost`, 품목 상세에 최신 이력 20개 표시).
   - 사용 출고는 반환할 대여가 아니므로 `loans` 대신 `activity_logs`에 기록.
 - 품목 수정(owner/manager): 이름·단위·최소재고·제조사·태그·메모·사진·즐겨찾기. 유형/QR/재고 수량은 바꾸지 않음.
-- 재입고(owner/manager): 기존 로트 증가 또는 새 위치에 `stock_lots` 생성. `activity_logs.action=restock`.
+- 재료 로트 속성(#48): `stock_lots.lot_code`/`expires_at`/`received_at` (모두 선택). 기존 DB는 `Database::migrate`/`ensureGuards`. 등록·품목 상세 수정·재입고에서 입력. Unique `(catalog_item_id, location_id)` 유지. 부족 뱃지·알림 조건(소모품·부품, 수량 < 최소재고)은 그대로.
+- 재입고(owner/manager): 기존 로트 증가 또는 새 위치에 `stock_lots` 생성. `activity_logs.action=restock`. 비어 있지 않은 로트 필드는 해당 위치 로트에 반영.
 - 출고 취소(owner/manager/teacher): `stock_issue_cancels.issue_log_id` UNIQUE로 이중 취소 실패 폐쇄. 수량 복원과 `cancel_issue` 이력을 같은 트랜잭션으로.
 - 가벼운 실사(owner/manager): 실 선택 → 예상 장비·품목 목록 → #7과 같은 카메라/코드 입력으로 확인 → 종료 시 미확인 목록. 진행 중 세션은 1건. 이어하기·텔레그램·엑셀은 없음.
 - 품목 CSV(owner/manager, `canWrite`): 더보기·설정에서 템플릿/목록 내려받기, POST+CSRF 업로드로 신규·수정. 충돌·오류 행은 건너뛰고 이유를 보여 줌. **CSV UTF-8** (Excel CP949도 읽음). xlsx/에듀파인 파일 동기화/실사 연동/텔레그램은 없음. 사업명·예산연도 열 포함.
@@ -37,6 +38,7 @@
 
 - PHP 8.4 임시 실행 환경에서 전체 PHP 파일 45개 문법 검사 통과.
 - `php tests/stock.php`: 출고·재입고·출고 취소 수량/권한/롤백 검증.
+- `php tests/stock_lot.php`: 로트번호·유통기한·입고일 파싱, 마이그레이션, 등록/수정/재입고, 부족 뱃지 유지, 알림 조건 불변.
 - `php tests/catalog.php`: 품목 수정 필드·권한·이력 롤백 검증.
 - `php tests/catalog_list.php`: 품목 전체 브라우즈, 유형·재고부족·사업예산 필터, 잘못된 유형/예산 무시, 찾기 UX 유지, 일반교사 조회(canWrite 없음).
 - `php tests/budget.php`: 사업명·예산연도 파싱, 마이그레이션, 저장/비우기, CSV 라운드트립, 목록 필터 훅.

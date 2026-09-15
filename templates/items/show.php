@@ -5,6 +5,7 @@ use Inni\AssetLife;
 use Inni\Auth;
 use Inni\Budget;
 use Inni\Csrf;
+use Inni\StockLot;
 use Inni\Support;
 
 $tags = Support::jsonDecode($item['tags'] ?? null);
@@ -75,8 +76,20 @@ $budgetLabel = Budget::format(
 <div class="card">
   <h2 class="section-title" style="margin-top:0">위치별 재고</h2>
   <?php foreach ($lots as $lot): ?>
+    <?php
+      $lotLabel = StockLot::format(
+          isset($lot['lot_code']) ? (string) $lot['lot_code'] : null,
+          isset($lot['expires_at']) ? (string) $lot['expires_at'] : null,
+          isset($lot['received_at']) ? (string) $lot['received_at'] : null,
+      );
+    ?>
     <div class="list-row">
-      <div class="title"><?= Support::e($lot['location_name']) ?></div>
+      <div>
+        <div class="title"><?= Support::e($lot['location_name']) ?></div>
+        <?php if ($lotLabel !== ''): ?>
+          <div class="meta"><?= Support::e($lotLabel) ?></div>
+        <?php endif; ?>
+      </div>
       <div><strong><?= Support::e((string) $lot['quantity']) ?></strong> <?= Support::e($item['unit']) ?></div>
     </div>
     <?php if ($issueable && Auth::canLoan($user) && (float) $lot['quantity'] > 0): ?>
@@ -111,7 +124,28 @@ $budgetLabel = Budget::format(
         <label for="restock-note-<?= Support::e($lot['id']) ?>">입고 메모</label>
         <input id="restock-note-<?= Support::e($lot['id']) ?>" name="note" placeholder="예: 학기 초 보충">
       </div>
+      <?php
+        $idSuffix = 'restock-' . $lot['id'];
+        $lotCode = '';
+        $expiresAt = null;
+        $receivedAt = null;
+        require dirname(__DIR__) . '/partials/lot_fields.php';
+      ?>
+      <p class="muted">로트·날짜를 비우면 기존 값을 유지합니다.</p>
       <button class="btn btn-ink btn-block" type="submit">재입고</button>
+    </form>
+    <form method="post" action="<?= Support::e(App::url('items/lot')) ?>">
+      <?= Csrf::field() ?>
+      <input type="hidden" name="item_id" value="<?= Support::e($item['id']) ?>">
+      <input type="hidden" name="lot_id" value="<?= Support::e($lot['id']) ?>">
+      <?php
+        $idSuffix = 'edit-' . $lot['id'];
+        $lotCode = isset($lot['lot_code']) ? (string) $lot['lot_code'] : '';
+        $expiresAt = isset($lot['expires_at']) ? (string) $lot['expires_at'] : null;
+        $receivedAt = isset($lot['received_at']) ? (string) $lot['received_at'] : null;
+        require dirname(__DIR__) . '/partials/lot_fields.php';
+      ?>
+      <button class="btn btn-ghost" type="submit">로트 정보 저장</button>
     </form>
     <?php endif; ?>
   <?php endforeach; ?>
@@ -138,6 +172,13 @@ $budgetLabel = Budget::format(
         <label for="restock-new-note">입고 메모</label>
         <input id="restock-new-note" name="note" placeholder="예: 새 보관함">
       </div>
+      <?php
+        $idSuffix = 'restock-new';
+        $lotCode = '';
+        $expiresAt = null;
+        $receivedAt = null;
+        require dirname(__DIR__) . '/partials/lot_fields.php';
+      ?>
       <button class="btn btn-ink btn-block" type="submit">이 위치에 입고</button>
     </form>
   <?php endif; ?>

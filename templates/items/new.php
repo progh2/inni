@@ -74,13 +74,27 @@ use Inni\Support;
       <input name="budget_year" type="number" inputmode="numeric" min="1900" max="2100" step="1" placeholder="YYYY">
     </div>
   </div>
-  <div class="field">
-    <label>단위 / 최소재고 (소모품)</label>
-    <div style="display:flex;gap:0.5rem">
-      <input name="unit" value="ea" style="max-width:6rem">
-      <input name="min_stock" type="number" step="0.1" placeholder="최소재고">
+  <div class="grid-2">
+    <div class="field">
+      <label for="item-unit">단위</label>
+      <input id="item-unit" name="unit" value="ea" style="max-width:6rem" placeholder="ea">
+    </div>
+    <div class="field">
+      <label for="item-min-stock">최소재고</label>
+      <input id="item-min-stock" name="min_stock" type="number" step="0.1" min="0" placeholder="소모품·부품">
     </div>
   </div>
+  <p class="muted">소모품·부품은 재고가 최소재고보다 적으면 목록에 부족으로 표시됩니다. 장비에는 쓰이지 않습니다.</p>
+  <fieldset style="border:0;padding:0;margin:0">
+    <legend class="muted" style="padding:0;margin:0 0 0.5rem">로트·유통기한 (소모품·부품·비품, 선택)</legend>
+    <?php
+      $idSuffix = 'new';
+      $lotCode = '';
+      $expiresAt = null;
+      $receivedAt = null;
+      require dirname(__DIR__) . '/partials/lot_fields.php';
+    ?>
+  </fieldset>
   <div class="field">
     <label>태그 (쉼표)</label>
     <input name="tags" placeholder="계측,전자">

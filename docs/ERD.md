@@ -120,13 +120,16 @@ erDiagram
 | createdAt, updatedAt | timestamp | |
 
 ### `stockLots/{id}`
-비품·소모품·부품의 위치별 수량.
+비품·소모품·부품의 위치별 수량. 로트번호·유통기한·입고일은 선택 속성. Unique `(catalogItemId, locationId)`는 유지한다.
 
 | Field | Type | Notes |
 |-------|------|-------|
 | catalogItemId | string | |
 | locationId | string | |
 | quantity | number | |
+| lotCode | string? | 로트번호 |
+| expiresAt | string? | 유통기한 ISO date |
+| receivedAt | string? | 입고일 ISO date |
 | updatedAt | timestamp | |
 
 Unique: `(catalogItemId, locationId)`

@@ -3,6 +3,7 @@
 use Inni\App;
 use Inni\Auth;
 use Inni\Csrf;
+use Inni\StockLot;
 use Inni\Support;
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('rooms')) ?>">← 실 목록</a></p>
@@ -53,10 +54,20 @@ use Inni\Support;
 <div class="card">
   <h2 class="section-title" style="margin-top:0">비품·소모품 재고</h2>
   <?php foreach ($stock as $s): ?>
+    <?php
+      $lotLabel = StockLot::format(
+          isset($s['lot_code']) ? (string) $s['lot_code'] : null,
+          isset($s['expires_at']) ? (string) $s['expires_at'] : null,
+          isset($s['received_at']) ? (string) $s['received_at'] : null,
+      );
+    ?>
     <div class="list-row">
       <div>
         <div class="title"><?= Support::e($s['item_name']) ?></div>
-        <div class="meta"><?= Support::e(Support::typeLabel($s['type'])) ?></div>
+        <div class="meta">
+          <?= Support::e(Support::typeLabel($s['type'])) ?>
+          <?php if ($lotLabel !== ''): ?> · <?= Support::e($lotLabel) ?><?php endif; ?>
+        </div>
       </div>
       <div><strong><?= Support::e((string) $s['quantity']) ?></strong> <?= Support::e($s['unit']) ?></div>
     </div>
