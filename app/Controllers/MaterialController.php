@@ -7,6 +7,7 @@ namespace Inni\Controllers;
 use Inni\Auth;
 use Inni\Database;
 use Inni\MaterialBoard;
+use Inni\Stock;
 use Inni\View;
 
 final class MaterialController
@@ -20,7 +21,9 @@ final class MaterialController
         $items = MaterialBoard::list($pdo, $filters);
         $rooms = MaterialBoard::rooms($pdo);
         $summary = MaterialBoard::summary($pdo);
+        $issueRoom = Stock::issueRoomFromRequest($_GET, 'issue_room');
+        $issueLogs = Stock::issueHistory($pdo, $issueRoom);
 
-        View::render('materials/index', compact('items', 'rooms', 'filters', 'summary'));
+        View::render('materials/index', compact('items', 'rooms', 'filters', 'summary', 'issueLogs', 'issueRoom'));
     }
 }

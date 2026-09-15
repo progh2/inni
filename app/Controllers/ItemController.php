@@ -6,6 +6,7 @@ namespace Inni\Controllers;
 
 use Inni\Alert;
 use Inni\App;
+use Inni\AssetBoard;
 use Inni\Auth;
 use Inni\AssetLife;
 use Inni\Budget;
@@ -190,11 +191,8 @@ final class ItemController
         $lots->execute([$id]);
         $lots = $lots->fetchAll();
 
-        $logs = $pdo->prepare(
-            "SELECT * FROM activity_logs WHERE entity_type = 'catalog' AND entity_id = ? ORDER BY created_at DESC, rowid DESC LIMIT 20"
-        );
-        $logs->execute([$id]);
-        $logs = $logs->fetchAll();
+        $issueRoom = Stock::issueRoomFromRequest($_GET);
+        $logs = Stock::itemLogs($pdo, $id, $issueRoom);
 
         $cancels = [];
         $cancelStmt = $pdo->prepare(
@@ -228,8 +226,20 @@ final class ItemController
         }
         $item['stock_qty'] = $stockQty;
         $lowStock = Catalog::rowIsLowStock($item);
+        $rooms = AssetBoard::rooms($pdo);
 
-        View::render('items/show', compact('item', 'assets', 'lots', 'logs', 'cancels', 'locations', 'openLocations', 'lowStock'));
+        View::render('items/show', compact(
+            'item',
+            'assets',
+            'lots',
+            'logs',
+            'cancels',
+            'locations',
+            'openLocations',
+            'lowStock',
+            'rooms',
+            'issueRoom',
+        ));
     }
 
     public function editForm(): void
@@ -327,21 +337,32 @@ final class ItemController
         }
 
         $itemId = is_string($_POST['item_id'] ?? null) ? $_POST['item_id'] : '';
+        $roomId = is_string($_POST['room_id'] ?? null) ? trim($_POST['room_id']) : '';
+        $classMemo = is_string($_POST['class_memo'] ?? null) ? $_POST['class_memo'] : '';
         try {
+            if ($roomId === '') {
+                throw new \InvalidArgumentException('분출할 실을 선택하세요.');
+            }
             Stock::issue(
                 Database::pdo(), $user, $itemId,
                 is_string($_POST['lot_id'] ?? null) ? $_POST['lot_id'] : '',
                 $_POST['quantity'] ?? null,
                 is_string($_POST['purpose'] ?? null) ? $_POST['purpose'] : '',
+                $roomId,
+                $classMemo,
             );
-            App::flash('ok', '사용 출고를 처리했습니다.');
+            App::flash('ok', '분출을 처리했습니다.');
         } catch (\InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());
         } catch (\Throwable $e) {
             error_log((string) $e);
-            App::flash('error', '출고를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+            App::flash('error', '분출을 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
         }
-        App::redirect('items/show', ['id' => $itemId]);
+        $redirect = ['id' => $itemId];
+        if ($roomId !== '') {
+            $redirect['room'] = $roomId;
+        }
+        App::redirect('items/show', $redirect);
     }
 
     public function restock(): void

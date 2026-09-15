@@ -512,6 +512,46 @@ $lotGet = invokeItemAction('updateLot', 'GET', [
 ], $sessionToken);
 check($lotGet['status'] === 405 && (float) $lotGet['quantity'] === 18.0, 'GET must be rejected for lot update');
 
+$issueOk = invokeItemAction('issue', 'POST', [
+    'csrf_token' => $sessionToken,
+    'item_id' => 'ci-solder',
+    'lot_id' => 'lot-solder',
+    'quantity' => '2',
+    'purpose' => '5교시',
+    'room_id' => 'loc-elec',
+    'class_memo' => '전자회로',
+], $sessionToken);
+check(($issueOk['status'] === 302 || $issueOk['status'] === 200) && (float) $issueOk['quantity'] === 16.0, 'Valid CSRF should issue with room');
+
+$issueNoRoom = invokeItemAction('issue', 'POST', [
+    'csrf_token' => $sessionToken,
+    'item_id' => 'ci-solder',
+    'lot_id' => 'lot-solder',
+    'quantity' => '2',
+    'purpose' => '5교시',
+], $sessionToken);
+check(($issueNoRoom['status'] === 302 || $issueNoRoom['status'] === 200) && (float) $issueNoRoom['quantity'] === 18.0, 'Issue without room must not deduct');
+
+$issueBad = invokeItemAction('issue', 'POST', [
+    'csrf_token' => 'wrong-token',
+    'item_id' => 'ci-solder',
+    'lot_id' => 'lot-solder',
+    'quantity' => '2',
+    'purpose' => '5교시',
+    'room_id' => 'loc-elec',
+], $sessionToken);
+check($issueBad['status'] === 403 && (float) $issueBad['quantity'] === 18.0, 'Bad CSRF must fail closed without issuing');
+
+$issueGet = invokeItemAction('issue', 'GET', [
+    'csrf_token' => $sessionToken,
+    'item_id' => 'ci-solder',
+    'lot_id' => 'lot-solder',
+    'quantity' => '2',
+    'purpose' => '5교시',
+    'room_id' => 'loc-elec',
+], $sessionToken);
+check($issueGet['status'] === 405 && (float) $issueGet['quantity'] === 18.0, 'GET must be rejected for issue');
+
 $cancelOk = invokeItemAction('cancelIssue', 'POST', [
     'csrf_token' => $sessionToken,
     'item_id' => 'ci-solder',

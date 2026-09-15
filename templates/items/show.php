@@ -12,6 +12,8 @@ $tags = Support::jsonDecode($item['tags'] ?? null);
 $stockable = in_array($item['type'], ['fixture', 'consumable', 'part'], true);
 $issueable = in_array($item['type'], ['consumable', 'part'], true);
 $lowStock = !empty($lowStock);
+$rooms = $rooms ?? [];
+$issueRoom = $issueRoom ?? null;
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('items')) ?>">← 품목 목록</a> · <a href="<?= Support::e(App::url('search')) ?>">찾기</a><?php if ($issueable): ?> · <a href="<?= Support::e(App::url('materials')) ?>">실험실습재료</a><?php endif; ?></p>
 <h1>
@@ -124,15 +126,32 @@ $budgetLabel = Budget::format(
       <input type="hidden" name="item_id" value="<?= Support::e($item['id']) ?>">
       <input type="hidden" name="lot_id" value="<?= Support::e($lot['id']) ?>">
       <div class="field">
-        <label for="quantity-<?= Support::e($lot['id']) ?>">출고 수량 (<?= Support::e($item['unit']) ?>)</label>
+        <label for="quantity-<?= Support::e($lot['id']) ?>">분출 수량 (<?= Support::e($item['unit']) ?>)</label>
         <input id="quantity-<?= Support::e($lot['id']) ?>" name="quantity" type="number" min="0" max="<?= Support::e((string) $lot['quantity']) ?>" step="any" inputmode="decimal" required>
+      </div>
+      <div class="field">
+        <label for="room-<?= Support::e($lot['id']) ?>">실</label>
+        <select id="room-<?= Support::e($lot['id']) ?>" name="room_id" required>
+          <option value="">실을 선택하세요</option>
+          <?php foreach ($rooms as $room): ?>
+            <option value="<?= Support::e((string) $room['id']) ?>" <?= ($issueRoom ?? null) === $room['id'] ? 'selected' : '' ?>>
+              <?= Support::e((string) $room['name']) ?>
+              <?= !empty($room['parent_name']) ? ' · ' . Support::e((string) $room['parent_name']) : '' ?>
+              <?= !empty($room['code']) ? ' · ' . Support::e((string) $room['code']) : '' ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="field">
+        <label for="class-memo-<?= Support::e($lot['id']) ?>">수업/메모 (선택)</label>
+        <input id="class-memo-<?= Support::e($lot['id']) ?>" name="class_memo" maxlength="200" placeholder="예: 2학년 전자회로">
       </div>
       <div class="field">
         <label for="purpose-<?= Support::e($lot['id']) ?>">사용 사유</label>
         <input id="purpose-<?= Support::e($lot['id']) ?>" name="purpose" placeholder="예: 5교시 실습, 프로젝트 제작" required>
       </div>
-      <button class="btn btn-primary btn-block" type="submit">사용 출고</button>
-      <p class="muted">선택한 위치의 재고에서 차감됩니다.</p>
+      <button class="btn btn-primary btn-block" type="submit">분출</button>
+      <p class="muted">선택한 위치의 재고에서 차감되고, 이력에 실이 남습니다.</p>
     </form>
     <?php elseif ($issueable && (float) $lot['quantity'] <= 0): ?>
       <p class="muted">출고할 재고가 없습니다.</p>
@@ -206,6 +225,26 @@ $budgetLabel = Budget::format(
 
 <div class="card">
   <h2 class="section-title" style="margin-top:0">이력</h2>
+  <?php if (!empty($rooms)): ?>
+  <form method="get" action="<?= Support::e(App::url('items/show', ['id' => $item['id']])) ?>">
+    <input type="hidden" name="r" value="items/show">
+    <input type="hidden" name="id" value="<?= Support::e((string) $item['id']) ?>">
+    <div class="field">
+      <label for="history-room">분출 실</label>
+      <select id="history-room" name="room">
+        <option value="">전체</option>
+        <?php foreach ($rooms as $room): ?>
+          <option value="<?= Support::e((string) $room['id']) ?>" <?= ($issueRoom ?? null) === $room['id'] ? 'selected' : '' ?>>
+            <?= Support::e((string) $room['name']) ?>
+            <?= !empty($room['parent_name']) ? ' · ' . Support::e((string) $room['parent_name']) : '' ?>
+            <?= !empty($room['code']) ? ' · ' . Support::e((string) $room['code']) : '' ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <button class="btn btn-ghost" type="submit">이력 걸러보기</button>
+  </form>
+  <?php endif; ?>
   <?php foreach ($logs as $log): ?>
     <?php $cancel = $cancels[$log['id']] ?? null; ?>
     <div class="list-row">
