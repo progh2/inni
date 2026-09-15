@@ -6,6 +6,7 @@ use Inni\Support;
 ?>
 <h1>실사</h1>
 <p class="muted">실을 고르면 그 장소의 예상 장비·품목 목록이 만들어집니다. 스캔 또는 코드 입력으로 확인하고, 끝나면 미확인 목록을 봅니다.</p>
+<p class="muted"><a href="<?= Support::e(App::url('inventory/report')) ?>">사업예산으로 장부 vs 실물 차이 보기</a></p>
 
 <form class="card" style="margin-top:1rem" method="post" action="<?= Support::e(App::url('inventory/start')) ?>">
   <?= Csrf::field() ?>

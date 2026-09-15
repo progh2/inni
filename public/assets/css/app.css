@@ -266,6 +266,36 @@ h1 { font-size: clamp(1.5rem, 3vw, 1.9rem); }
   border: 0;
 }
 
+.report-table-wrap { overflow-x: auto; }
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.report-table th,
+.report-table td {
+  text-align: left;
+  padding: 0.5rem 0.55rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.report-table th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(26,42,40,0.5);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.report-table td.num,
+.report-table th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.report-table tr.is-missing { background: rgba(161,29,46,0.06); }
+.report-table .title { font-weight: 600; }
+.report-table .meta { font-size: 0.8rem; color: rgba(26,42,40,0.55); }
+
 @media print {
   .no-print, .bottom-nav, .side-nav, .shell-header { display: none !important; }
   body, .cutting-mat { background: #fff; }

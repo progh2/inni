@@ -51,6 +51,10 @@ check(str_contains($more, '수리 대기'), 'More menu must expose 수리 대기
 check(str_contains($more, "App::url('reports')"), '수리 대기 must link to reports');
 check(str_contains($more, 'Auth::canWrite($user)'), '수리 대기 is gated on canWrite');
 check(substr_count($more, "App::url('reports')") === 1, 'More must not duplicate the repair queue link');
+check(str_contains($more, '사업예산 실사'), 'More menu must expose 사업예산 실사');
+check(str_contains($more, "App::url('inventory/report')"), '사업예산 실사 must link to inventory/report');
+check(str_contains($more, 'Auth::canInventory($user)'), '사업예산 실사 is gated on canInventory');
+check(substr_count($more, "App::url('inventory/report')") === 1, 'More must not duplicate the inventory report link');
 check(!str_contains($layout, "str_starts_with(\$current, 'items/')"), 'Item detail/new must not steal the 더보기 tab');
 check(!str_contains($layout, "str_starts_with(\$current, 'assets/')"), 'Asset detail must not steal the 더보기 tab');
 
@@ -63,6 +67,7 @@ check(str_contains($router, "'items' => [ItemController::class, 'index']"), 'ite
 check(str_contains($router, "'assets' => [AssetController::class, 'index']"), 'assets GET route is registered');
 check(str_contains($router, "'materials' => [MaterialController::class, 'index']"), 'materials GET route is registered');
 check(str_contains($router, "'reports' => [ReportController::class, 'index']"), 'reports GET route is registered');
+check(str_contains($router, "'inventory/report' => [InventoryController::class, 'report']"), 'inventory/report GET route is registered');
 
 check(str_contains($itemCtl, 'Catalog::list'), 'ItemController index keeps the #29 catalog list');
 check(str_contains($itemsTpl, '<h1>품목 목록</h1>'), 'items/index.php keeps the #29 list title');

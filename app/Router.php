@@ -94,6 +94,8 @@ final class Router
             'inventory/confirm' => [InventoryController::class, 'confirm'],
             'inventory/finish' => [InventoryController::class, 'finish'],
             'inventory/result' => [InventoryController::class, 'result'],
+            'inventory/report' => [InventoryController::class, 'report'],
+            'inventory/report/csv' => [InventoryController::class, 'reportCsv'],
 
             'more' => [MoreController::class, 'index'],
             'settings' => [SettingsController::class, 'index'],

@@ -6,9 +6,11 @@ namespace Inni\Controllers;
 
 use Inni\App;
 use Inni\Auth;
+use Inni\CatalogCsv;
 use Inni\Csrf;
 use Inni\Database;
 use Inni\Inventory;
+use Inni\InventoryBudget;
 use Inni\View;
 use InvalidArgumentException;
 
@@ -117,6 +119,26 @@ final class InventoryController
         View::render('inventory/result', compact('user', 'check', 'unchecked', 'lines'));
     }
 
+    public function report(): void
+    {
+        $user = $this->requireManager();
+        $pdo = Database::pdo();
+        $filters = InventoryBudget::filtersFromRequest($_GET);
+        $checks = InventoryBudget::checks($pdo);
+        $aggregates = InventoryBudget::aggregates($pdo, $filters);
+        $lines = InventoryBudget::lines($pdo, $filters);
+        $summary = InventoryBudget::summary($pdo, $filters);
+        View::render('inventory/report', compact('user', 'filters', 'checks', 'aggregates', 'lines', 'summary'));
+    }
+
+    public function reportCsv(): void
+    {
+        $this->requireManager();
+        $filters = InventoryBudget::filtersFromRequest($_GET);
+        $csv = InventoryBudget::csv(Database::pdo(), $filters);
+        $this->sendCsv('inni-inventory-budget-' . gmdate('Ymd') . '.csv', $csv);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -128,5 +150,16 @@ final class InventoryController
             App::redirect('more');
         }
         return $user;
+    }
+
+    private function sendCsv(string $filename, string $csv): never
+    {
+        $filename = preg_replace('/[^A-Za-z0-9._-]/', '_', $filename) ?: 'inni-inventory-budget.csv';
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('X-Content-Type-Options: nosniff');
+        header('Cache-Control: no-store');
+        echo CatalogCsv::BOM . $csv;
+        exit;
     }
 }

@@ -215,6 +215,7 @@ check(str_contains($room, 'Auth::canWrite($user)') && str_contains($room, 'funct
 $inventory = (string) file_get_contents($root . '/app/Controllers/InventoryController.php');
 check(str_contains($inventory, 'Auth::canInventory($user)'), 'inventory controller requires canInventory');
 check(str_contains($inventory, 'function start') && str_contains($inventory, 'function confirm') && str_contains($inventory, 'function finish'), 'inventory has start/confirm/finish');
+check(str_contains($inventory, 'function report') && str_contains($inventory, 'function reportCsv'), 'inventory report is gated with the same canInventory helper');
 
 $catalogCsv = (string) file_get_contents($root . '/app/Controllers/CatalogCsvController.php');
 check(str_contains($catalogCsv, 'Auth::canWrite($user)'), 'catalog csv requires canWrite (owner/manager)');
