@@ -123,12 +123,13 @@ check(str_contains($showTpl, 'Csrf::field()') && str_contains($showTpl, 'method=
 check(str_contains($showTpl, 'Auth::canLoan($user)'), 'Issue form is canLoan-gated');
 check(str_contains($showTpl, 'name="room"') && str_contains($showTpl, '이력 걸러보기'), 'Item show filters history by room');
 check(str_contains($showTpl, 'items/cancel-issue') && str_contains($showTpl, 'name="issue_log_id"'), 'Cancel-issue path stays on item show');
+check(str_contains($showTpl, 'id="issue"') && str_contains($showTpl, 'id="restock"'), 'Item show keeps #issue and #restock anchors for the board');
 check(str_contains($showTpl, 'items/lot') && str_contains($showTpl, 'name="lot_code"') && str_contains($showTpl, 'name="expires_at"'), '#48 lot/expiry fields stay');
 check(str_contains($showTpl, 'badge overdue') && str_contains($showTpl, '부족'), '#48 shortage badge stays on item show');
 
 $matTpl = (string) file_get_contents($root . '/templates/materials/index.php');
-check(str_contains($matTpl, 'name="issue_room"') && str_contains($matTpl, '분출 이력'), 'Materials board filters issue history by room');
-check(!str_contains($matTpl, 'items/issue') && !str_contains($matTpl, 'items/restock'), 'Materials history has no issue/restock CTA');
+check(str_contains($matTpl, 'name="issue_room"') && str_contains($matTpl, '최근 분출'), 'Materials board filters recent 분출 by room');
+check(str_contains($matTpl, 'material_actions.php'), 'Materials board rows link to 분출/재입고');
 check(!str_contains($matTpl, 'Csrf::field()'), 'Materials history stays GET/read');
 check(str_contains($matTpl, 'badge overdue') && str_contains($matTpl, 'is-low-stock'), '#48 shortage badge stays on materials board');
 
@@ -140,6 +141,7 @@ check(preg_match('/function cancelIssue\(\): void\s*\{.*?Csrf::requirePost\(\)/s
 
 $matCtl = (string) file_get_contents($root . '/app/Controllers/MaterialController.php');
 check(str_contains($matCtl, 'Stock::issueHistory') && str_contains($matCtl, 'issue_room'), 'Materials board loads room-filtered issue history');
+check(str_contains($matCtl, 'MaterialBoard::waitingRestock'), 'Materials board loads 재입고 대기');
 check(!str_contains($matCtl, 'Csrf::'), 'Materials board stays read-only');
 
 $newTpl = (string) file_get_contents($root . '/templates/items/new.php');

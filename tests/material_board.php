@@ -167,6 +167,10 @@ check($summary['by_type']['consumable'] === 4, 'summary consumable count');
 check($summary['by_type']['part'] === 2, 'summary part count');
 check($summary['low_stock'] === 3, 'summary low_stock follows qty < min_stock');
 
+$waiting = MaterialBoard::waitingRestock($pdo);
+check(idSet($waiting) === ['empty', 'res', 'solder'], 'waitingRestock is the unfiltered shortage list');
+check(ids($waiting) === ids($low), 'waitingRestock matches low_stock=true list');
+
 check(snapshot($pdo) === $before, 'list/filter must not write catalog, stock, assets, or logs');
 
 $emptyDb = memoryDb();
@@ -187,6 +191,7 @@ check(str_contains($ctl, 'Auth::requireLogin()'), 'board requires login');
 check(!preg_match('/function index\(\): void\s*\{[^}]*canWrite/', $ctl), 'board browse is not write-gated');
 check(!str_contains($ctl, 'Csrf::'), 'read-only board has no CSRF write');
 check(str_contains($ctl, 'Stock::issueHistory'), 'board loads issue history for room filter');
+check(str_contains($ctl, 'MaterialBoard::waitingRestock'), 'board loads 재입고 대기 list');
 
 $router = (string) file_get_contents($root . '/app/Router.php');
 check(str_contains($router, "'materials' => [MaterialController::class, 'index']"), 'router registers materials board');
@@ -202,8 +207,9 @@ check(str_contains($tpl, 'method="get"'), 'board filters are GET/SSR');
 check(!preg_match('/name=["\']q["\']/', $tpl), 'board does not require a search box');
 check(!str_contains($tpl, 'Csrf::field()'), 'board is a GET read; no CSRF write');
 check(str_contains($tpl, "App::url('items')"), 'board points at #29 catalog for equipment/fixture');
-check(str_contains($tpl, 'name="issue_room"') && str_contains($tpl, '분출 이력'), 'board can filter issue history by room');
-check(!str_contains($tpl, 'items/issue') && !str_contains($tpl, 'items/restock'), 'board history is not an issue/restock CTA');
+check(str_contains($tpl, 'name="issue_room"') && str_contains($tpl, '최근 분출'), 'board can filter recent 분출 by room');
+check(str_contains($tpl, 'id="restock-wait"') && str_contains($tpl, 'id="recent-issues"'), 'board has 재입고 대기 and 최근 분출 sections');
+check(str_contains($tpl, 'material_actions.php'), 'board rows include 분출/재입고 action partial');
 
 $more = (string) file_get_contents($root . '/templates/more/index.php');
 check(str_contains($more, "App::url('materials')") && str_contains($more, '실험실습재료 현황'), 'more menu links to the board');
