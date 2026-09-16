@@ -23,6 +23,19 @@ final class Report
         self::STATUS_REJECTED,
     ];
 
+    public const URGENCY_NORMAL = 'normal';
+    public const URGENCY_URGENT = 'urgent';
+
+    /** @var list<string> */
+    public const URGENCIES = [self::URGENCY_NORMAL, self::URGENCY_URGENT];
+
+    public const WISH_INHOUSE = 'inhouse';
+    public const WISH_OUTSOURCE = 'outsource';
+    public const WISH_REPLACE = 'replace';
+
+    /** @var list<string> */
+    public const WISHES = [self::WISH_INHOUSE, self::WISH_OUTSOURCE, self::WISH_REPLACE];
+
     /** Open repair work — 접수 + 수리중. */
     /** @var list<string> */
     public const OPEN_STATUSES = [self::STATUS_OPEN, self::STATUS_IN_PROGRESS];
@@ -73,6 +86,9 @@ final class Report
         string $symptom,
         ?string $title = null,
         ?string $imagePath = null,
+        mixed $discoveredAt = null,
+        mixed $urgency = null,
+        mixed $wish = null,
     ): string {
         if (!Auth::canLoan($actor) || ($actor['status'] ?? '') !== 'active') {
             throw new InvalidArgumentException('수리 요청 권한이 없습니다.');
@@ -82,6 +98,9 @@ final class Report
         $symptom = trim($symptom);
         $title = self::nullableTrim($title);
         $imagePath = self::nullableTrim($imagePath);
+        $discoveredAt = self::parseDiscoveredAt($discoveredAt);
+        $urgency = self::parseUrgency($urgency);
+        $wish = self::parseWish($wish);
         if ($assetId === '') {
             throw new InvalidArgumentException('장비를 찾을 수 없습니다.');
         }
@@ -109,8 +128,8 @@ final class Report
             $t = Support::now();
             $reportId = Support::id('rep');
             $pdo->prepare(
-                'INSERT INTO reports(id,target_type,target_id,reporter_user_id,reporter_name,title,body,image_path,status,created_at,updated_at)
-                 VALUES(?,?,?,?,?,?,?,?,?,?,?)'
+                'INSERT INTO reports(id,target_type,target_id,reporter_user_id,reporter_name,title,body,image_path,status,discovered_at,urgency,wish,created_at,updated_at)
+                 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             )->execute([
                 $reportId,
                 'asset',
@@ -121,6 +140,9 @@ final class Report
                 $symptom,
                 $imagePath,
                 self::STATUS_OPEN,
+                $discoveredAt,
+                $urgency,
+                $wish,
                 $t,
                 $t,
             ]);
@@ -130,6 +152,9 @@ final class Report
             self::writeLog($pdo, $actor, 'report', 'report', $reportId, $summary, [
                 'asset_id' => $assetId,
                 'asset_status' => $marked ? 'repair' : $assetStatus,
+                'discovered_at' => $discoveredAt,
+                'urgency' => $urgency,
+                'wish' => $wish,
             ], $t);
             if ($marked) {
                 self::writeLog($pdo, $actor, 'report', 'asset', $assetId, $summary . ' · 상태를 수리중으로 변경', [
@@ -328,7 +353,9 @@ final class Report
                     a.name AS asset_name,
                     a.management_number,
                     a.status AS asset_status,
-                    a.location_id
+                    a.location_id,
+                    a.budget_program AS asset_budget_program,
+                    a.budget_year AS asset_budget_year
              FROM reports r
              LEFT JOIN assets a ON r.target_type = 'asset' AND a.id = r.target_id
              WHERE r.id = ?"
@@ -348,6 +375,89 @@ final class Report
         );
         $stmt->execute(['report', $reportId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function parseDiscoveredAt(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_string($value) && !is_int($value)) {
+            throw new InvalidArgumentException('발견일시는 날짜로 입력하세요.');
+        }
+        $text = trim((string) $value);
+        if ($text === '') {
+            return null;
+        }
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $text, $m) === 1) {
+            $year = (int) $m[1];
+            $month = (int) $m[2];
+            $day = (int) $m[3];
+            if ($year < 1900 || $year > 2100 || !checkdate($month, $day, $year)) {
+                throw new InvalidArgumentException('발견일시가 올바른 날짜가 아닙니다.');
+            }
+            return sprintf('%04d-%02d-%02d', $year, $month, $day);
+        }
+        $ts = strtotime($text);
+        if ($ts === false) {
+            throw new InvalidArgumentException('발견일시는 YYYY-MM-DD로 입력하세요.');
+        }
+        return date('Y-m-d', $ts);
+    }
+
+    public static function parseUrgency(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return self::URGENCY_NORMAL;
+        }
+        if (!is_string($value)) {
+            throw new InvalidArgumentException('긴급도를 확인하세요.');
+        }
+        $value = trim($value);
+        if ($value === '') {
+            return self::URGENCY_NORMAL;
+        }
+        if (!in_array($value, self::URGENCIES, true)) {
+            throw new InvalidArgumentException('긴급도를 확인하세요.');
+        }
+        return $value;
+    }
+
+    public static function parseWish(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_string($value)) {
+            throw new InvalidArgumentException('외주·교체 희망을 확인하세요.');
+        }
+        $value = trim($value);
+        if ($value === '') {
+            return null;
+        }
+        if (!in_array($value, self::WISHES, true)) {
+            throw new InvalidArgumentException('외주·교체 희망을 확인하세요.');
+        }
+        return $value;
+    }
+
+    public static function urgencyLabel(?string $urgency): string
+    {
+        return match ($urgency) {
+            self::URGENCY_URGENT => '긴급',
+            self::URGENCY_NORMAL => '보통',
+            default => $urgency !== null && $urgency !== '' ? $urgency : '보통',
+        };
+    }
+
+    public static function wishLabel(?string $wish): string
+    {
+        return match ($wish) {
+            self::WISH_INHOUSE => '자체 수리',
+            self::WISH_OUTSOURCE => '외주',
+            self::WISH_REPLACE => '교체',
+            default => $wish ?? '',
+        };
     }
 
     public static function titleFromSymptom(string $symptom): string

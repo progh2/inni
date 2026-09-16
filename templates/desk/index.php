@@ -42,11 +42,17 @@ $scanHintText = 'QR을 찍으면 바로 빌려주기·받아주기가 뜹니다.
       <p>
         <strong><?= Support::e((string) $loan['borrower_name']) ?></strong>
         · 예정 <?= Support::e(Support::formatWhen($loan['due_at'] ?? null)) ?>
+        <?php if (!empty($loan['purpose'])): ?> · <?= Support::e((string) $loan['purpose']) ?><?php endif; ?>
+        <?php if (!empty($loan['borrower_note'])): ?> · <?= Support::e((string) $loan['borrower_note']) ?><?php endif; ?>
       </p>
       <form method="post" action="<?= Support::e(App::url('loans/return')) ?>">
         <?= Csrf::field() ?>
         <input type="hidden" name="loan_id" value="<?= Support::e((string) $loan['id']) ?>">
         <input type="hidden" name="return_to" value="desk">
+        <?php
+          $required = true;
+          require dirname(__DIR__) . '/partials/return_condition.php';
+        ?>
         <button class="btn btn-ink btn-block" type="submit">받아주기</button>
       </form>
     <?php elseif ($canLoanNow): ?>
@@ -64,6 +70,14 @@ $scanHintText = 'QR을 찍으면 바로 빌려주기·받아주기가 뜹니다.
               </label>
             <?php endforeach; ?>
           </div>
+        </div>
+        <div class="field">
+          <label>용도</label>
+          <input name="purpose" maxlength="200" placeholder="5교시 실습">
+        </div>
+        <div class="field">
+          <label>학번/비고</label>
+          <input name="borrower_note" maxlength="200" placeholder="3-2 / 프로젝트명">
         </div>
         <div class="field">
           <label>반납 예정</label>

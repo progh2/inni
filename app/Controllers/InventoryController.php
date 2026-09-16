@@ -94,7 +94,13 @@ final class InventoryController
             $checkId = $active['id'] ?? '';
         }
         try {
-            $check = Inventory::finish($pdo, $user, (string) $checkId);
+            $check = Inventory::finish(
+                $pdo,
+                $user,
+                (string) $checkId,
+                $_POST['witness_name'] ?? null,
+                $_POST['confirm_teacher'] ?? null,
+            );
         } catch (InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());
             App::redirect('inventory');
@@ -153,6 +159,32 @@ final class InventoryController
         }
         if ($returnTo === 'report') {
             App::redirect('inventory/report', InventoryBudget::query(InventoryBudget::filtersFromRequest($_POST)));
+        }
+        if ($checkId !== '') {
+            App::redirect('inventory/result', ['id' => $checkId]);
+        }
+        App::redirect('inventory/report');
+    }
+
+    public function attest(): void
+    {
+        $user = $this->requireManager();
+        Csrf::requirePost();
+        $checkId = trim((string) ($_POST['check_id'] ?? ''));
+        try {
+            Inventory::attest(
+                Database::pdo(),
+                $user,
+                $checkId,
+                $_POST['witness_name'] ?? null,
+                $_POST['confirm_teacher'] ?? null,
+            );
+            App::flash('ok', '실사조서에 입회·확인 교사를 남겼습니다.');
+        } catch (InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '실사조서를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
         }
         if ($checkId !== '') {
             App::redirect('inventory/result', ['id' => $checkId]);

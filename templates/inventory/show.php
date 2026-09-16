@@ -39,9 +39,21 @@ $total = count($lines);
   <?php endif; ?>
 </div>
 
-<form class="actions" method="post" action="<?= Support::e(App::url('inventory/finish')) ?>">
+<form class="card" method="post" action="<?= Support::e(App::url('inventory/finish')) ?>">
   <?= Csrf::field() ?>
   <input type="hidden" name="check_id" value="<?= Support::e($check['id']) ?>">
+  <h2 class="section-title" style="margin-top:0">실사조서</h2>
+  <p class="muted">종료할 때 입회·확인 교사를 남깁니다.</p>
+  <div class="grid-2">
+    <div class="field">
+      <label for="inv-witness">입회 교사</label>
+      <input id="inv-witness" name="witness_name" maxlength="80" required placeholder="입회한 교사 이름">
+    </div>
+    <div class="field">
+      <label for="inv-confirm">확인 교사</label>
+      <input id="inv-confirm" name="confirm_teacher" maxlength="80" required placeholder="확인한 교사 이름" value="<?= Support::e((string) ($user['display_name'] ?? '')) ?>">
+    </div>
+  </div>
   <button class="btn btn-ink btn-block" type="submit">실사 종료 · 미확인 보기</button>
 </form>
 <p class="muted" style="margin-top:0.75rem">

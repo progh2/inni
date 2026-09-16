@@ -49,6 +49,8 @@ $chips = [
           <?= !empty($r['management_number']) ? ' · ' . Support::e((string) $r['management_number']) : '' ?>
           · <?= Support::e($r['reporter_name']) ?>
           · <?= Support::e(Support::formatWhen($r['created_at'] ?? null)) ?>
+          <?php if (!empty($r['urgency'])): ?> · <?= Support::e(Report::urgencyLabel((string) $r['urgency'])) ?><?php endif; ?>
+          <?php if (!empty($r['wish'])): ?> · <?= Support::e(Report::wishLabel((string) $r['wish'])) ?><?php endif; ?>
         </div>
       </div>
       <div class="actions">

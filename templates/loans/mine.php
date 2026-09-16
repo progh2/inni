@@ -3,6 +3,7 @@
 use Inni\App;
 use Inni\Auth;
 use Inni\Csrf;
+use Inni\Loan;
 use Inni\Support;
 
 /** @var array $user */
@@ -32,17 +33,21 @@ use Inni\Support;
           <?= !empty($loan['management_number']) ? ' · ' . Support::e((string) $loan['management_number']) : '' ?>
           <?= !empty($loan['purpose']) ? ' · ' . Support::e((string) $loan['purpose']) : '' ?>
         </div>
-      </div>
-      <div class="actions">
-        <span class="badge <?= Support::e((string) $loan['status']) ?>"><?= Support::e(Support::statusLabel((string) $loan['status'])) ?></span>
         <?php if (Auth::canReturn($user, $loan)): ?>
-          <form method="post" action="<?= Support::e(App::url('loans/return')) ?>">
+          <form method="post" action="<?= Support::e(App::url('loans/return')) ?>" style="margin-top:0.5rem">
             <?= Csrf::field() ?>
             <input type="hidden" name="loan_id" value="<?= Support::e((string) $loan['id']) ?>">
             <input type="hidden" name="return_to" value="mine">
+            <?php
+              $required = false;
+              require dirname(__DIR__) . '/partials/return_condition.php';
+            ?>
             <button class="btn <?= $overdue ? 'btn-primary' : 'btn-ghost' ?>" type="submit">반납</button>
           </form>
         <?php endif; ?>
+      </div>
+      <div class="actions">
+        <span class="badge <?= Support::e((string) $loan['status']) ?>"><?= Support::e(Support::statusLabel((string) $loan['status'])) ?></span>
       </div>
     </div>
   <?php endforeach; ?>
@@ -60,6 +65,9 @@ use Inni\Support;
         <div class="meta">
           반납 <?= Support::e(Support::formatWhen($loan['returned_at'] ?? null)) ?>
           <?= !empty($loan['management_number']) ? ' · ' . Support::e((string) $loan['management_number']) : '' ?>
+          <?php if (!empty($loan['return_condition'])): ?>
+            · <?= Support::e(Loan::returnConditionLabel((string) $loan['return_condition'])) ?>
+          <?php endif; ?>
         </div>
       </div>
       <span class="badge <?= Support::e((string) $loan['status']) ?>"><?= Support::e(Support::statusLabel((string) $loan['status'])) ?></span>

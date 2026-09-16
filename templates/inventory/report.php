@@ -24,7 +24,7 @@ $csvQuery = InventoryBudget::query($filters);
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('inventory')) ?>">← 실사</a></p>
 <h1>사업예산 실사</h1>
-<p class="muted">종료·진행 중 실사를 사업명·예산연도로 거릅니다. 장부는 실사 시작 수량, 실물은 확인이면 장부와 같고 미확인이면 0입니다. 종료된 실사의 미확인은 아래에서 장부 보정할 수 있습니다.</p>
+<p class="muted">종료·진행 중 실사를 사업명·예산연도로 거릅니다. 장부는 실사 시작 수량, 실물은 확인이면 장부와 같고 미확인이면 0입니다. 종료된 실사의 미확인은 아래에서 장부 보정할 수 있습니다. 실사조서에는 입회·확인 교사를 남깁니다.</p>
 
 <div class="stats" style="margin:1rem 0">
   <a class="stat" href="<?= Support::e(App::url('inventory/report', $filterQuery(['diff' => 'all']))) ?>">
@@ -167,7 +167,13 @@ $csvQuery = InventoryBudget::query($filters);
               </td>
               <td>
                 <?= Support::e((string) ($line['check_location_name'] ?? '')) ?>
-                <div class="meta"><?= Support::e(InventoryBudget::checkStatusLabel((string) ($line['check_status'] ?? ''))) ?></div>
+                <div class="meta">
+                  <?= Support::e(InventoryBudget::checkStatusLabel((string) ($line['check_status'] ?? ''))) ?>
+                  <?php if (!empty($line['witness_name']) || !empty($line['confirm_teacher'])): ?>
+                    · 입회 <?= Support::e((string) ($line['witness_name'] ?? '—')) ?>
+                    · 확인 <?= Support::e((string) ($line['confirm_teacher'] ?? '—')) ?>
+                  <?php endif; ?>
+                </div>
               </td>
               <td><?= $rowBudget !== '' ? Support::e($rowBudget) : '—' ?></td>
               <td class="num"><?= Support::e(InventoryBudget::formatQty((float) $line['expected_qty'])) ?></td>

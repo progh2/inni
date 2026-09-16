@@ -1,6 +1,7 @@
 <?php
 
 use Inni\App;
+use Inni\Asset;
 use Inni\Auth;
 use Inni\Csrf;
 use Inni\InventoryAdjust;
@@ -83,3 +84,13 @@ if (!$user || !Auth::canWrite($user)) {
   </div>
   <button class="btn btn-ink" type="submit"><?= $already ? '다시 보정' : '장부 보정' ?></button>
 </form>
+<?php if ($kind === 'asset' && !empty($line['asset_id'])): ?>
+  <?php
+    $assetId = (string) $line['asset_id'];
+    $kind = Asset::RETIRE_OTHER;
+    $reason = '실사 미확인';
+    $label = '파기로 이어가기';
+    $hint = '';
+    require __DIR__ . '/retire_handoff.php';
+  ?>
+<?php endif; ?>

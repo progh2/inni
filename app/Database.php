@@ -66,6 +66,9 @@ final class Database
         self::ensureColumn($pdo, 'assets', 'retired_at', 'TEXT');
         self::ensureColumn($pdo, 'assets', 'retire_reason', 'TEXT');
         self::ensureColumn($pdo, 'assets', 'retire_evidence', 'TEXT');
+        self::ensureColumn($pdo, 'assets', 'retire_kind', 'TEXT');
+        self::ensureColumn($pdo, 'loans', 'return_condition', 'TEXT');
+        self::ensureColumn($pdo, 'loans', 'return_note', 'TEXT');
         self::ensureColumn($pdo, 'stock_lots', 'lot_code', 'TEXT');
         self::ensureColumn($pdo, 'stock_lots', 'expires_at', 'TEXT');
         $pdo->exec('CREATE INDEX IF NOT EXISTS idx_catalog_budget ON catalog_items(budget_year, budget_program)');
@@ -99,6 +102,13 @@ final class Database
         self::ensureColumn($pdo, 'reports', 'cost_vendor', 'TEXT');
         self::ensureColumn($pdo, 'reports', 'cost_budget_line', 'TEXT');
         self::ensureColumn($pdo, 'reports', 'cost_at', 'TEXT');
+        self::ensureColumn($pdo, 'reports', 'discovered_at', 'TEXT');
+        self::ensureColumn($pdo, 'reports', 'urgency', 'TEXT');
+        self::ensureColumn($pdo, 'reports', 'wish', 'TEXT');
+        self::ensureColumn($pdo, 'reports', 'cost_estimate', 'REAL');
+        self::ensureColumn($pdo, 'reports', 'cost_evidence', 'TEXT');
+        self::ensureColumn($pdo, 'reports', 'cost_budget_program', 'TEXT');
+        self::ensureColumn($pdo, 'reports', 'cost_budget_year', 'INTEGER');
         $reportsExists = $pdo->query(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'reports'"
         )->fetchColumn();
@@ -168,10 +178,12 @@ final class Database
         self::ensureColumn($pdo, 'inventory_check_lines', 'adjusted_by', 'TEXT');
         self::ensureColumn($pdo, 'inventory_check_lines', 'adjust_reason', 'TEXT');
         self::ensureColumn($pdo, 'inventory_check_lines', 'adjust_approver', 'TEXT');
+        self::ensureColumn($pdo, 'inventory_checks', 'witness_name', 'TEXT');
+        self::ensureColumn($pdo, 'inventory_checks', 'confirm_teacher', 'TEXT');
     }
 
     /**
-     * @param 'catalog_items'|'assets'|'stock_lots'|'inventory_check_lines'|'reports' $table
+     * @param 'catalog_items'|'assets'|'stock_lots'|'inventory_check_lines'|'inventory_checks'|'reports'|'loans' $table
      */
     private static function ensureColumn(PDO $pdo, string $table, string $column, string $type): void
     {
@@ -184,6 +196,7 @@ final class Database
                 'retired_at' => 'TEXT',
                 'retire_reason' => 'TEXT',
                 'retire_evidence' => 'TEXT',
+                'retire_kind' => 'TEXT',
             ],
             'stock_lots' => [
                 'lot_code' => 'TEXT',
@@ -195,11 +208,26 @@ final class Database
                 'adjust_reason' => 'TEXT',
                 'adjust_approver' => 'TEXT',
             ],
+            'inventory_checks' => [
+                'witness_name' => 'TEXT',
+                'confirm_teacher' => 'TEXT',
+            ],
+            'loans' => [
+                'return_condition' => 'TEXT',
+                'return_note' => 'TEXT',
+            ],
             'reports' => [
                 'cost_amount' => 'REAL',
                 'cost_vendor' => 'TEXT',
                 'cost_budget_line' => 'TEXT',
                 'cost_at' => 'TEXT',
+                'discovered_at' => 'TEXT',
+                'urgency' => 'TEXT',
+                'wish' => 'TEXT',
+                'cost_estimate' => 'REAL',
+                'cost_evidence' => 'TEXT',
+                'cost_budget_program' => 'TEXT',
+                'cost_budget_year' => 'INTEGER',
             ],
         ];
         if (!isset($allowed[$table][$column]) || $allowed[$table][$column] !== $type) {

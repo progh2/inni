@@ -1,15 +1,22 @@
 <?php
 
 use Inni\App;
+use Inni\Asset;
 use Inni\AssetLife;
 use Inni\Auth;
 use Inni\Budget;
 use Inni\Csrf;
+use Inni\Report;
 use Inni\Support;
+
+$retireKind = $retireKind ?? null;
+$retireReason = $retireReason ?? '';
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('search')) ?>">← 찾기</a></p>
 <?php if (($focus ?? '') === 'repair'): ?>
   <p><a class="btn btn-primary" href="#repair">↓ 수리 요청으로 이동</a></p>
+<?php elseif (($focus ?? '') === 'retire'): ?>
+  <p><a class="btn btn-primary" href="#retire">↓ 파기로 이동</a></p>
 <?php endif; ?>
 <h1><?= Support::e($asset['name']) ?></h1>
 <p class="muted">
@@ -47,6 +54,10 @@ $lifeLabel = AssetLife::format(
 <?php if ($asset['status'] === 'retired'): ?>
   <p class="muted">
     파기
+    <?php
+      $retireKindLabel = Asset::retireKindLabel(isset($asset['retire_kind']) ? (string) $asset['retire_kind'] : null);
+    ?>
+    <?php if ($retireKindLabel !== ''): ?> · <?= Support::e($retireKindLabel) ?><?php endif; ?>
     <?php if (!empty($asset['retired_at'])): ?> · <?= Support::e((string) $asset['retired_at']) ?><?php endif; ?>
     <?php if (!empty($asset['retire_reason'])): ?> · <?= Support::e((string) $asset['retire_reason']) ?><?php endif; ?>
   </p>
@@ -93,11 +104,19 @@ $lifeLabel = AssetLife::format(
   <p><strong><?= Support::e($loan['borrower_name']) ?></strong>
     <span class="badge <?= Support::e($loan['status']) ?>"><?= Support::e(Support::statusLabel($loan['status'])) ?></span>
   </p>
-  <p class="muted">예정 <?= Support::e(Support::formatWhen($loan['due_at'])) ?></p>
+  <p class="muted">
+    예정 <?= Support::e(Support::formatWhen($loan['due_at'])) ?>
+    <?php if (!empty($loan['purpose'])): ?> · <?= Support::e((string) $loan['purpose']) ?><?php endif; ?>
+    <?php if (!empty($loan['borrower_note'])): ?> · <?= Support::e((string) $loan['borrower_note']) ?><?php endif; ?>
+  </p>
   <?php if (Auth::canReturn($user, $loan)): ?>
     <form method="post" action="<?= Support::e(App::url('loans/return')) ?>">
       <?= Csrf::field() ?>
       <input type="hidden" name="loan_id" value="<?= Support::e($loan['id']) ?>">
+      <?php
+        $required = true;
+        require dirname(__DIR__) . '/partials/return_condition.php';
+      ?>
       <button class="btn btn-ink btn-block" type="submit">반납 처리</button>
     </form>
   <?php endif; ?>
@@ -201,8 +220,19 @@ $lifeLabel = AssetLife::format(
       <?= Csrf::field() ?>
       <input type="hidden" name="asset_id" value="<?= Support::e($asset['id']) ?>">
       <div class="field">
+        <label>불용 구분</label>
+        <select name="retire_kind">
+          <option value="">선택 (선택)</option>
+          <?php foreach (Asset::RETIRE_KINDS as $kind): ?>
+            <option value="<?= Support::e($kind) ?>" <?= $retireKind === $kind ? 'selected' : '' ?>>
+              <?= Support::e(Asset::retireKindLabel($kind)) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="field">
         <label>사유</label>
-        <input name="reason" required maxlength="200" placeholder="내용연한 만료, 파손 등">
+        <input name="reason" required maxlength="200" placeholder="수리불가, 연한초과, 파손 등" value="<?= Support::e((string) $retireReason) ?>">
       </div>
       <div class="field">
         <label>파기일</label>
@@ -232,6 +262,28 @@ $lifeLabel = AssetLife::format(
         <label>증상</label>
         <textarea name="body" rows="3" required placeholder="전원 안 켜짐, 화면이 깜빡임 등"></textarea>
       </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>발견일</label>
+          <input name="discovered_at" type="date" value="<?= Support::e(date('Y-m-d')) ?>">
+        </div>
+        <div class="field">
+          <label>긴급도</label>
+          <select name="urgency">
+            <option value="<?= Support::e(Report::URGENCY_NORMAL) ?>">보통</option>
+            <option value="<?= Support::e(Report::URGENCY_URGENT) ?>">긴급</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>처리 희망</label>
+        <select name="wish">
+          <option value="">선택 (선택)</option>
+          <option value="<?= Support::e(Report::WISH_INHOUSE) ?>">자체 수리</option>
+          <option value="<?= Support::e(Report::WISH_OUTSOURCE) ?>">외주</option>
+          <option value="<?= Support::e(Report::WISH_REPLACE) ?>">교체</option>
+        </select>
+      </div>
       <div class="field">
         <label>사진 (선택)</label>
         <input type="file" name="photo" accept="image/*" capture="environment">
@@ -249,7 +301,13 @@ $lifeLabel = AssetLife::format(
         <?php else: ?>
           <div class="title"><?= Support::e($r['title']) ?></div>
         <?php endif; ?>
-        <div class="meta"><?= Support::e(Support::statusLabel($r['status'])) ?> · <?= Support::e($r['reporter_name']) ?> · <?= Support::e(Support::formatWhen($r['created_at'])) ?></div>
+        <div class="meta">
+          <?= Support::e(Support::statusLabel($r['status'])) ?>
+          · <?= Support::e($r['reporter_name']) ?>
+          · <?= Support::e(Support::formatWhen($r['created_at'])) ?>
+          <?php if (!empty($r['urgency'])): ?> · <?= Support::e(Report::urgencyLabel((string) $r['urgency'])) ?><?php endif; ?>
+          <?php if (!empty($r['wish'])): ?> · <?= Support::e(Report::wishLabel((string) $r['wish'])) ?><?php endif; ?>
+        </div>
       </div>
       <span class="badge <?= Support::e($r['status']) ?>"><?= Support::e(Support::statusLabel($r['status'])) ?></span>
     </div>
@@ -258,6 +316,16 @@ $lifeLabel = AssetLife::format(
       $returnTo = 'asset';
       require dirname(__DIR__) . '/partials/report_status.php';
     ?>
+    <?php if (($r['status'] ?? '') === Report::STATUS_REJECTED && ($asset['status'] ?? '') !== 'retired'): ?>
+      <?php
+        $assetId = (string) $asset['id'];
+        $kind = Asset::RETIRE_UNREPAIRABLE;
+        $reason = '수리불가';
+        $label = '불용·파기로 이어가기';
+        $hint = '수리불가면 불용 결정 후 파기합니다.';
+        require dirname(__DIR__) . '/partials/retire_handoff.php';
+      ?>
+    <?php endif; ?>
   <?php endforeach; ?>
   <?php if (!$reports): ?><p class="muted">아직 수리 요청이 없습니다.</p><?php endif; ?>
 </div>

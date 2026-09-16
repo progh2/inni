@@ -110,6 +110,16 @@ use Inni\Support;
           <?= !empty($r['management_number']) ? ' · ' . Support::e((string) $r['management_number']) : '' ?>
           <?= !empty($r['cost_vendor']) ? ' · ' . Support::e((string) $r['cost_vendor']) : '' ?>
           <?= !empty($r['cost_budget_line']) ? ' · ' . Support::e((string) $r['cost_budget_line']) : '' ?>
+          <?php
+            $caseBudget = \Inni\Budget::format(
+                isset($r['cost_budget_program']) ? (string) $r['cost_budget_program'] : null,
+                $r['cost_budget_year'] ?? null,
+            );
+          ?>
+          <?= $caseBudget !== '' ? ' · ' . Support::e($caseBudget) : '' ?>
+          <?php if (isset($r['cost_estimate']) && $r['cost_estimate'] !== null && $r['cost_estimate'] !== ''): ?>
+            · 견적 <?= Support::e(ReportCost::formatAmount((float) $r['cost_estimate'])) ?>
+          <?php endif; ?>
           <?= !empty($r['cost_at']) ? ' · ' . Support::e((string) $r['cost_at']) : '' ?>
         </div>
       </div>
