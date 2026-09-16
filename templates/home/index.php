@@ -5,7 +5,7 @@ use Inni\Auth;
 use Inni\Support;
 ?>
 <h1>홈</h1>
-<p class="muted">스캔하고, 찾고, 실별로 확인하세요.</p>
+<p class="muted">고장 나면 수리 요청, 빌린 장비는 내 대여함에서 보세요.</p>
 <?php if (!empty($telegramConnectNeeded) && ($lowStock || $activeLoans)): ?>
   <p class="flash error">알림 연결 필요. 재고 부족·연체 푸시는 설정에서 텔레그램 봇 토큰을 연결한 뒤에 보내집니다.</p>
 <?php endif; ?>
@@ -15,6 +15,8 @@ use Inni\Support;
   <div class="stat"><b><?= (int) $roomCount ?></b>실</div>
   <?php if (Auth::canWrite($user)): ?>
     <a class="stat" href="<?= Support::e(App::url('reports')) ?>"><b><?= (int) $openReports ?></b>수리</a>
+  <?php elseif (Auth::canLoan($user)): ?>
+    <a class="stat" href="<?= Support::e(App::url('reports/request')) ?>"><b><?= (int) $openReports ?></b>수리</a>
   <?php else: ?>
     <div class="stat"><b><?= (int) $openReports ?></b>수리</div>
   <?php endif; ?>
@@ -22,19 +24,25 @@ use Inni\Support;
 
 <div class="actions" style="margin-bottom:1rem">
   <a class="btn btn-primary" href="<?= Support::e(App::url('scan')) ?>">스캔하기</a>
+  <?php if (Auth::canLoan($user)): ?>
+    <a class="btn btn-primary" href="<?= Support::e(App::url('reports/request')) ?>">수리 요청</a>
+    <a class="btn btn-primary" href="<?= Support::e(App::url('loans/mine')) ?>">내 대여함</a>
+    <a class="btn btn-ghost" href="<?= Support::e(App::url('loans/desk')) ?>">대여 데스크</a>
+  <?php endif; ?>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('items')) ?>">품목 목록</a>
-  <a class="btn btn-ghost" href="<?= Support::e(App::url('items/new')) ?>">빠른 등록</a>
+  <?php if (Auth::canWrite($user)): ?>
+    <a class="btn btn-ghost" href="<?= Support::e(App::url('items/new')) ?>">빠른 등록</a>
+  <?php endif; ?>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('assets')) ?>">기자재 현황</a>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('materials')) ?>">실험실습재료</a>
-  <?php if (Auth::canLoan($user)): ?>
-    <a class="btn btn-primary" href="<?= Support::e(App::url('loans/desk')) ?>">대여 데스크</a>
-    <a class="btn btn-ghost" href="<?= Support::e(App::url('loans/mine')) ?>">내 대여함</a>
-  <?php endif; ?>
   <?php if (Auth::canWrite($user)): ?>
     <a class="btn btn-ghost" href="<?= Support::e(App::url('reports')) ?>">수리 대기</a>
   <?php endif; ?>
   <a class="btn btn-ghost" href="<?= Support::e(App::url('loans')) ?>">대여 현황</a>
 </div>
+<?php if (Auth::canLoan($user)): ?>
+  <p class="muted">대여 데스크는 장비를 빌려주고 받아주는 창구입니다.</p>
+<?php endif; ?>
 
 <?php if (Auth::canLoan($user)): ?>
 <div class="card">
@@ -56,6 +64,43 @@ use Inni\Support;
     <?php else: ?>
       <span class="badge active">내 대여</span>
     <?php endif; ?>
+  </a>
+  <a class="list-row" href="<?= Support::e(App::url('reports/request')) ?>">
+    <div>
+      <div class="title">수리 요청</div>
+      <div class="meta">고장난 장비를 찾아 증상을 남기세요.</div>
+    </div>
+    <span class="badge repair">수리</span>
+  </a>
+</div>
+<?php endif; ?>
+
+<?php if (Auth::canWrite($user)): ?>
+<div class="card">
+  <h2 class="section-title" style="margin-top:0">담당 작업</h2>
+  <a class="list-row" href="<?= Support::e(App::url('assets/aging')) ?>">
+    <div>
+      <div class="title">파기</div>
+      <div class="meta">노후·파손 장비는 상세에서 폐기 처리합니다.</div>
+    </div>
+  </a>
+  <a class="list-row" href="<?= Support::e(App::url('inventory')) ?>">
+    <div>
+      <div class="title">장부 보정</div>
+      <div class="meta">종료된 실사의 미확인을 장부에 맞춥니다.</div>
+    </div>
+  </a>
+  <a class="list-row" href="<?= Support::e(App::url('inventory/report')) ?>">
+    <div>
+      <div class="title">사업예산 실사</div>
+      <div class="meta">장부 vs 실물 차이 · CSV</div>
+    </div>
+  </a>
+  <a class="list-row" href="<?= Support::e(App::url('reports/costs')) ?>">
+    <div>
+      <div class="title">수리비</div>
+      <div class="meta">월·연 수리비 · 업체·예산과목</div>
+    </div>
   </a>
 </div>
 <?php endif; ?>

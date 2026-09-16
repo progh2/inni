@@ -105,7 +105,8 @@ final class AssetController
             $lifeSuggestions = PpsUsefulLife::suggest((string) ($asset['name'] ?? ''));
         }
 
-        View::render('assets/show', compact('user', 'asset', 'path', 'locations', 'loan', 'logs', 'reports', 'lifeSuggestions'));
+        $focus = (string) ($_GET['focus'] ?? '');
+        View::render('assets/show', compact('user', 'asset', 'path', 'locations', 'loan', 'logs', 'reports', 'lifeSuggestions', 'focus'));
     }
 
     public function suggestLife(): void

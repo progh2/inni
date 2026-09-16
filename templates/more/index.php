@@ -15,24 +15,32 @@ use Inni\Support;
   <a class="list-row" href="<?= Support::e(App::url('assets/aging')) ?>">
     <div>
       <div class="title">연한·노후 기자재</div>
-      <div class="meta">내용연한 임박·초과</div>
+      <div class="meta">내용연한(쓸 수 있는 햇수) 임박·초과</div>
     </div>
   </a>
   <a class="list-row" href="<?= Support::e(App::url('materials')) ?>">
     <div class="title">실험실습재료 현황</div>
   </a>
-  <a class="list-row" href="<?= Support::e(App::url('items/new')) ?>">
-    <div class="title">빠른 등록</div>
-  </a>
+  <?php if (Auth::canWrite($user)): ?>
+    <a class="list-row" href="<?= Support::e(App::url('items/new')) ?>">
+      <div class="title">빠른 등록</div>
+    </a>
+  <?php endif; ?>
   <?php if (Auth::canLoan($user)): ?>
     <a class="list-row" href="<?= Support::e(App::url('loans/desk')) ?>">
       <div>
         <div class="title">대여 데스크</div>
-        <div class="meta">스캔·검색으로 빌려주기·받아주기</div>
+        <div class="meta">장비를 빌려주고 받아주는 창구 · 스캔·검색</div>
       </div>
     </a>
     <a class="list-row" href="<?= Support::e(App::url('loans/mine')) ?>">
       <div class="title">내 대여함</div>
+    </a>
+    <a class="list-row" href="<?= Support::e(App::url('reports/request')) ?>">
+      <div>
+        <div class="title">수리 요청</div>
+        <div class="meta">고장난 장비를 찾아 증상을 남기세요</div>
+      </div>
     </a>
   <?php endif; ?>
   <?php if (Auth::canWrite($user)): ?>
@@ -43,6 +51,18 @@ use Inni\Support;
       <div>
         <div class="title">수리비 합계</div>
         <div class="meta">월·연 수리비 · 업체·예산과목</div>
+      </div>
+    </a>
+    <a class="list-row" href="<?= Support::e(App::url('assets/aging')) ?>">
+      <div>
+        <div class="title">파기</div>
+        <div class="meta">노후·파손 장비는 상세에서 폐기 처리</div>
+      </div>
+    </a>
+    <a class="list-row" href="<?= Support::e(App::url('inventory')) ?>">
+      <div>
+        <div class="title">장부 보정</div>
+        <div class="meta">종료된 실사 미확인을 장부에 반영</div>
       </div>
     </a>
   <?php endif; ?>

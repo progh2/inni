@@ -8,13 +8,48 @@ use Inni\App;
 use Inni\Auth;
 use Inni\Csrf;
 use Inni\Database;
+use Inni\Desk;
 use Inni\Report;
 use Inni\ReportCost;
+use Inni\Scan;
 use Inni\Support;
 use Inni\View;
 
 final class ReportController
 {
+    public function requestForm(): void
+    {
+        $user = self::requireTeacherRequest();
+        $pdo = Database::pdo();
+        $q = trim((string) ($_GET['q'] ?? ''));
+        $hits = $q !== '' ? Desk::searchAssets($pdo, $q) : [];
+
+        View::render('reports/request', compact('user', 'q', 'hits'));
+    }
+
+    public function requestResolve(): void
+    {
+        self::requireTeacherRequest();
+        Csrf::requirePost();
+        $code = trim((string) ($_POST['code'] ?? ''));
+        if ($code === '') {
+            App::flash('error', '코드를 입력하세요.');
+            App::redirect('reports/request');
+        }
+
+        $hit = Scan::lookup(Database::pdo(), $code);
+        if ($hit !== null && $hit['kind'] === 'asset') {
+            App::redirect('assets/show', ['id' => $hit['id'], 'focus' => 'repair']);
+        }
+        if ($hit !== null) {
+            App::flash('error', '수리 요청은 장비 QR만 처리합니다. 품목·실은 스캔 탭에서 여세요.');
+            App::redirect('reports/request');
+        }
+
+        App::flash('error', '코드를 찾지 못했습니다: ' . $code);
+        App::redirect('reports/request');
+    }
+
     public function index(): void
     {
         $user = Auth::requireLogin();
@@ -151,5 +186,16 @@ final class ReportController
                 : ['route' => 'reports', 'query' => []];
         }
         return ['route' => 'reports', 'query' => []];
+    }
+
+    /** @return array<string, mixed> */
+    private static function requireTeacherRequest(): array
+    {
+        $user = Auth::requireLogin();
+        if (!Auth::canLoan($user)) {
+            App::flash('error', '수리 요청 권한이 없습니다.');
+            App::redirect('home');
+        }
+        return $user;
     }
 }
