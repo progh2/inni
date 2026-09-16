@@ -48,11 +48,14 @@ check(str_contains($request, '<h1>수리 요청</h1>'), 'request page keeps the 
 check(str_contains($request, "App::url('reports/request/resolve')"), 'request camera/code posts to request resolve');
 check(str_contains($request, "App::url('assets/show'") && str_contains($request, '#repair'), 'request search lands on asset repair');
 check(str_contains($request, 'name="q"'), 'request page has a search field');
+check(str_contains($request, '장비 고르기') || str_contains($request, '$browse'), 'request shows a pick list when search is empty');
+check(strpos($request, 'name="q"') < strpos($request, 'scan_input.php'), 'name search comes before the QR form');
 check(!str_contains($request, 'new Vue') && !str_contains($request, 'createApp'), 'request page stays SSR');
 
 check(str_contains($router, "'reports/request' => [ReportController::class, 'requestForm']"), 'request route is registered');
 check(str_contains($router, "'reports/request/resolve' => [ReportController::class, 'requestResolve']"), 'request resolve route is registered');
 check(str_contains($reportCtl, 'function requestForm') && str_contains($reportCtl, 'function requestResolve'), 'request actions exist');
+check(str_contains($reportCtl, 'AssetBoard::list'), 'empty request page browses assets');
 check(str_contains($reportCtl, 'requireTeacherRequest') && str_contains($reportCtl, 'Auth::canLoan($user)'), 'request is gated on canLoan');
 check(str_contains($reportCtl, 'Csrf::requirePost()'), 'request resolve is POST+CSRF');
 check(str_contains($reportCtl, "focus' => 'repair'") || str_contains($reportCtl, "'focus' => 'repair'"), 'scan resolve focuses the repair form');

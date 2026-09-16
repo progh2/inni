@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Inni\Controllers;
 
 use Inni\App;
+use Inni\AssetBoard;
 use Inni\Auth;
 use Inni\Csrf;
 use Inni\Database;
@@ -23,8 +24,20 @@ final class ReportController
         $pdo = Database::pdo();
         $q = trim((string) ($_GET['q'] ?? ''));
         $hits = $q !== '' ? Desk::searchAssets($pdo, $q) : [];
+        $browse = [];
+        if ($q === '') {
+            foreach (AssetBoard::list($pdo, []) as $row) {
+                if (in_array((string) ($row['status'] ?? ''), ['lost', 'retired'], true)) {
+                    continue;
+                }
+                $browse[] = $row;
+                if (count($browse) >= 12) {
+                    break;
+                }
+            }
+        }
 
-        View::render('reports/request', compact('user', 'q', 'hits'));
+        View::render('reports/request', compact('user', 'q', 'hits', 'browse'));
     }
 
     public function requestResolve(): void
