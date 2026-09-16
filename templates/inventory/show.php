@@ -4,6 +4,9 @@ use Inni\App;
 use Inni\Csrf;
 use Inni\Support;
 
+/** @var list<array<string, mixed>> $teachers */
+$teachers = $teachers ?? [];
+
 $scanAction = App::url('inventory/confirm');
 $scanSubmitLabel = '확인';
 $scanHintText = '이 실의 장비·품목 QR을 찍거나 관리번호를 입력하세요.';
