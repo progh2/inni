@@ -15,6 +15,7 @@ final class ReportCost
 {
     public const VENDOR_MAX = 200;
     public const BUDGET_LINE_MAX = 200;
+    public const EVIDENCE_MAX = 200;
     public const AMOUNT_MAX = 999999999999.0;
     public const YEAR_MIN = 1900;
     public const YEAR_MAX = 2100;
@@ -54,6 +55,11 @@ final class ReportCost
         mixed $vendor,
         mixed $budgetLine,
         mixed $costAt,
+        mixed $estimate = null,
+        mixed $evidence = null,
+        mixed $budgetProgram = null,
+        mixed $budgetYear = null,
+        ?string $evidencePath = null,
     ): array {
         if (!Auth::canWrite($actor) || ($actor['status'] ?? '') !== 'active') {
             throw new InvalidArgumentException('수리비 기록 권한이 없습니다.');
@@ -68,6 +74,10 @@ final class ReportCost
         $vendor = self::parseText($vendor, '업체', self::VENDOR_MAX);
         $budgetLine = self::parseText($budgetLine, '예산과목', self::BUDGET_LINE_MAX);
         $costAt = self::parseDate($costAt);
+        $estimate = self::parseAmount($estimate);
+        $evidence = self::parseEvidence($evidence, $evidencePath);
+        $budgetProgram = Budget::parseProgram($budgetProgram);
+        $budgetYear = Budget::parseYear($budgetYear);
         if ($amount !== null && $costAt === null) {
             $costAt = self::today();
         }
@@ -84,12 +94,18 @@ final class ReportCost
             $t = Support::now();
             $upd = $pdo->prepare(
                 'UPDATE reports
-                 SET cost_amount = ?, cost_vendor = ?, cost_budget_line = ?, cost_at = ?, updated_at = ?
+                 SET cost_amount = ?, cost_vendor = ?, cost_budget_line = ?, cost_at = ?,
+                     cost_estimate = ?, cost_evidence = ?, cost_budget_program = ?, cost_budget_year = ?,
+                     updated_at = ?
                  WHERE id = ?'
             );
-            $upd->execute([$amount, $vendor, $budgetLine, $costAt, $t, $reportId]);
+            $upd->execute([
+                $amount, $vendor, $budgetLine, $costAt,
+                $estimate, $evidence, $budgetProgram, $budgetYear,
+                $t, $reportId,
+            ]);
 
-            $summary = self::logSummary($amount, $vendor, $budgetLine, $costAt);
+            $summary = self::logSummary($amount, $vendor, $budgetLine, $costAt, $estimate, $budgetProgram, $budgetYear);
             $pdo->prepare(
                 'INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,meta_json,created_at)
                  VALUES(?,?,?,?,?,?,?,?,?)'
@@ -106,6 +122,10 @@ final class ReportCost
                     'cost_vendor' => $vendor,
                     'cost_budget_line' => $budgetLine,
                     'cost_at' => $costAt,
+                    'cost_estimate' => $estimate,
+                    'cost_evidence' => $evidence,
+                    'cost_budget_program' => $budgetProgram,
+                    'cost_budget_year' => $budgetYear,
                     'status' => $report['status'] ?? null,
                 ], JSON_UNESCAPED_UNICODE),
                 $t,
@@ -398,20 +418,47 @@ final class ReportCost
         return [$sql, $params, $year, $month];
     }
 
-    private static function logSummary(?float $amount, ?string $vendor, ?string $budgetLine, ?string $costAt): string
+    public static function parseEvidence(mixed $evidence, ?string $evidencePath = null): ?string
     {
-        if ($amount === null && $vendor === null && $budgetLine === null && $costAt === null) {
+        $path = is_string($evidencePath) ? trim($evidencePath) : '';
+        $note = self::parseText($evidence, '증빙', self::EVIDENCE_MAX);
+        if ($path !== '') {
+            return $path;
+        }
+        return $note;
+    }
+
+    private static function logSummary(
+        ?float $amount,
+        ?string $vendor,
+        ?string $budgetLine,
+        ?string $costAt,
+        ?float $estimate = null,
+        ?string $budgetProgram = null,
+        ?int $budgetYear = null,
+    ): string {
+        if (
+            $amount === null && $vendor === null && $budgetLine === null && $costAt === null
+            && $estimate === null && $budgetProgram === null && $budgetYear === null
+        ) {
             return '수리비 지움';
         }
         $parts = [];
         if ($amount !== null) {
             $parts[] = self::formatAmount($amount);
         }
+        if ($estimate !== null) {
+            $parts[] = '견적 ' . self::formatAmount($estimate);
+        }
         if ($vendor !== null) {
             $parts[] = $vendor;
         }
         if ($budgetLine !== null) {
             $parts[] = $budgetLine;
+        }
+        $budget = Budget::format($budgetProgram, $budgetYear);
+        if ($budget !== '') {
+            $parts[] = $budget;
         }
         if ($costAt !== null) {
             $parts[] = $costAt;

@@ -1,8 +1,10 @@
 <?php
 
 use Inni\App;
+use Inni\Asset;
 use Inni\AssetLife;
 use Inni\AssetLifeBoard;
+use Inni\Auth;
 use Inni\Support;
 
 /** @var list<array<string, mixed>> $assets */
@@ -58,9 +60,11 @@ $filterQuery = static function (array $extra = []) use ($filters): array {
       $bucket = (string) ($asset['life_bucket'] ?? '');
       $rowClass = $bucket === AssetLife::BUCKET_EXCEEDED ? ' is-exceeded' : ($bucket === AssetLife::BUCKET_IMMINENT ? ' is-imminent' : '');
     ?>
-    <a class="list-row<?= $rowClass ?>" href="<?= Support::e(App::url('assets/show', ['id' => $asset['id']])) ?>">
+    <div class="list-row<?= $rowClass ?>">
       <div>
-        <div class="title"><?= Support::e((string) $asset['name']) ?></div>
+        <a class="title" href="<?= Support::e(App::url('assets/show', ['id' => $asset['id']])) ?>">
+          <?= Support::e((string) $asset['name']) ?>
+        </a>
         <div class="meta">
           <?= Support::e((string) $asset['management_number']) ?>
           · <?= Support::e((string) ($asset['location_name'] ?? '')) ?>
@@ -71,11 +75,21 @@ $filterQuery = static function (array $extra = []) use ($filters): array {
             · <?= Support::e((string) $asset['remaining_label']) ?>
           <?php endif; ?>
         </div>
+        <?php if ($bucket === AssetLife::BUCKET_EXCEEDED && Auth::canWrite($user ?? null) && ($asset['status'] ?? '') !== 'retired'): ?>
+          <?php
+            $assetId = (string) $asset['id'];
+            $kind = Asset::RETIRE_LIFE_EXCEEDED;
+            $reason = '연한초과';
+            $label = '파기 (연한초과)';
+            $hint = '';
+            require dirname(__DIR__) . '/partials/retire_handoff.php';
+          ?>
+        <?php endif; ?>
       </div>
       <?php if ($bucket !== ''): ?>
         <span class="badge <?= Support::e($bucket) ?>"><?= Support::e(AssetLife::bucketLabel($bucket)) ?></span>
       <?php endif; ?>
-    </a>
+    </div>
   <?php endforeach; ?>
   <?php if (!$assets): ?>
     <p class="muted">조건에 맞는 연한 임박·초과 장비가 없습니다. 도입일과 내용연한은 장비 상세에서 입력하세요.</p>

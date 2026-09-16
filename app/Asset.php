@@ -13,6 +13,13 @@ final class Asset
     public const RETIRE_REASON_MAX = 200;
     public const RETIRE_EVIDENCE_MAX = 200;
 
+    public const RETIRE_UNREPAIRABLE = 'unrepairable';
+    public const RETIRE_LIFE_EXCEEDED = 'life_exceeded';
+    public const RETIRE_OTHER = 'other';
+
+    /** @var list<string> */
+    public const RETIRE_KINDS = [self::RETIRE_UNREPAIRABLE, self::RETIRE_LIFE_EXCEEDED, self::RETIRE_OTHER];
+
     /** @var list<string> */
     public const RETIRE_FROM = ['available', 'repair', 'moving', 'lost'];
 
@@ -163,6 +170,7 @@ final class Asset
         mixed $retiredAt,
         mixed $evidence,
         ?string $evidencePath = null,
+        mixed $kind = null,
     ): void {
         if (!Auth::canWrite($actor) || ($actor['status'] ?? '') !== 'active') {
             throw new InvalidArgumentException('파기 권한이 없습니다.');
@@ -180,6 +188,7 @@ final class Asset
         $reason = self::parseRetireReason($reason);
         $retiredAt = self::parseRetireDate($retiredAt);
         $evidence = self::parseRetireEvidence($evidence, $evidencePath);
+        $kind = self::parseRetireKind($kind);
 
         $pdo->exec('PRAGMA busy_timeout = 5000');
         $pdo->exec('BEGIN IMMEDIATE');
@@ -204,10 +213,10 @@ final class Asset
             $t = Support::now();
             $upd = $pdo->prepare(
                 "UPDATE assets
-                 SET status = 'retired', retired_at = ?, retire_reason = ?, retire_evidence = ?, updated_at = ?
+                 SET status = 'retired', retired_at = ?, retire_reason = ?, retire_evidence = ?, retire_kind = ?, updated_at = ?
                  WHERE id = ? AND status = ? AND status IN ('available','repair','moving','lost')"
             );
-            $upd->execute([$retiredAt, $reason, $evidence, $t, $assetId, $from]);
+            $upd->execute([$retiredAt, $reason, $evidence, $kind, $t, $assetId, $from]);
             if ($upd->rowCount() !== 1) {
                 throw new InvalidArgumentException('이미 처리되었거나 파기할 수 없는 상태입니다.');
             }
@@ -229,6 +238,7 @@ final class Asset
                     'reason' => $reason,
                     'retired_at' => $retiredAt,
                     'evidence' => $evidence,
+                    'kind' => $kind,
                 ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
                 $t,
             ]);
@@ -241,6 +251,43 @@ final class Asset
             }
             throw $e;
         }
+    }
+
+    public static function parseRetireKind(mixed $kind): ?string
+    {
+        if ($kind === null || $kind === '') {
+            return null;
+        }
+        if (!is_string($kind)) {
+            throw new InvalidArgumentException('불용 구분을 확인하세요.');
+        }
+        $kind = trim($kind);
+        if ($kind === '') {
+            return null;
+        }
+        if (!in_array($kind, self::RETIRE_KINDS, true)) {
+            throw new InvalidArgumentException('불용 구분을 확인하세요.');
+        }
+        return $kind;
+    }
+
+    public static function retireKindLabel(?string $kind): string
+    {
+        return match ($kind) {
+            self::RETIRE_UNREPAIRABLE => '수리불가',
+            self::RETIRE_LIFE_EXCEEDED => '연한초과',
+            self::RETIRE_OTHER => '기타',
+            default => $kind ?? '',
+        };
+    }
+
+    public static function retireReasonForKind(?string $kind, ?string $fallback = null): string
+    {
+        $label = self::retireKindLabel($kind);
+        if ($label !== '') {
+            return $label;
+        }
+        return $fallback ?? '';
     }
 
     public static function parseRetireReason(mixed $reason): string

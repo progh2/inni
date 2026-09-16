@@ -71,6 +71,8 @@ final class DeskController
 
         $assetId = trim((string) ($_POST['asset_id'] ?? ''));
         $borrowerUserId = trim((string) ($_POST['borrower_user_id'] ?? ''));
+        $borrowerNote = trim((string) ($_POST['borrower_note'] ?? '')) ?: null;
+        $purpose = trim((string) ($_POST['purpose'] ?? '')) ?: null;
         $dueIso = Desk::dueIsoFromLocal((string) ($_POST['due_at'] ?? ''));
 
         try {
@@ -79,8 +81,8 @@ final class DeskController
                 $user,
                 $assetId,
                 '',
-                null,
-                null,
+                $borrowerNote,
+                $purpose,
                 $dueIso,
                 $borrowerUserId !== '' ? $borrowerUserId : null,
             );

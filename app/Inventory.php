@@ -11,6 +11,7 @@ use Throwable;
 
 final class Inventory
 {
+    public const TEACHER_NAME_MAX = 80;
     /**
      * @return array<string, mixed>|null
      */
@@ -273,13 +274,20 @@ final class Inventory
      * @return array<string, mixed>
      */
     /** 종료 시 미확인 목록만. 텔레그램·엑셀·이어하기는 범위 밖. */
-    public static function finish(PDO $pdo, array $actor, string $checkId): array
-    {
+    public static function finish(
+        PDO $pdo,
+        array $actor,
+        string $checkId,
+        mixed $witnessName = null,
+        mixed $confirmTeacher = null,
+    ): array {
         self::requireActor($actor);
         $checkId = trim($checkId);
         if ($checkId === '') {
             throw new InvalidArgumentException('실사 세션이 없습니다.');
         }
+        $witnessName = self::parseTeacherName($witnessName, '입회 교사');
+        $confirmTeacher = self::parseTeacherName($confirmTeacher, '확인 교사');
 
         self::beginImmediate($pdo);
         try {
@@ -293,10 +301,10 @@ final class Inventory
 
             $t = Support::now();
             $upd = $pdo->prepare(
-                "UPDATE inventory_checks SET status = 'done', finished_at = ?
+                "UPDATE inventory_checks SET status = 'done', finished_at = ?, witness_name = ?, confirm_teacher = ?
                  WHERE id = ? AND status = 'active'"
             );
-            $upd->execute([$t, $checkId]);
+            $upd->execute([$t, $witnessName, $confirmTeacher, $checkId]);
             if ($upd->rowCount() !== 1) {
                 throw new InvalidArgumentException('이미 종료된 실사입니다.');
             }
@@ -321,6 +329,8 @@ final class Inventory
                 json_encode([
                     'check_id' => $checkId,
                     'unchecked' => $unchecked,
+                    'witness_name' => $witnessName,
+                    'confirm_teacher' => $confirmTeacher,
                 ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
                 $t,
             ]);
@@ -336,6 +346,100 @@ final class Inventory
             throw new InvalidArgumentException('실사를 종료하지 못했습니다.');
         }
         return $done;
+    }
+
+    /**
+     * Record 입회·확인 교사 on a finished 실사조서.
+     *
+     * @param array<string, mixed> $actor
+     * @return array<string, mixed>
+     */
+    public static function attest(PDO $pdo, array $actor, string $checkId, mixed $witnessName, mixed $confirmTeacher): array
+    {
+        self::requireActor($actor);
+        $checkId = trim($checkId);
+        if ($checkId === '') {
+            throw new InvalidArgumentException('실사 세션이 없습니다.');
+        }
+        $witnessName = self::parseTeacherName($witnessName, '입회 교사', true);
+        $confirmTeacher = self::parseTeacherName($confirmTeacher, '확인 교사', true);
+
+        self::beginImmediate($pdo);
+        try {
+            $check = self::get($pdo, $checkId);
+            if (!$check) {
+                throw new InvalidArgumentException('실사 세션이 없습니다.');
+            }
+            if (($check['status'] ?? '') !== 'done') {
+                throw new InvalidArgumentException('종료된 실사만 입회·확인 교사를 남길 수 있습니다.');
+            }
+
+            $t = Support::now();
+            $upd = $pdo->prepare(
+                'UPDATE inventory_checks SET witness_name = ?, confirm_teacher = ? WHERE id = ? AND status = ?'
+            );
+            $upd->execute([$witnessName, $confirmTeacher, $checkId, 'done']);
+            if ($upd->rowCount() !== 1) {
+                throw new InvalidArgumentException('실사 세션이 없습니다.');
+            }
+
+            $pdo->prepare(
+                'INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,meta_json,created_at)
+                 VALUES(?,?,?,?,?,?,?,?,?)'
+            )->execute([
+                Support::id('log'),
+                'inventory_attest',
+                'location',
+                $check['location_id'],
+                $actor['id'],
+                $actor['display_name'],
+                "«{$check['location_name']}» 실사조서 · 입회 {$witnessName} · 확인 {$confirmTeacher}",
+                json_encode([
+                    'check_id' => $checkId,
+                    'witness_name' => $witnessName,
+                    'confirm_teacher' => $confirmTeacher,
+                ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+                $t,
+            ]);
+
+            self::commitImmediate($pdo);
+        } catch (Throwable $e) {
+            self::rollBackImmediate($pdo);
+            throw $e;
+        }
+
+        $done = self::get($pdo, $checkId);
+        if (!$done) {
+            throw new InvalidArgumentException('실사조서를 저장하지 못했습니다.');
+        }
+        return $done;
+    }
+
+    public static function parseTeacherName(mixed $value, string $label, bool $required = false): ?string
+    {
+        if ($value === null || $value === '') {
+            if ($required) {
+                throw new InvalidArgumentException($label . '를 입력하세요.');
+            }
+            return null;
+        }
+        if (!is_string($value) && !is_int($value) && !is_float($value)) {
+            throw new InvalidArgumentException($label . '는 텍스트로 입력하세요.');
+        }
+        $text = trim((string) $value);
+        if ($text === '') {
+            if ($required) {
+                throw new InvalidArgumentException($label . '를 입력하세요.');
+            }
+            return null;
+        }
+        if (str_contains($text, "\n") || str_contains($text, "\r")) {
+            throw new InvalidArgumentException($label . '는 한 줄로 입력하세요.');
+        }
+        if (mb_strlen($text) > self::TEACHER_NAME_MAX) {
+            throw new InvalidArgumentException($label . '는 ' . self::TEACHER_NAME_MAX . '자 이내로 입력하세요.');
+        }
+        return $text;
     }
 
     /**

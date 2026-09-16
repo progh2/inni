@@ -106,7 +106,29 @@ final class AssetController
         }
 
         $focus = (string) ($_GET['focus'] ?? '');
-        View::render('assets/show', compact('user', 'asset', 'path', 'locations', 'loan', 'logs', 'reports', 'lifeSuggestions', 'focus'));
+        $retireKind = null;
+        try {
+            $retireKind = Asset::parseRetireKind($_GET['retire_kind'] ?? null);
+        } catch (\InvalidArgumentException) {
+            $retireKind = null;
+        }
+        $retireReason = trim((string) ($_GET['reason'] ?? ''));
+        if ($retireReason === '' && $retireKind !== null) {
+            $retireReason = Asset::retireReasonForKind($retireKind);
+        }
+        View::render('assets/show', compact(
+            'user',
+            'asset',
+            'path',
+            'locations',
+            'loan',
+            'logs',
+            'reports',
+            'lifeSuggestions',
+            'focus',
+            'retireKind',
+            'retireReason'
+        ));
     }
 
     public function suggestLife(): void
@@ -223,7 +245,17 @@ final class AssetController
             App::redirect('assets/show', ['id' => $assetId]);
         }
         try {
-            Report::file(Database::pdo(), $user, $assetId, $symptom, $title, $imagePath);
+            Report::file(
+                Database::pdo(),
+                $user,
+                $assetId,
+                $symptom,
+                $title,
+                $imagePath,
+                $_POST['discovered_at'] ?? null,
+                $_POST['urgency'] ?? null,
+                $_POST['wish'] ?? null,
+            );
             App::flash('ok', '수리 요청이 접수되었습니다.');
         } catch (\InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());
@@ -334,6 +366,7 @@ final class AssetController
                 $_POST['retired_at'] ?? null,
                 $_POST['evidence'] ?? null,
                 $evidencePath,
+                $_POST['retire_kind'] ?? null,
             );
             App::flash('ok', '장비를 파기 처리했습니다.');
         } catch (\InvalidArgumentException $e) {

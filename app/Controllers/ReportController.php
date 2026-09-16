@@ -13,6 +13,7 @@ use Inni\Report;
 use Inni\ReportCost;
 use Inni\Scan;
 use Inni\Support;
+use Inni\Uploader;
 use Inni\View;
 
 final class ReportController
@@ -122,6 +123,18 @@ final class ReportController
         }
         Csrf::requirePost();
         try {
+            $evidencePath = null;
+            if (!empty($_FILES['cost_evidence_photo']['name'])) {
+                $evidencePath = Uploader::store($_FILES['cost_evidence_photo'], 'costs');
+            }
+            $evidenceMemo = $_POST['cost_evidence'] ?? null;
+            if ($evidencePath === null && (trim((string) $evidenceMemo) === '')) {
+                $existing = Report::find(Database::pdo(), $reportId);
+                $prev = is_array($existing) ? (string) ($existing['cost_evidence'] ?? '') : '';
+                if ($prev !== '' && str_starts_with($prev, '/uploads/')) {
+                    $evidenceMemo = $prev;
+                }
+            }
             ReportCost::save(
                 Database::pdo(),
                 $user,
@@ -130,6 +143,11 @@ final class ReportController
                 $_POST['cost_vendor'] ?? null,
                 $_POST['cost_budget_line'] ?? null,
                 $_POST['cost_at'] ?? null,
+                $_POST['cost_estimate'] ?? null,
+                $evidenceMemo,
+                $_POST['cost_budget_program'] ?? null,
+                $_POST['cost_budget_year'] ?? null,
+                $evidencePath,
             );
             App::flash('ok', '수리비를 저장했습니다.');
         } catch (\InvalidArgumentException $e) {
@@ -155,7 +173,15 @@ final class ReportController
         $note = trim((string) ($_POST['note'] ?? '')) ?: null;
         try {
             Report::transition(Database::pdo(), $user, $reportId, $status, $note);
-            App::flash('ok', '수리 상태를 변경했습니다.');
+            if ($status === Report::STATUS_REJECTED) {
+                App::flash('ok', '수리 불가입니다. 불용이면 장비 파기로 이어가세요.');
+                $after = self::returnTo();
+                if (($after['route'] ?? '') !== 'assets/show' && $reportId !== '') {
+                    App::redirect('reports/show', ['id' => $reportId]);
+                }
+            } else {
+                App::flash('ok', '수리 상태를 변경했습니다.');
+            }
         } catch (\InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());
         } catch (\Throwable $e) {
