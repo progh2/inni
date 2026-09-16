@@ -1,6 +1,7 @@
 <?php
 
 use Inni\App;
+use Inni\Auth;
 use Inni\Support;
 
 /** @var string $content */
@@ -61,7 +62,9 @@ $tabActive = static function (string $tab, string $current): bool {
         <a class="<?= $tabActive($r, $current_route) ? 'active' : '' ?>"
            href="<?= Support::e(App::url($r)) ?>"><?= Support::e($label) ?></a>
       <?php endforeach; ?>
-      <a class="ghost" href="<?= Support::e(App::url('items/new')) ?>">+ 빠른 등록</a>
+      <?php if (Auth::canWrite($user ?? null)): ?>
+        <a class="ghost" href="<?= Support::e(App::url('items/new')) ?>">+ 빠른 등록</a>
+      <?php endif; ?>
     </nav>
 
     <main>

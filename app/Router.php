@@ -84,6 +84,8 @@ final class Router
             'loans/return' => [LoanController::class, 'returnLoan'],
 
             'reports' => [ReportController::class, 'index'],
+            'reports/request' => [ReportController::class, 'requestForm'],
+            'reports/request/resolve' => [ReportController::class, 'requestResolve'],
             'reports/show' => [ReportController::class, 'show'],
             'reports/status' => [ReportController::class, 'updateStatus'],
             'reports/costs' => [ReportController::class, 'costs'],

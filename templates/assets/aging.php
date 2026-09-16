@@ -20,7 +20,8 @@ $filterQuery = static function (array $extra = []) use ($filters): array {
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('assets')) ?>">← 기자재 현황</a></p>
 <h1>연한·노후 기자재</h1>
-<p class="muted">도입일·내용연한(#39)으로 만료일을 계산합니다. 내용연한은 장비 상세에서 직접 입력하거나 조달청 제안(#40)을 수락해 채웁니다. 파기는 장비 상세에서, 실사 보정은 실사 결과·사업예산 실사에서 합니다.</p>
+<p class="muted">도입일과 내용연한(이 장비를 쓸 수 있는 햇수)으로 만료일을 계산합니다. 내용연한은 장비 상세에서 직접 입력하거나 조달청 제안을 수락해 채웁니다. 파기는 장비 상세에서, 장부 보정은 실사 결과·사업예산 실사에서 합니다.</p>
+<p class="muted">임박은 만료가 1년 안, 초과는 이미 지난 장비입니다.</p>
 
 <div class="stats" style="margin:1rem 0">
   <a class="stat" href="<?= Support::e(App::url('assets/aging')) ?>">
@@ -37,7 +38,7 @@ $filterQuery = static function (array $extra = []) use ($filters): array {
 <form method="get" action="<?= Support::e(App::url('assets/aging')) ?>" class="card">
   <input type="hidden" name="r" value="assets/aging">
   <div class="field">
-    <label for="aging-life">연한</label>
+    <label for="aging-life">연한 (임박=1년 안, 초과=이미 지남)</label>
     <select id="aging-life" name="life">
       <option value="">임박·초과</option>
       <?php foreach (AssetLifeBoard::LIFE_FILTERS as $life): ?>

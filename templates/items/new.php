@@ -48,6 +48,7 @@ use Inni\Support;
       </div>
       <div class="field">
         <label>내용연한(년)</label>
+        <p class="muted">이 장비를 쓸 수 있는 햇수</p>
         <input name="useful_life_years" type="number" inputmode="numeric" min="1" max="100" step="1" placeholder="예: 5">
       </div>
     </div>

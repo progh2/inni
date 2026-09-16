@@ -8,6 +8,9 @@ use Inni\Csrf;
 use Inni\Support;
 ?>
 <p class="muted"><a href="<?= Support::e(App::url('search')) ?>">← 찾기</a></p>
+<?php if (($focus ?? '') === 'repair'): ?>
+  <p><a class="btn btn-primary" href="#repair">↓ 수리 요청으로 이동</a></p>
+<?php endif; ?>
 <h1><?= Support::e($asset['name']) ?></h1>
 <p class="muted">
   <?= Support::e($asset['management_number']) ?>
@@ -135,6 +138,7 @@ $lifeLabel = AssetLife::format(
       </div>
       <div class="field">
         <label>내용연한(년)</label>
+        <p class="muted">이 장비를 쓸 수 있는 햇수</p>
         <input name="useful_life_years" type="number" inputmode="numeric" min="1" max="100" step="1" placeholder="예: 5" value="<?= $asset['useful_life_years'] !== null && $asset['useful_life_years'] !== '' ? Support::e((string) $asset['useful_life_years']) : '' ?>">
       </div>
     </div>
@@ -218,7 +222,7 @@ $lifeLabel = AssetLife::format(
 </div>
 <?php endif; ?>
 
-<div class="card">
+<div class="card" id="repair">
   <h2 class="section-title" style="margin-top:0">수리 요청</h2>
   <?php if (Auth::canLoan($user) && !in_array($asset['status'], ['lost', 'retired'], true)): ?>
     <form method="post" action="<?= Support::e(App::url('assets/report')) ?>" enctype="multipart/form-data">

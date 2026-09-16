@@ -32,7 +32,7 @@ check(str_contains($more, "App::url('assets')"), '기자재 현황 must link to 
 check(substr_count($more, "App::url('assets')") === 1, 'More must not duplicate the assets board link');
 check(str_contains($more, '연한·노후 기자재'), 'More menu must expose 연한·노후 기자재');
 check(str_contains($more, "App::url('assets/aging')"), '연한·노후 기자재 must link to assets/aging');
-check(substr_count($more, "App::url('assets/aging')") === 1, 'More must not duplicate the aging board link');
+check(substr_count($more, "App::url('assets/aging')") === 2, '연한·노후 and 파기 both land on aging');
 check(str_contains($more, '실험실습재료 현황'), 'More menu must expose 실험실습재료 현황');
 check(str_contains($more, "App::url('materials')"), '실험실습재료 현황 must link to materials');
 check(substr_count($more, "App::url('materials')") === 1, 'More must not duplicate the materials board link');
@@ -51,13 +51,18 @@ check(substr_count($more, "App::url('loans/mine')") === 1, 'More must not duplic
 check(str_contains($more, '대여 데스크'), 'More menu must expose 대여 데스크');
 check(str_contains($more, "App::url('loans/desk')"), '대여 데스크 must link to loans/desk');
 check(substr_count($more, "App::url('loans/desk')") === 1, 'More must not duplicate the desk link');
+check(str_contains($more, '수리 요청'), 'More menu must expose 수리 요청');
+check(str_contains($more, "App::url('reports/request')"), '수리 요청 must link to reports/request');
+check(substr_count($more, "App::url('reports/request')") === 1, 'More must not duplicate the repair request link');
 check(str_contains($more, '수리 대기'), 'More menu must expose 수리 대기');
 check(str_contains($more, "App::url('reports')"), '수리 대기 must link to reports');
 check(str_contains($more, 'Auth::canWrite($user)'), '수리 대기 is gated on canWrite');
 check(substr_count($more, "App::url('reports'))") === 1, 'More must not duplicate the repair queue link');
-check(str_contains($more, '수리비 합계'), 'More menu must expose 수리비 합계');
-check(str_contains($more, "App::url('reports/costs')"), '수리비 합계 must link to reports/costs');
+check(str_contains($more, '수리비'), 'More menu must expose 수리비');
+check(str_contains($more, "App::url('reports/costs')"), '수리비 must link to reports/costs');
 check(substr_count($more, "App::url('reports/costs')") === 1, 'More must not duplicate the repair cost totals link');
+check(str_contains($more, '파기'), 'More menu must expose 파기');
+check(str_contains($more, '장부 보정'), 'More menu must expose 장부 보정');
 check(str_contains($more, '사업예산 실사'), 'More menu must expose 사업예산 실사');
 check(str_contains($more, "App::url('inventory/report')"), '사업예산 실사 must link to inventory/report');
 check(str_contains($more, 'Auth::canInventory($user)'), '사업예산 실사 is gated on canInventory');
@@ -75,6 +80,7 @@ check(str_contains($router, "'assets' => [AssetController::class, 'index']"), 'a
 check(str_contains($router, "'assets/aging' => [AssetController::class, 'aging']"), 'assets/aging GET route is registered');
 check(str_contains($router, "'materials' => [MaterialController::class, 'index']"), 'materials GET route is registered');
 check(str_contains($router, "'reports' => [ReportController::class, 'index']"), 'reports GET route is registered');
+check(str_contains($router, "'reports/request' => [ReportController::class, 'requestForm']"), 'reports/request GET route is registered');
 check(str_contains($router, "'reports/costs' => [ReportController::class, 'costs']"), 'reports/costs GET route is registered');
 check(str_contains($router, "'inventory/report' => [InventoryController::class, 'report']"), 'inventory/report GET route is registered');
 
