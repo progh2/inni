@@ -190,6 +190,8 @@ check(str_contains($deskTpl, '<h1>대여 데스크</h1>'), 'desk keeps the Korea
 check(str_contains($deskTpl, "App::url('loans/desk/resolve')"), 'desk camera/code posts to desk resolve');
 check(str_contains($deskTpl, "App::url('loans/desk/loan')") && str_contains($deskTpl, 'Csrf::field()'), 'desk loan form is POST+CSRF');
 check(str_contains($deskTpl, 'borrower_user_id') && str_contains($deskTpl, 'pick-chip'), 'desk shows a borrower quick pick');
+check(str_contains($deskTpl, 'name="purpose"') && str_contains($deskTpl, 'name="borrower_note"'), 'desk loan collects purpose and 학번/비고');
+check(str_contains($deskTpl, 'loan_return_check.php') && str_contains($deskTpl, '받아주기'), 'desk return asks 이상유무');
 check(str_contains($deskTpl, 'due_at') && str_contains($deskTpl, '$dueLocal'), 'desk pre-fills the default due date');
 check(str_contains($deskTpl, '빌려주기') && str_contains($deskTpl, '받아주기'), 'desk CTAs are 빌려주기 / 받아주기');
 check(str_contains($deskTpl, "App::url('loans/return')") && str_contains($deskTpl, 'value="desk"'), 'desk return posts to loans/return with return_to=desk');

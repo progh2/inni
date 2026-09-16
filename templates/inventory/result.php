@@ -5,6 +5,8 @@ use Inni\Support;
 
 /** @var list<array<string, mixed>> $locations */
 /** @var list<array<string, mixed>> $approvers */
+/** @var list<array<string, mixed>> $teachers */
+$teachers = $teachers ?? [];
 
 $total = count($lines);
 $missing = count($unchecked);
@@ -14,6 +16,11 @@ $confirmed = $total - $missing;
 <h1>실사 결과 · <?= Support::e($check['location_name']) ?></h1>
 <p class="muted">확인 <?= (int) $confirmed ?> · 미확인 <?= (int) $missing ?> · 전체 <?= (int) $total ?></p>
 <p class="muted">미확인은 장부 보정(사유·승인자)으로 위치·상태·수량을 맞출 수 있습니다. 파기는 장비 상세에서 합니다.</p>
+<?php
+  $returnTo = 'result';
+  $returnQuery = [];
+  require dirname(__DIR__) . '/partials/inventory_sign.php';
+?>
 
 <div class="card" style="margin-top:1rem">
   <h2 class="section-title" style="margin-top:0">미확인 목록</h2>

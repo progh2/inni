@@ -103,6 +103,7 @@ final class Router
             'inventory/report' => [InventoryController::class, 'report'],
             'inventory/report/csv' => [InventoryController::class, 'reportCsv'],
             'inventory/adjust' => [InventoryController::class, 'adjust'],
+            'inventory/sign' => [InventoryController::class, 'sign'],
 
             'more' => [MoreController::class, 'index'],
             'settings' => [SettingsController::class, 'index'],

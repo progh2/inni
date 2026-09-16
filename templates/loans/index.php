@@ -25,6 +25,7 @@ use Inni\Support;
           <form method="post" action="<?= Support::e(App::url('loans/return')) ?>">
             <?= Csrf::field() ?>
             <input type="hidden" name="loan_id" value="<?= Support::e($loan['id']) ?>">
+            <?php $compact = true; require dirname(__DIR__) . '/partials/loan_return_check.php'; ?>
             <button class="btn btn-ghost" type="submit">반납</button>
           </form>
         <?php endif; ?>

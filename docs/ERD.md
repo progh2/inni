@@ -117,6 +117,11 @@ erDiagram
 | budgetYear | number? | YYYY |
 | notes | string? | |
 | qrCode | string | `AST:{id}` 또는 관리번호 |
+| retiredAt | date? | 파기일 |
+| retireReason | string? | |
+| retireEvidence | string? | 메모 또는 사진 경로 |
+| retireSource | `repair_impossible` \| `useful_life`? | 불용 결정 출처 |
+| retireReportId | string? | 수리불가 핸드오프 시 reports.id |
 | createdAt, updatedAt | timestamp | |
 
 ### `stockLots/{id}`
@@ -148,6 +153,8 @@ Unique: `(catalogItemId, locationId)`
 | returnedAt | timestamp? | |
 | status | `active` \| `returned` \| `overdue` | |
 | purpose | string? | |
+| returnCondition | `ok` \| `abnormal`? | 반납 이상유무 |
+| returnNote | string? | 이상 내용 |
 | createdAt | timestamp | |
 | createdBy | string | uid |
 
@@ -188,6 +195,10 @@ Unique: `(catalogItemId, locationId)`
 | status | `active` \| `done` | UNIQUE partial: active 1건 |
 | startedBy | string | owner/manager |
 | startedAt, finishedAt | timestamp | |
+| attendingTeacherId | string? | 실사조서 입회 교사 |
+| attendingTeacherName | string? | |
+| confirmingTeacherId | string? | 실사조서 확인 교사 |
+| confirmingTeacherName | string? | |
 
 ### `inventory_check_lines/{id}`
 실 + 하위 위치의 장비·재고 스냅샷. 스캔/코드 입력으로 `confirmedAt`만 채운다(수량 변경 없음).
@@ -220,6 +231,12 @@ Unique: `(catalogItemId, locationId)`
 | costVendor | string? | 업체 |
 | costBudgetLine | string? | 예산과목 |
 | costAt | date? | 비용일(YYYY-MM-DD). 월·연 합계 |
+| discoveredAt | datetime? | 고장 발견일시 |
+| urgency | `normal` \| `urgent`? | 긴급도 |
+| prefer | `inhouse` \| `outsource` \| `replace`? | 희망 처리 |
+| costEstimate | number? | 견적(원) |
+| costEvidence | string? | 견적·증빙 메모 또는 사진 경로 |
+| costBudgetProgram | string? | 사업예산 연결 |
 | createdAt, updatedAt | timestamp | |
 
 ### `categories/{id}`

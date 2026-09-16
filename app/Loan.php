@@ -11,6 +11,13 @@ use Throwable;
 
 final class Loan
 {
+    public const RETURN_OK = 'ok';
+    public const RETURN_ABNORMAL = 'abnormal';
+    public const RETURN_NOTE_MAX = 200;
+
+    /** @var list<string> */
+    public const RETURN_CONDITIONS = [self::RETURN_OK, self::RETURN_ABNORMAL];
+
     public static function checkout(
         PDO $pdo,
         array $actor,
@@ -109,12 +116,19 @@ final class Loan
     /**
      * @return string|null Asset id when the returned loan was tied to an asset.
      */
-    public static function checkin(PDO $pdo, array $actor, string $loanId): ?string
-    {
+    public static function checkin(
+        PDO $pdo,
+        array $actor,
+        string $loanId,
+        mixed $condition = null,
+        mixed $note = null,
+    ): ?string {
         $loanId = trim($loanId);
         if ($loanId === '') {
             throw new InvalidArgumentException('반납할 대여를 확인하세요.');
         }
+        $condition = self::parseReturnCondition($condition);
+        $note = self::parseReturnNote($note);
 
         $assetId = null;
         self::beginImmediate($pdo);
@@ -131,10 +145,10 @@ final class Loan
 
             $t = Support::now();
             $close = $pdo->prepare(
-                "UPDATE loans SET status = 'returned', returned_at = ?
+                "UPDATE loans SET status = 'returned', returned_at = ?, return_condition = ?, return_note = ?
                  WHERE id = ? AND status IN ('active','overdue')"
             );
-            $close->execute([$t, $loanId]);
+            $close->execute([$t, $condition, $note, $loanId]);
             if ($close->rowCount() !== 1) {
                 throw new InvalidArgumentException('이미 반납되었거나 반납할 수 없는 대여입니다.');
             }
@@ -153,6 +167,14 @@ final class Loan
                 $assetId = null;
             }
 
+            $summary = '대여 반납';
+            if ($condition !== null) {
+                $summary .= ' · ' . self::returnConditionLabel($condition);
+            }
+            if ($note !== null) {
+                $summary .= ' · ' . $note;
+            }
+
             $pdo->prepare(
                 'INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,meta_json,created_at)
                  VALUES(?,?,?,?,?,?,?,?,?)'
@@ -163,8 +185,11 @@ final class Loan
                 $loanId,
                 $actor['id'] ?? null,
                 $actor['display_name'] ?? '시스템',
-                '대여 반납',
-                null,
+                $summary,
+                json_encode([
+                    'return_condition' => $condition,
+                    'return_note' => $note,
+                ], JSON_UNESCAPED_UNICODE),
                 $t,
             ]);
 
@@ -223,6 +248,60 @@ final class Loan
         );
         $stmt->execute([$userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function parseReturnCondition(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_string($value) && !is_int($value)) {
+            throw new InvalidArgumentException('이상유무를 확인하세요.');
+        }
+        $text = trim((string) $value);
+        if ($text === '') {
+            return null;
+        }
+        $map = [
+            self::RETURN_OK => self::RETURN_OK,
+            self::RETURN_ABNORMAL => self::RETURN_ABNORMAL,
+            '정상' => self::RETURN_OK,
+            '이상' => self::RETURN_ABNORMAL,
+        ];
+        if (!isset($map[$text])) {
+            throw new InvalidArgumentException('이상유무는 정상 또는 이상으로 입력하세요.');
+        }
+        return $map[$text];
+    }
+
+    public static function parseReturnNote(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        if (!is_string($value) && !is_int($value) && !is_float($value)) {
+            throw new InvalidArgumentException('이상 내용은 텍스트로 입력하세요.');
+        }
+        $text = trim((string) $value);
+        if ($text === '') {
+            return null;
+        }
+        if (str_contains($text, "\n") || str_contains($text, "\r")) {
+            throw new InvalidArgumentException('이상 내용은 한 줄로 입력하세요.');
+        }
+        if (mb_strlen($text) > self::RETURN_NOTE_MAX) {
+            throw new InvalidArgumentException('이상 내용은 ' . self::RETURN_NOTE_MAX . '자 이내로 입력하세요.');
+        }
+        return $text;
+    }
+
+    public static function returnConditionLabel(?string $condition): string
+    {
+        return match ($condition) {
+            self::RETURN_OK => '정상',
+            self::RETURN_ABNORMAL => '이상',
+            default => '',
+        };
     }
 
     private static function resolveBorrowerUserId(PDO $pdo, array $actor, ?string $borrowerUserId): ?string

@@ -80,6 +80,8 @@ CREATE TABLE IF NOT EXISTS assets (
   retired_at TEXT,
   retire_reason TEXT,
   retire_evidence TEXT,
+  retire_source TEXT,
+  retire_report_id TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -109,6 +111,8 @@ CREATE TABLE IF NOT EXISTS loans (
   returned_at TEXT,
   status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','returned','overdue')),
   purpose TEXT,
+  return_condition TEXT,
+  return_note TEXT,
   created_at TEXT NOT NULL,
   created_by TEXT NOT NULL REFERENCES users(id)
 );
@@ -153,6 +157,12 @@ CREATE TABLE IF NOT EXISTS reports (
   cost_vendor TEXT,
   cost_budget_line TEXT,
   cost_at TEXT,
+  discovered_at TEXT,
+  urgency TEXT,
+  prefer TEXT,
+  cost_estimate REAL,
+  cost_evidence TEXT,
+  cost_budget_program TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -164,7 +174,11 @@ CREATE TABLE IF NOT EXISTS inventory_checks (
   status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','done')),
   started_by TEXT NOT NULL REFERENCES users(id),
   started_at TEXT NOT NULL,
-  finished_at TEXT
+  finished_at TEXT,
+  attending_teacher_id TEXT REFERENCES users(id),
+  attending_teacher_name TEXT,
+  confirming_teacher_id TEXT REFERENCES users(id),
+  confirming_teacher_name TEXT
 );
 
 CREATE TABLE IF NOT EXISTS alert_dispatches (

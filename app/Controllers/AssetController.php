@@ -106,7 +106,40 @@ final class AssetController
         }
 
         $focus = (string) ($_GET['focus'] ?? '');
-        View::render('assets/show', compact('user', 'asset', 'path', 'locations', 'loan', 'logs', 'reports', 'lifeSuggestions', 'focus'));
+        $retireFrom = '';
+        try {
+            $retireFrom = Asset::parseRetireSource($_GET['retire_from'] ?? null) ?? '';
+        } catch (\InvalidArgumentException) {
+            $retireFrom = '';
+        }
+        $retireReportId = trim((string) ($_GET['report_id'] ?? ''));
+        $retireReasonPrefill = $retireFrom !== ''
+            ? Asset::retireReasonForSource($retireFrom)
+            : '';
+        if ($retireReasonPrefill === '' && is_array($reports)) {
+            foreach ($reports as $r) {
+                if (($r['status'] ?? '') === Report::STATUS_REJECTED) {
+                    $retireFrom = $retireFrom !== '' ? $retireFrom : Asset::RETIRE_SOURCE_REPAIR;
+                    $retireReportId = $retireReportId !== '' ? $retireReportId : (string) ($r['id'] ?? '');
+                    $retireReasonPrefill = Asset::RETIRE_REASON_REPAIR;
+                    break;
+                }
+            }
+        }
+        View::render('assets/show', compact(
+            'user',
+            'asset',
+            'path',
+            'locations',
+            'loan',
+            'logs',
+            'reports',
+            'lifeSuggestions',
+            'focus',
+            'retireFrom',
+            'retireReportId',
+            'retireReasonPrefill'
+        ));
     }
 
     public function suggestLife(): void
@@ -223,7 +256,17 @@ final class AssetController
             App::redirect('assets/show', ['id' => $assetId]);
         }
         try {
-            Report::file(Database::pdo(), $user, $assetId, $symptom, $title, $imagePath);
+            Report::file(
+                Database::pdo(),
+                $user,
+                $assetId,
+                $symptom,
+                $title,
+                $imagePath,
+                $_POST['discovered_at'] ?? null,
+                $_POST['urgency'] ?? null,
+                $_POST['prefer'] ?? null,
+            );
             App::flash('ok', '수리 요청이 접수되었습니다.');
         } catch (\InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());
@@ -334,6 +377,8 @@ final class AssetController
                 $_POST['retired_at'] ?? null,
                 $_POST['evidence'] ?? null,
                 $evidencePath,
+                $_POST['retire_source'] ?? null,
+                $_POST['report_id'] ?? null,
             );
             App::flash('ok', '장비를 파기 처리했습니다.');
         } catch (\InvalidArgumentException $e) {

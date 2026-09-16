@@ -272,14 +272,115 @@ final class Inventory
      * @param array<string, mixed> $actor
      * @return array<string, mixed>
      */
-    /** 종료 시 미확인 목록만. 텔레그램·엑셀·이어하기는 범위 밖. */
-    public static function finish(PDO $pdo, array $actor, string $checkId): array
+    /**
+     * Active staff who can appear on a 실사조서 (입회·확인).
+     *
+     * @return list<array{id: string, display_name: string, role: string}>
+     */
+    public static function teachers(PDO $pdo): array
     {
+        $stmt = $pdo->query(
+            "SELECT id, display_name, role FROM users
+             WHERE status = 'active' AND role IN ('owner','manager','teacher')
+             ORDER BY display_name COLLATE NOCASE, id"
+        );
+        return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    }
+
+    /**
+     * Record 입회·확인 교사 on a 실사조서. Allowed during or after the check.
+     *
+     * @param array<string, mixed> $actor
+     * @return array<string, mixed>
+     */
+    public static function signTeachers(
+        PDO $pdo,
+        array $actor,
+        string $checkId,
+        mixed $attendingId,
+        mixed $confirmingId,
+    ): array {
         self::requireActor($actor);
         $checkId = trim($checkId);
         if ($checkId === '') {
             throw new InvalidArgumentException('실사 세션이 없습니다.');
         }
+        $attending = self::resolveTeacher($pdo, $attendingId, '입회 교사');
+        $confirming = self::resolveTeacher($pdo, $confirmingId, '확인 교사');
+
+        self::beginImmediate($pdo);
+        try {
+            $check = self::get($pdo, $checkId);
+            if (!$check) {
+                throw new InvalidArgumentException('실사 세션이 없습니다.');
+            }
+
+            $t = Support::now();
+            $upd = $pdo->prepare(
+                'UPDATE inventory_checks
+                 SET attending_teacher_id = ?, attending_teacher_name = ?,
+                     confirming_teacher_id = ?, confirming_teacher_name = ?
+                 WHERE id = ?'
+            );
+            $upd->execute([
+                $attending['id'] ?? null,
+                $attending['display_name'] ?? null,
+                $confirming['id'] ?? null,
+                $confirming['display_name'] ?? null,
+                $checkId,
+            ]);
+            if ($upd->rowCount() !== 1 && self::get($pdo, $checkId) === null) {
+                throw new InvalidArgumentException('실사 세션이 없습니다.');
+            }
+
+            $pdo->prepare(
+                'INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,meta_json,created_at)
+                 VALUES(?,?,?,?,?,?,?,?,?)'
+            )->execute([
+                Support::id('log'),
+                'inventory_sign',
+                'location',
+                $check['location_id'],
+                $actor['id'],
+                $actor['display_name'],
+                "«{$check['location_name']}» 실사조서 · 입회 " . ($attending['display_name'] ?? '—')
+                    . ' · 확인 ' . ($confirming['display_name'] ?? '—'),
+                json_encode([
+                    'check_id' => $checkId,
+                    'attending_teacher_id' => $attending['id'] ?? null,
+                    'confirming_teacher_id' => $confirming['id'] ?? null,
+                ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+                $t,
+            ]);
+
+            self::commitImmediate($pdo);
+        } catch (Throwable $e) {
+            self::rollBackImmediate($pdo);
+            throw $e;
+        }
+
+        $signed = self::get($pdo, $checkId);
+        if (!$signed) {
+            throw new InvalidArgumentException('실사조서를 저장하지 못했습니다.');
+        }
+        return $signed;
+    }
+
+    /** 종료 시 미확인 목록만. 텔레그램·엑셀·이어하기는 범위 밖. */
+    public static function finish(
+        PDO $pdo,
+        array $actor,
+        string $checkId,
+        mixed $attendingId = null,
+        mixed $confirmingId = null,
+    ): array {
+        self::requireActor($actor);
+        $checkId = trim($checkId);
+        if ($checkId === '') {
+            throw new InvalidArgumentException('실사 세션이 없습니다.');
+        }
+        $attending = self::resolveTeacher($pdo, $attendingId, '입회 교사');
+        $confirming = self::resolveTeacher($pdo, $confirmingId, '확인 교사');
 
         self::beginImmediate($pdo);
         try {
@@ -292,11 +393,25 @@ final class Inventory
             }
 
             $t = Support::now();
+            $attendingId = $attending['id'] ?? ($check['attending_teacher_id'] ?? null);
+            $attendingName = $attending['display_name'] ?? ($check['attending_teacher_name'] ?? null);
+            $confirmingId = $confirming['id'] ?? ($check['confirming_teacher_id'] ?? null);
+            $confirmingName = $confirming['display_name'] ?? ($check['confirming_teacher_name'] ?? null);
             $upd = $pdo->prepare(
-                "UPDATE inventory_checks SET status = 'done', finished_at = ?
+                "UPDATE inventory_checks
+                 SET status = 'done', finished_at = ?,
+                     attending_teacher_id = ?, attending_teacher_name = ?,
+                     confirming_teacher_id = ?, confirming_teacher_name = ?
                  WHERE id = ? AND status = 'active'"
             );
-            $upd->execute([$t, $checkId]);
+            $upd->execute([
+                $t,
+                $attendingId,
+                $attendingName,
+                $confirmingId,
+                $confirmingName,
+                $checkId,
+            ]);
             if ($upd->rowCount() !== 1) {
                 throw new InvalidArgumentException('이미 종료된 실사입니다.');
             }
@@ -321,6 +436,8 @@ final class Inventory
                 json_encode([
                     'check_id' => $checkId,
                     'unchecked' => $unchecked,
+                    'attending_teacher_id' => $attendingId,
+                    'confirming_teacher_id' => $confirmingId,
                 ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
                 $t,
             ]);
@@ -351,6 +468,39 @@ final class Inventory
         if (!is_string($id) || $id === '' || !is_string($name) || $name === '') {
             throw new InvalidArgumentException('실사 권한이 없습니다.');
         }
+    }
+
+    /**
+     * @return array{id: string, display_name: string}|null
+     */
+    private static function resolveTeacher(PDO $pdo, mixed $id, string $label): ?array
+    {
+        if ($id === null || $id === '') {
+            return null;
+        }
+        if (!is_string($id) && !is_int($id)) {
+            throw new InvalidArgumentException($label . '를 확인하세요.');
+        }
+        $id = trim((string) $id);
+        if ($id === '') {
+            return null;
+        }
+        $stmt = $pdo->prepare(
+            "SELECT id, display_name, role, status FROM users WHERE id = ?"
+        );
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (
+            !$row
+            || ($row['status'] ?? '') !== 'active'
+            || !in_array((string) ($row['role'] ?? ''), ['owner', 'manager', 'teacher'], true)
+        ) {
+            throw new InvalidArgumentException($label . '를 확인하세요.');
+        }
+        return [
+            'id' => (string) $row['id'],
+            'display_name' => (string) $row['display_name'],
+        ];
     }
 
     /**

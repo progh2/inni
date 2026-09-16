@@ -54,6 +54,10 @@ final class ReportCost
         mixed $vendor,
         mixed $budgetLine,
         mixed $costAt,
+        mixed $estimate = null,
+        mixed $evidence = null,
+        ?string $evidencePath = null,
+        mixed $budgetProgram = null,
     ): array {
         if (!Auth::canWrite($actor) || ($actor['status'] ?? '') !== 'active') {
             throw new InvalidArgumentException('수리비 기록 권한이 없습니다.');
@@ -68,6 +72,9 @@ final class ReportCost
         $vendor = self::parseText($vendor, '업체', self::VENDOR_MAX);
         $budgetLine = self::parseText($budgetLine, '예산과목', self::BUDGET_LINE_MAX);
         $costAt = self::parseDate($costAt);
+        $estimate = self::parseAmount($estimate);
+        $evidence = self::parseEvidence($evidence, $evidencePath);
+        $budgetProgram = Budget::parseProgram($budgetProgram);
         if ($amount !== null && $costAt === null) {
             $costAt = self::today();
         }
@@ -81,15 +88,21 @@ final class ReportCost
                 throw new InvalidArgumentException('수리 요청을 찾을 수 없습니다.');
             }
 
+            if ($evidence === null) {
+                $kept = isset($report['cost_evidence']) ? trim((string) $report['cost_evidence']) : '';
+                $evidence = $kept !== '' ? $kept : null;
+            }
+
             $t = Support::now();
             $upd = $pdo->prepare(
                 'UPDATE reports
-                 SET cost_amount = ?, cost_vendor = ?, cost_budget_line = ?, cost_at = ?, updated_at = ?
+                 SET cost_amount = ?, cost_vendor = ?, cost_budget_line = ?, cost_at = ?,
+                     cost_estimate = ?, cost_evidence = ?, cost_budget_program = ?, updated_at = ?
                  WHERE id = ?'
             );
-            $upd->execute([$amount, $vendor, $budgetLine, $costAt, $t, $reportId]);
+            $upd->execute([$amount, $vendor, $budgetLine, $costAt, $estimate, $evidence, $budgetProgram, $t, $reportId]);
 
-            $summary = self::logSummary($amount, $vendor, $budgetLine, $costAt);
+            $summary = self::logSummary($amount, $vendor, $budgetLine, $costAt, $estimate, $budgetProgram);
             $pdo->prepare(
                 'INSERT INTO activity_logs(id,action,entity_type,entity_id,actor_id,actor_name,summary,meta_json,created_at)
                  VALUES(?,?,?,?,?,?,?,?,?)'
@@ -106,6 +119,9 @@ final class ReportCost
                     'cost_vendor' => $vendor,
                     'cost_budget_line' => $budgetLine,
                     'cost_at' => $costAt,
+                    'cost_estimate' => $estimate,
+                    'cost_evidence' => $evidence,
+                    'cost_budget_program' => $budgetProgram,
                     'status' => $report['status'] ?? null,
                 ], JSON_UNESCAPED_UNICODE),
                 $t,
@@ -398,17 +414,53 @@ final class ReportCost
         return [$sql, $params, $year, $month];
     }
 
-    private static function logSummary(?float $amount, ?string $vendor, ?string $budgetLine, ?string $costAt): string
+    public static function parseEvidence(mixed $evidence, ?string $evidencePath = null): ?string
     {
-        if ($amount === null && $vendor === null && $budgetLine === null && $costAt === null) {
+        $path = is_string($evidencePath) ? trim($evidencePath) : '';
+        $note = '';
+        if ($evidence !== null && (is_string($evidence) || is_int($evidence) || is_float($evidence))) {
+            $note = trim((string) $evidence);
+        } elseif ($evidence !== null && $evidence !== '') {
+            throw new InvalidArgumentException('증빙을 확인하세요.');
+        }
+        if ($note !== '' && (str_contains($note, "\n") || str_contains($note, "\r"))) {
+            throw new InvalidArgumentException('증빙은 한 줄로 입력하세요.');
+        }
+        if (mb_strlen($note) > self::BUDGET_LINE_MAX) {
+            throw new InvalidArgumentException('증빙은 ' . self::BUDGET_LINE_MAX . '자 이내로 입력하세요.');
+        }
+        if ($path !== '') {
+            return $path;
+        }
+        return $note === '' ? null : $note;
+    }
+
+    private static function logSummary(
+        ?float $amount,
+        ?string $vendor,
+        ?string $budgetLine,
+        ?string $costAt,
+        ?float $estimate = null,
+        ?string $budgetProgram = null,
+    ): string {
+        if (
+            $amount === null && $vendor === null && $budgetLine === null && $costAt === null
+            && $estimate === null && $budgetProgram === null
+        ) {
             return '수리비 지움';
         }
         $parts = [];
+        if ($estimate !== null) {
+            $parts[] = '견적 ' . self::formatAmount($estimate);
+        }
         if ($amount !== null) {
             $parts[] = self::formatAmount($amount);
         }
         if ($vendor !== null) {
             $parts[] = $vendor;
+        }
+        if ($budgetProgram !== null) {
+            $parts[] = $budgetProgram;
         }
         if ($budgetLine !== null) {
             $parts[] = $budgetLine;

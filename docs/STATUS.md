@@ -26,6 +26,7 @@
 - 가벼운 실사(owner/manager): 실 선택 → 예상 장비·품목 목록 → #7과 같은 카메라/코드 입력으로 확인 → 종료 시 미확인 목록. 진행 중 세션은 1건. 이어하기·텔레그램·엑셀은 없음.
 - 실사 보정·파기(#53): 종료된 실사의 미확인 항목을 사유·승인자로 장부 반영(장비 위치/상태, 재고 수량). 파기는 장비 상세에서 사유·일자·증빙(메모 또는 사진)으로 `retired` 전이. POST+CSRF, `canWrite`(owner/manager). 이력은 `activity_logs`. 대여 중·이미 폐기는 거부. 에듀파인·감가상각은 없음.
 - 수리비(#54): `reports`에 금액·업체·예산과목·비용일. 수리 상세에서 저장(POST+CSRF, `canWrite`). `reports/costs`에서 월·연 합계. 상태 머신(#46)은 그대로. 에듀파인·감가상각·교사 UX(#55)는 없음.
+- 노련교사 현장절차 필드·핸드오프(#77): 대여 데스크에 용도·학번/비고와 반납 이상유무. 고장접수에 발견일시·긴급도·외주/교체 희망. 수리불가·내용연한 초과에서 불용·파기 이어가기. 수리비 견적·증빙·사업예산. 실사조서 입회·확인 교사. 조달청 API·에듀파인은 없음.
 - 품목 CSV(owner/manager, `canWrite`): 더보기·설정에서 템플릿/목록 내려받기, POST+CSRF 업로드로 신규·수정. 충돌·오류 행은 건너뛰고 이유를 보여 줌. **CSV UTF-8** (Excel CP949도 읽음). xlsx/에듀파인 파일 동기화/실사 연동/텔레그램은 없음. 사업명·예산연도 열 포함.
 - 구입 사업예산(#32): `catalog_items`/`assets`에 `budget_program`(자유 입력) + `budget_year`(YYYY). 기존 DB는 `Database::migrate`/`ensureGuards`로 컬럼 추가. 빈 값 허용. 등록·수정·상세·CSV 라운드트립. #29 품목 목록과 #30 기자재 현황 보드에서 표시·GET 필터(`budget_program`, `budget_year`).
 - 도입일·내용연한(#39): `assets.purchase_date`를 UI에서 **도입일**로 노출·편집. `useful_life_years`(INTEGER, nullable) 추가. 기존 DB는 `Database::migrate`/`ensureGuards`. 빈 값 허용. 등록·장비 상세·현황 보드에 도입일·내용연한·(둘 다 있을 때) 만료 예정일=도입일+년. CSV 열 `도입일`/`내용연한`.
@@ -54,6 +55,7 @@
 - `php tests/inventory.php`: 실 선택·스캔/코드 확인·미확인 목록·단일 진행 세션·권한·이력 롤백.
 - `php tests/inventory_adjust.php`: 일반교사 보정/파기 거부, 성공 보정·파기, 이력, 활성 실사/대여중/이중 파기 거부, 로그 실패 롤백, 마이그레이션.
 - `php tests/report_cost.php`: 수리비 저장·권한(교사/학생 거부), 월·연 집계, 마이그레이션, CSRF/canWrite 경로. 상태 머신 미변경.
+- `php tests/field_handoff.php`: #77 용도·학번/비고·반납 이상유무, 고장 발견일시·긴급도·희망처리, 수리불가/연한초과→파기 핸드오프, 수리비 견적·증빙·사업예산, 실사조서 입회·확인, 권한, 마이그레이션. #76 홈 문구는 유지.
 - `php tests/catalog_csv.php`: 품목 CSV 템플릿·내보내기·가져오기, 충돌 건너뜀, 역할, xlsx 거부.
 - `php tests/alerts.php`: 재고 부족·연체 텔레그램(HTTP 스텁), 토큰 공백 실패 폐쇄, 이벤트 off, 중복 방지, 설정 CSRF, owner/manager. 실제 봇 토큰 없음.
 - `php tests/ai.php`: 프로바이더 미설정/불완전/미지원 실패 폐쇄, 설정 시 제안만, 재고·대여·대장 무변경, 쓰기 훅 없음, 설정 폼에 키 필드 없음. 실제 API 키 없음.

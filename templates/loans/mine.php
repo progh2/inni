@@ -40,6 +40,7 @@ use Inni\Support;
             <?= Csrf::field() ?>
             <input type="hidden" name="loan_id" value="<?= Support::e((string) $loan['id']) ?>">
             <input type="hidden" name="return_to" value="mine">
+            <?php $compact = true; require dirname(__DIR__) . '/partials/loan_return_check.php'; ?>
             <button class="btn <?= $overdue ? 'btn-primary' : 'btn-ghost' ?>" type="submit">반납</button>
           </form>
         <?php endif; ?>
@@ -60,6 +61,11 @@ use Inni\Support;
         <div class="meta">
           반납 <?= Support::e(Support::formatWhen($loan['returned_at'] ?? null)) ?>
           <?= !empty($loan['management_number']) ? ' · ' . Support::e((string) $loan['management_number']) : '' ?>
+          <?php
+            $returnLabel = \Inni\Loan::returnConditionLabel(isset($loan['return_condition']) ? (string) $loan['return_condition'] : null);
+          ?>
+          <?= $returnLabel !== '' ? ' · ' . Support::e($returnLabel) : '' ?>
+          <?= !empty($loan['return_note']) ? ' · ' . Support::e((string) $loan['return_note']) : '' ?>
         </div>
       </div>
       <span class="badge <?= Support::e((string) $loan['status']) ?>"><?= Support::e(Support::statusLabel((string) $loan['status'])) ?></span>

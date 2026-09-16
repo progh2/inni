@@ -27,6 +27,18 @@ final class Report
     /** @var list<string> */
     public const OPEN_STATUSES = [self::STATUS_OPEN, self::STATUS_IN_PROGRESS];
 
+    public const URGENCY_NORMAL = 'normal';
+    public const URGENCY_URGENT = 'urgent';
+    public const PREFER_INHOUSE = 'inhouse';
+    public const PREFER_OUTSOURCE = 'outsource';
+    public const PREFER_REPLACE = 'replace';
+
+    /** @var list<string> */
+    public const URGENCIES = [self::URGENCY_NORMAL, self::URGENCY_URGENT];
+
+    /** @var list<string> */
+    public const PREFERS = [self::PREFER_INHOUSE, self::PREFER_OUTSOURCE, self::PREFER_REPLACE];
+
     /**
      * @return list<string>
      */
@@ -73,6 +85,9 @@ final class Report
         string $symptom,
         ?string $title = null,
         ?string $imagePath = null,
+        mixed $discoveredAt = null,
+        mixed $urgency = null,
+        mixed $prefer = null,
     ): string {
         if (!Auth::canLoan($actor) || ($actor['status'] ?? '') !== 'active') {
             throw new InvalidArgumentException('수리 요청 권한이 없습니다.');
@@ -82,6 +97,9 @@ final class Report
         $symptom = trim($symptom);
         $title = self::nullableTrim($title);
         $imagePath = self::nullableTrim($imagePath);
+        $discoveredAt = self::parseDiscoveredAt($discoveredAt);
+        $urgency = self::parseUrgency($urgency);
+        $prefer = self::parsePrefer($prefer);
         if ($assetId === '') {
             throw new InvalidArgumentException('장비를 찾을 수 없습니다.');
         }
@@ -109,8 +127,8 @@ final class Report
             $t = Support::now();
             $reportId = Support::id('rep');
             $pdo->prepare(
-                'INSERT INTO reports(id,target_type,target_id,reporter_user_id,reporter_name,title,body,image_path,status,created_at,updated_at)
-                 VALUES(?,?,?,?,?,?,?,?,?,?,?)'
+                'INSERT INTO reports(id,target_type,target_id,reporter_user_id,reporter_name,title,body,image_path,status,discovered_at,urgency,prefer,created_at,updated_at)
+                 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             )->execute([
                 $reportId,
                 'asset',
@@ -121,6 +139,9 @@ final class Report
                 $symptom,
                 $imagePath,
                 self::STATUS_OPEN,
+                $discoveredAt,
+                $urgency,
+                $prefer,
                 $t,
                 $t,
             ]);
@@ -328,7 +349,8 @@ final class Report
                     a.name AS asset_name,
                     a.management_number,
                     a.status AS asset_status,
-                    a.location_id
+                    a.location_id,
+                    a.budget_program AS asset_budget_program
              FROM reports r
              LEFT JOIN assets a ON r.target_type = 'asset' AND a.id = r.target_id
              WHERE r.id = ?"
@@ -348,6 +370,114 @@ final class Report
         );
         $stmt->execute(['report', $reportId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function parseDiscoveredAt(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_string($value) && !is_int($value)) {
+            throw new InvalidArgumentException('발견일시는 날짜와 시각으로 입력하세요.');
+        }
+        $text = trim((string) $value);
+        if ($text === '') {
+            return null;
+        }
+        $text = str_replace('T', ' ', $text);
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $text) === 1) {
+            $text .= ' 00:00';
+        }
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/', $text, $m) !== 1) {
+            throw new InvalidArgumentException('발견일시는 YYYY-MM-DD HH:MM으로 입력하세요.');
+        }
+        $year = (int) $m[1];
+        $month = (int) $m[2];
+        $day = (int) $m[3];
+        $hour = (int) $m[4];
+        $minute = (int) $m[5];
+        if ($year < 1900 || $year > 2100 || !checkdate($month, $day, $year) || $hour > 23 || $minute > 59) {
+            throw new InvalidArgumentException('발견일시가 올바른 시각이 아닙니다.');
+        }
+        return sprintf('%04d-%02d-%02d %02d:%02d', $year, $month, $day, $hour, $minute);
+    }
+
+    public static function parseUrgency(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_string($value) && !is_int($value)) {
+            throw new InvalidArgumentException('긴급도를 확인하세요.');
+        }
+        $text = trim((string) $value);
+        if ($text === '') {
+            return null;
+        }
+        $map = [
+            self::URGENCY_NORMAL => self::URGENCY_NORMAL,
+            self::URGENCY_URGENT => self::URGENCY_URGENT,
+            '보통' => self::URGENCY_NORMAL,
+            '긴급' => self::URGENCY_URGENT,
+        ];
+        if (!isset($map[$text])) {
+            throw new InvalidArgumentException('긴급도는 보통 또는 긴급으로 입력하세요.');
+        }
+        return $map[$text];
+    }
+
+    public static function parsePrefer(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_string($value) && !is_int($value)) {
+            throw new InvalidArgumentException('희망 처리를 확인하세요.');
+        }
+        $text = trim((string) $value);
+        if ($text === '') {
+            return null;
+        }
+        $map = [
+            self::PREFER_INHOUSE => self::PREFER_INHOUSE,
+            self::PREFER_OUTSOURCE => self::PREFER_OUTSOURCE,
+            self::PREFER_REPLACE => self::PREFER_REPLACE,
+            '자체' => self::PREFER_INHOUSE,
+            '외주' => self::PREFER_OUTSOURCE,
+            '교체' => self::PREFER_REPLACE,
+        ];
+        if (!isset($map[$text])) {
+            throw new InvalidArgumentException('희망 처리는 자체·외주·교체 중에서 고르세요.');
+        }
+        return $map[$text];
+    }
+
+    public static function urgencyLabel(?string $urgency): string
+    {
+        return match ($urgency) {
+            self::URGENCY_NORMAL => '보통',
+            self::URGENCY_URGENT => '긴급',
+            default => '',
+        };
+    }
+
+    public static function preferLabel(?string $prefer): string
+    {
+        return match ($prefer) {
+            self::PREFER_INHOUSE => '자체수리',
+            self::PREFER_OUTSOURCE => '외주',
+            self::PREFER_REPLACE => '교체',
+            default => '',
+        };
+    }
+
+    public static function discoveredAtLocal(?string $value): string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+        return str_replace(' ', 'T', substr($value, 0, 16));
     }
 
     public static function titleFromSymptom(string $symptom): string

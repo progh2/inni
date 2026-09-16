@@ -61,13 +61,14 @@ final class InventoryController
             App::redirect('inventory');
         }
         $lines = Inventory::lines($pdo, (string) $check['id']);
+        $teachers = Inventory::teachers($pdo);
         $confirmed = 0;
         foreach ($lines as $line) {
             if (($line['confirmed_at'] ?? null) !== null) {
                 $confirmed++;
             }
         }
-        View::render('inventory/show', compact('user', 'check', 'lines', 'confirmed'));
+        View::render('inventory/show', compact('user', 'check', 'lines', 'confirmed', 'teachers'));
     }
 
     public function confirm(): void
@@ -94,7 +95,13 @@ final class InventoryController
             $checkId = $active['id'] ?? '';
         }
         try {
-            $check = Inventory::finish($pdo, $user, (string) $checkId);
+            $check = Inventory::finish(
+                $pdo,
+                $user,
+                (string) $checkId,
+                $_POST['attending_teacher_id'] ?? null,
+                $_POST['confirming_teacher_id'] ?? null,
+            );
         } catch (InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());
             App::redirect('inventory');
@@ -117,9 +124,10 @@ final class InventoryController
         }
         $unchecked = Inventory::unchecked($pdo, (string) $check['id']);
         $lines = Inventory::lines($pdo, (string) $check['id']);
+        $teachers = Inventory::teachers($pdo);
         $locations = $pdo->query('SELECT id, name, kind FROM locations ORDER BY kind, name')->fetchAll();
         $approvers = InventoryAdjust::approvers($pdo);
-        View::render('inventory/result', compact('user', 'check', 'unchecked', 'lines', 'locations', 'approvers'));
+        View::render('inventory/result', compact('user', 'check', 'unchecked', 'lines', 'locations', 'approvers', 'teachers'));
     }
 
     public function adjust(): void
@@ -169,9 +177,55 @@ final class InventoryController
         $aggregates = InventoryBudget::aggregates($pdo, $filters);
         $lines = InventoryBudget::lines($pdo, $filters);
         $summary = InventoryBudget::summary($pdo, $filters);
+        $teachers = Inventory::teachers($pdo);
         $locations = $pdo->query('SELECT id, name, kind FROM locations ORDER BY kind, name')->fetchAll();
         $approvers = InventoryAdjust::approvers($pdo);
-        View::render('inventory/report', compact('user', 'filters', 'checks', 'aggregates', 'lines', 'summary', 'locations', 'approvers'));
+        $selectedCheck = null;
+        if (($filters['check_id'] ?? null) !== null) {
+            $selectedCheck = Inventory::get($pdo, (string) $filters['check_id']);
+        }
+        View::render('inventory/report', compact(
+            'user',
+            'filters',
+            'checks',
+            'aggregates',
+            'lines',
+            'summary',
+            'locations',
+            'approvers',
+            'teachers',
+            'selectedCheck'
+        ));
+    }
+
+    public function sign(): void
+    {
+        $user = $this->requireManager();
+        Csrf::requirePost();
+        $checkId = trim((string) ($_POST['check_id'] ?? ''));
+        $returnTo = trim((string) ($_POST['return_to'] ?? 'result'));
+        try {
+            Inventory::signTeachers(
+                Database::pdo(),
+                $user,
+                $checkId,
+                $_POST['attending_teacher_id'] ?? null,
+                $_POST['confirming_teacher_id'] ?? null,
+            );
+            App::flash('ok', '실사조서의 입회·확인 교사를 저장했습니다.');
+        } catch (InvalidArgumentException $e) {
+            App::flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log((string) $e);
+            App::flash('error', '실사조서를 저장하지 못했습니다. 잠시 후 다시 시도하세요.');
+        }
+        if ($returnTo === 'report') {
+            App::redirect('inventory/report', InventoryBudget::query(InventoryBudget::filtersFromRequest($_POST)));
+        }
+        if ($checkId !== '') {
+            App::redirect('inventory/result', ['id' => $checkId]);
+        }
+        App::redirect('inventory/report');
     }
 
     public function reportCsv(): void

@@ -13,6 +13,7 @@ use Inni\Report;
 use Inni\ReportCost;
 use Inni\Scan;
 use Inni\Support;
+use Inni\Uploader;
 use Inni\View;
 
 final class ReportController
@@ -121,7 +122,11 @@ final class ReportController
             App::redirect($after['route'], $after['query']);
         }
         Csrf::requirePost();
+        $evidencePath = null;
         try {
+            if (!empty($_FILES['cost_evidence_photo']['name'])) {
+                $evidencePath = Uploader::store($_FILES['cost_evidence_photo'], 'report-cost');
+            }
             ReportCost::save(
                 Database::pdo(),
                 $user,
@@ -130,6 +135,10 @@ final class ReportController
                 $_POST['cost_vendor'] ?? null,
                 $_POST['cost_budget_line'] ?? null,
                 $_POST['cost_at'] ?? null,
+                $_POST['cost_estimate'] ?? null,
+                $_POST['cost_evidence'] ?? null,
+                $evidencePath,
+                $_POST['cost_budget_program'] ?? null,
             );
             App::flash('ok', '수리비를 저장했습니다.');
         } catch (\InvalidArgumentException $e) {
@@ -155,6 +164,10 @@ final class ReportController
         $note = trim((string) ($_POST['note'] ?? '')) ?: null;
         try {
             Report::transition(Database::pdo(), $user, $reportId, $status, $note);
+            if ($status === Report::STATUS_REJECTED && $reportId !== '') {
+                App::flash('ok', '수리 불가(불용)로 두었습니다. 파기로 이어갈 수 있습니다.');
+                App::redirect('reports/show', ['id' => $reportId]);
+            }
             App::flash('ok', '수리 상태를 변경했습니다.');
         } catch (\InvalidArgumentException $e) {
             App::flash('error', $e->getMessage());

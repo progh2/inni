@@ -36,6 +36,8 @@ final class InventoryBudget
         '단위',
         '결과',
         '확인시각',
+        '입회교사',
+        '확인교사',
     ];
 
     /**
@@ -105,7 +107,9 @@ final class InventoryBudget
     public static function checks(PDO $pdo): array
     {
         $rows = $pdo->query(
-            "SELECT id, location_id, location_name, status, started_at, finished_at
+            "SELECT id, location_id, location_name, status, started_at, finished_at,
+                    attending_teacher_id, attending_teacher_name,
+                    confirming_teacher_id, confirming_teacher_name
              FROM inventory_checks
              ORDER BY CASE status WHEN 'active' THEN 0 ELSE 1 END, started_at DESC"
         );
@@ -126,6 +130,8 @@ final class InventoryBudget
                        l.adjusted_at, l.adjusted_by, l.adjust_reason, l.adjust_approver,
                        c.status AS check_status, c.location_name AS check_location_name,
                        c.started_at, c.finished_at,
+                       c.attending_teacher_id, c.attending_teacher_name,
+                       c.confirming_teacher_id, c.confirming_teacher_name,
                        loc.name AS location_name,
                        ' . self::budgetProgramExpr() . ' AS budget_program,
                        ' . self::budgetYearExpr() . ' AS budget_year
@@ -232,6 +238,8 @@ final class InventoryBudget
                 (string) ($line['unit'] ?? ''),
                 $line['is_confirmed'] ? '확인' : '미확인',
                 (string) ($line['confirmed_at'] ?? ''),
+                (string) ($line['attending_teacher_name'] ?? ''),
+                (string) ($line['confirming_teacher_name'] ?? ''),
             ];
         }
         return CatalogCsv::encode($rows);

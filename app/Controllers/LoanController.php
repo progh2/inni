@@ -54,8 +54,21 @@ final class LoanController
         Csrf::requirePost();
         $loanId = (string) ($_POST['loan_id'] ?? '');
         try {
-            $assetId = Loan::checkin(Database::pdo(), $user, $loanId);
-            App::flash('ok', '반납 처리되었습니다.');
+            $assetId = Loan::checkin(
+                Database::pdo(),
+                $user,
+                $loanId,
+                $_POST['return_condition'] ?? null,
+                $_POST['return_note'] ?? null,
+            );
+            $condition = Loan::parseReturnCondition($_POST['return_condition'] ?? null);
+            $flash = '반납 처리되었습니다.';
+            if ($condition === Loan::RETURN_ABNORMAL) {
+                $flash = '반납 처리되었습니다. 이상이 있으면 수리 요청으로 이어가세요.';
+            } elseif ($condition === Loan::RETURN_OK) {
+                $flash = '반납 처리되었습니다. 이상 없음.';
+            }
+            App::flash('ok', $flash);
             if (in_array($after, ['loans/mine', 'loans/desk'], true)) {
                 App::redirect($after);
             }

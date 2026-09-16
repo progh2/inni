@@ -233,7 +233,7 @@ $mutations = [
     'app/Controllers/SettingsController.php' => ['save', 'saveTelegram', 'approve'],
     'app/Controllers/ScanController.php' => ['resolve'],
     'app/Controllers/LabelController.php' => ['print'],
-    'app/Controllers/InventoryController.php' => ['start', 'confirm', 'finish', 'adjust'],
+    'app/Controllers/InventoryController.php' => ['start', 'confirm', 'finish', 'adjust', 'sign'],
     'app/Controllers/CatalogCsvController.php' => ['import'],
 ];
 foreach ($mutations as $file => $methods) {
@@ -262,6 +262,7 @@ $forms = [
     'templates/inventory/index.php' => 'inventory/start',
     'templates/inventory/show.php' => 'inventory/finish',
     'templates/partials/inventory_adjust.php' => 'inventory/adjust',
+    'templates/partials/inventory_sign.php' => 'inventory/sign',
     'templates/rooms/show.php' => 'inventory/start',
     'templates/catalog/csv.php' => 'catalog/csv/import',
 ];

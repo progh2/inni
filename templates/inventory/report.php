@@ -10,6 +10,10 @@ use Inni\Support;
 /** @var list<array<string, mixed>> $lines */
 /** @var array{budget_program: ?string, budget_year: ?int, check_status: ?string, check_id: ?string, diff: string} $filters */
 /** @var array{expected_count: int, confirmed_count: int, missing_count: int, expected_qty: float, confirmed_qty: float, missing_qty: float, check_count: int} $summary */
+/** @var list<array<string, mixed>> $teachers */
+/** @var ?array<string, mixed> $selectedCheck */
+$teachers = $teachers ?? [];
+$selectedCheck = $selectedCheck ?? null;
 
 $filterQuery = static function (array $extra = []) use ($filters): array {
     $merged = $filters;
@@ -82,6 +86,17 @@ $csvQuery = InventoryBudget::query($filters);
     <a class="btn btn-ghost" href="<?= Support::e(App::url('inventory/report/csv', $csvQuery)) ?>">CSV 내보내기</a>
   </div>
 </form>
+
+<?php if (!empty($selectedCheck)): ?>
+  <?php
+    $check = $selectedCheck;
+    $returnTo = 'report';
+    $returnQuery = $csvQuery;
+    require dirname(__DIR__) . '/partials/inventory_sign.php';
+  ?>
+<?php else: ?>
+  <p class="muted">실사 세션을 고르면 그 실사조서의 입회·확인 교사를 보고 고칠 수 있습니다.</p>
+<?php endif; ?>
 
 <div class="card">
   <h2 class="section-title" style="margin-top:0">사업별 집계 (<?= count($aggregates) ?>)</h2>

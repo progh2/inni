@@ -39,9 +39,35 @@ $total = count($lines);
   <?php endif; ?>
 </div>
 
-<form class="actions" method="post" action="<?= Support::e(App::url('inventory/finish')) ?>">
+<form class="card" method="post" action="<?= Support::e(App::url('inventory/finish')) ?>">
   <?= Csrf::field() ?>
   <input type="hidden" name="check_id" value="<?= Support::e($check['id']) ?>">
+  <h2 class="section-title" style="margin-top:0">실사조서 · 입회·확인</h2>
+  <p class="muted">종료할 때 입회 교사와 확인 교사를 남길 수 있습니다.</p>
+  <div class="grid-2">
+    <div class="field">
+      <label for="finish-attending">입회 교사</label>
+      <select id="finish-attending" name="attending_teacher_id">
+        <option value="">선택</option>
+        <?php foreach (($teachers ?? []) as $t): ?>
+          <option value="<?= Support::e((string) $t['id']) ?>" <?= (($check['attending_teacher_id'] ?? '') === $t['id']) ? 'selected' : '' ?>>
+            <?= Support::e((string) $t['display_name']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <div class="field">
+      <label for="finish-confirming">확인 교사</label>
+      <select id="finish-confirming" name="confirming_teacher_id">
+        <option value="">선택</option>
+        <?php foreach (($teachers ?? []) as $t): ?>
+          <option value="<?= Support::e((string) $t['id']) ?>" <?= (($check['confirming_teacher_id'] ?? '') === $t['id']) ? 'selected' : '' ?>>
+            <?= Support::e((string) $t['display_name']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+  </div>
   <button class="btn btn-ink btn-block" type="submit">실사 종료 · 미확인 보기</button>
 </form>
 <p class="muted" style="margin-top:0.75rem">

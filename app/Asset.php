@@ -12,9 +12,16 @@ final class Asset
 {
     public const RETIRE_REASON_MAX = 200;
     public const RETIRE_EVIDENCE_MAX = 200;
+    public const RETIRE_SOURCE_REPAIR = 'repair_impossible';
+    public const RETIRE_SOURCE_LIFE = 'useful_life';
+    public const RETIRE_REASON_REPAIR = '수리불가';
+    public const RETIRE_REASON_LIFE = '내용연한 초과';
 
     /** @var list<string> */
     public const RETIRE_FROM = ['available', 'repair', 'moving', 'lost'];
+
+    /** @var list<string> */
+    public const RETIRE_SOURCES = [self::RETIRE_SOURCE_REPAIR, self::RETIRE_SOURCE_LIFE];
 
     public static function updateBudget(
         PDO $pdo,
@@ -163,6 +170,8 @@ final class Asset
         mixed $retiredAt,
         mixed $evidence,
         ?string $evidencePath = null,
+        mixed $source = null,
+        mixed $reportId = null,
     ): void {
         if (!Auth::canWrite($actor) || ($actor['status'] ?? '') !== 'active') {
             throw new InvalidArgumentException('파기 권한이 없습니다.');
@@ -176,6 +185,11 @@ final class Asset
         $assetId = trim($assetId);
         if ($assetId === '') {
             throw new InvalidArgumentException('장비를 찾을 수 없습니다.');
+        }
+        $source = self::parseRetireSource($source);
+        $reportId = self::nullableTrim($reportId);
+        if (($reason === null || (is_string($reason) && trim((string) $reason) === '')) && $source !== null) {
+            $reason = self::retireReasonForSource($source);
         }
         $reason = self::parseRetireReason($reason);
         $retiredAt = self::parseRetireDate($retiredAt);
@@ -200,14 +214,18 @@ final class Asset
             if (!in_array($from, self::RETIRE_FROM, true)) {
                 throw new InvalidArgumentException('그 상태에서는 파기할 수 없습니다.');
             }
+            if ($reportId !== null) {
+                self::assertRetireReport($pdo, $assetId, $reportId);
+            }
 
             $t = Support::now();
             $upd = $pdo->prepare(
                 "UPDATE assets
-                 SET status = 'retired', retired_at = ?, retire_reason = ?, retire_evidence = ?, updated_at = ?
+                 SET status = 'retired', retired_at = ?, retire_reason = ?, retire_evidence = ?,
+                     retire_source = ?, retire_report_id = ?, updated_at = ?
                  WHERE id = ? AND status = ? AND status IN ('available','repair','moving','lost')"
             );
-            $upd->execute([$retiredAt, $reason, $evidence, $t, $assetId, $from]);
+            $upd->execute([$retiredAt, $reason, $evidence, $source, $reportId, $t, $assetId, $from]);
             if ($upd->rowCount() !== 1) {
                 throw new InvalidArgumentException('이미 처리되었거나 파기할 수 없는 상태입니다.');
             }
@@ -229,6 +247,8 @@ final class Asset
                     'reason' => $reason,
                     'retired_at' => $retiredAt,
                     'evidence' => $evidence,
+                    'source' => $source,
+                    'report_id' => $reportId,
                 ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
                 $t,
             ]);
@@ -241,6 +261,49 @@ final class Asset
             }
             throw $e;
         }
+    }
+
+    public static function parseRetireSource(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_string($value) && !is_int($value)) {
+            throw new InvalidArgumentException('불용 결정 출처를 확인하세요.');
+        }
+        $text = trim((string) $value);
+        if ($text === '') {
+            return null;
+        }
+        $map = [
+            self::RETIRE_SOURCE_REPAIR => self::RETIRE_SOURCE_REPAIR,
+            self::RETIRE_SOURCE_LIFE => self::RETIRE_SOURCE_LIFE,
+            '수리불가' => self::RETIRE_SOURCE_REPAIR,
+            '내용연한 초과' => self::RETIRE_SOURCE_LIFE,
+            '연한초과' => self::RETIRE_SOURCE_LIFE,
+        ];
+        if (!isset($map[$text])) {
+            throw new InvalidArgumentException('불용 결정은 수리불가 또는 내용연한 초과입니다.');
+        }
+        return $map[$text];
+    }
+
+    public static function retireReasonForSource(?string $source): string
+    {
+        return match ($source) {
+            self::RETIRE_SOURCE_REPAIR => self::RETIRE_REASON_REPAIR,
+            self::RETIRE_SOURCE_LIFE => self::RETIRE_REASON_LIFE,
+            default => '',
+        };
+    }
+
+    public static function retireSourceLabel(?string $source): string
+    {
+        return match ($source) {
+            self::RETIRE_SOURCE_REPAIR => '수리불가',
+            self::RETIRE_SOURCE_LIFE => '내용연한 초과',
+            default => '',
+        };
     }
 
     public static function parseRetireReason(mixed $reason): string
@@ -304,5 +367,30 @@ final class Asset
             throw new InvalidArgumentException('증빙 사진 또는 증빙 메모를 입력하세요.');
         }
         return $path !== '' ? $path : $note;
+    }
+
+    private static function assertRetireReport(PDO $pdo, string $assetId, string $reportId): void
+    {
+        $stmt = $pdo->prepare('SELECT target_type, target_id, status FROM reports WHERE id = ?');
+        $stmt->execute([$reportId]);
+        $report = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$report) {
+            throw new InvalidArgumentException('불용 결정 수리 요청을 확인하세요.');
+        }
+        if (($report['target_type'] ?? '') !== 'asset' || (string) ($report['target_id'] ?? '') !== $assetId) {
+            throw new InvalidArgumentException('불용 결정 수리 요청을 확인하세요.');
+        }
+    }
+
+    private static function nullableTrim(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        if (!is_string($value) && !is_int($value) && !is_float($value)) {
+            throw new InvalidArgumentException('수리 요청을 확인하세요.');
+        }
+        $text = trim((string) $value);
+        return $text === '' ? null : $text;
     }
 }

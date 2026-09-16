@@ -58,8 +58,8 @@ $filterQuery = static function (array $extra = []) use ($filters): array {
       $bucket = (string) ($asset['life_bucket'] ?? '');
       $rowClass = $bucket === AssetLife::BUCKET_EXCEEDED ? ' is-exceeded' : ($bucket === AssetLife::BUCKET_IMMINENT ? ' is-imminent' : '');
     ?>
-    <a class="list-row<?= $rowClass ?>" href="<?= Support::e(App::url('assets/show', ['id' => $asset['id']])) ?>">
-      <div>
+    <div class="list-row<?= $rowClass ?>">
+      <a href="<?= Support::e(App::url('assets/show', ['id' => $asset['id']])) ?>">
         <div class="title"><?= Support::e((string) $asset['name']) ?></div>
         <div class="meta">
           <?= Support::e((string) $asset['management_number']) ?>
@@ -71,11 +71,16 @@ $filterQuery = static function (array $extra = []) use ($filters): array {
             · <?= Support::e((string) $asset['remaining_label']) ?>
           <?php endif; ?>
         </div>
+      </a>
+      <div class="actions">
+        <?php if ($bucket !== ''): ?>
+          <span class="badge <?= Support::e($bucket) ?>"><?= Support::e(AssetLife::bucketLabel($bucket)) ?></span>
+        <?php endif; ?>
+        <?php if ($bucket === AssetLife::BUCKET_EXCEEDED && ($asset['status'] ?? '') !== 'retired'): ?>
+          <a class="btn btn-ghost" href="<?= Support::e(App::url('assets/show', ['id' => $asset['id'], 'retire_from' => 'useful_life'])) ?>#retire">불용·파기</a>
+        <?php endif; ?>
       </div>
-      <?php if ($bucket !== ''): ?>
-        <span class="badge <?= Support::e($bucket) ?>"><?= Support::e(AssetLife::bucketLabel($bucket)) ?></span>
-      <?php endif; ?>
-    </a>
+    </div>
   <?php endforeach; ?>
   <?php if (!$assets): ?>
     <p class="muted">조건에 맞는 연한 임박·초과 장비가 없습니다. 도입일과 내용연한은 장비 상세에서 입력하세요.</p>
