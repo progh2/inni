@@ -28,11 +28,13 @@ npm run demo            # http://localhost:18080  → [관리자(김담당)] 버
 ## NAS·서버에 설치 (도커)
 
 ```bash
+git clone https://github.com/progh2/inni.git && cd inni
 cp .env.example .env    # Firebase 값·관리자 메일·학교 도메인 채우기
 docker compose up -d --build
 ```
 
 - 자세히: **[docs/nas-deploy.md](docs/nas-deploy.md)** (시놀로지 Container Manager, https 역방향 프록시, AI·검색 키)
+- **업데이트는 git으로**: 손으로는 `git pull` 뒤 다시 빌드, 또는 NAS가 10분마다 스스로 받아 오게(업데이트 전 백업·실패하면 되돌리기) → [nas-deploy.md §7](docs/nas-deploy.md#7-업데이트-git)
 - 로그인 준비: **[docs/firebase-setup.md](docs/firebase-setup.md)** (구글 / 학교 메일 링크, 승인된 도메인)
 - 백업·복원·이전: **[docs/backup-restore.md](docs/backup-restore.md)** (예전 PHP 판 데이터 가져오기 포함)
 
@@ -129,7 +131,9 @@ web/               빌드 없는 SPA
   css/             함교 테마
 deploy/Dockerfile  compose.yaml  .env.example
 test/              node:test (npm test)
-scripts/dev-llm.js 개발용 흉내 LLM
+scripts/           NAS 자동 업데이트(nas-auto-update*.sh) · 개발용 흉내 LLM(dev-llm.js)
+server/cli.js      명령줄: 백업(업데이트 전) · 버전
+.github/workflows  CI — PR마다 시험·도커 빌드(NAS는 통과한 main만 받는다)
 docs/              설계·배포·Firebase·백업 문서
 ```
 

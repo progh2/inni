@@ -113,7 +113,7 @@ export function createApp(overrides = {}) {
     next();
   });
 
-  app.get("/health", (_req, res) => res.json({ status: "ok", version: cfg.version }));
+  app.get("/health", (_req, res) => res.json({ status: "ok", version: cfg.version, commit: cfg.commit || undefined }));
 
   // 라벨 QR: 휴대폰 기본 카메라로 찍으면 이 주소가 열린다
   app.get("/q/:code", (req, res) => {

@@ -14,6 +14,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY package.json ./
 COPY server ./server
 COPY web ./web
+# 어느 커밋으로 만든 이미지인지(시스템 → 정보에 보임). 자동 업데이트 스크립트가 넘겨 준다.
+# 맨 뒤에 두어야 커밋이 바뀌어도 위 단계의 캐시를 그대로 쓴다.
+ARG INNI_COMMIT=""
+ENV INNI_COMMIT=${INNI_COMMIT}
 VOLUME /app/data
 EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=5s --retries=5 --start-period=20s \

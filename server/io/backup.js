@@ -50,7 +50,7 @@ export function counts(db) {
 export async function createBackup(ctx, { reason = "manual", includeSecrets = true, actor = null } = {}) {
   const dir = ctx.cfg.backupsDir;
   fs.mkdirSync(dir, { recursive: true });
-  const tag = reason === "auto" ? "-auto" : reason === "before-restore" ? "-before-restore" : "";
+  const tag = reason === "auto" ? "-auto" : reason === "before-restore" ? "-before-restore" : reason === "before-update" ? "-before-update" : "";
   const name = `inni-backup-${stamp()}${tag}.zip`;
   const tmpDb = path.join(dir, `.tmp-${newId()}.db`);
   const tmpZip = path.join(dir, `.tmp-${newId()}.zip`);
@@ -81,7 +81,8 @@ export async function createBackup(ctx, { reason = "manual", includeSecrets = tr
     const final = path.join(dir, name);
     fs.renameSync(tmpZip, final);
     const bytes = fs.statSync(final).size;
-    if (reason !== "before-restore") logEvent(ctx.db, actor, { action: "backup", summary: `백업 만들기 (${reason === "auto" ? "자동" : "직접"}) · ${name} · ${fmtBytes(bytes)}` });
+    const how = { auto: "자동", "before-update": "업데이트 전" }[reason] || "직접";
+    if (reason !== "before-restore") logEvent(ctx.db, actor, { action: "backup", summary: `백업 만들기 (${how}) · ${name} · ${fmtBytes(bytes)}` });
     return { name, bytes, path: final, manifest };
   } finally {
     for (const f of [tmpDb, tmpZip]) { try { fs.unlinkSync(f); } catch { /* 없음 */ } }
@@ -104,7 +105,7 @@ export function listBackups(ctx) {
   try { files = fs.readdirSync(dir); } catch { return []; }
   return files.filter((f) => NAME_RE.test(f)).map((f) => {
     const st = fs.statSync(path.join(dir, f));
-    return { name: f, bytes: st.size, created_at: st.mtime.toISOString(), auto: f.includes("-auto"), before_restore: f.includes("-before-restore") };
+    return { name: f, bytes: st.size, created_at: st.mtime.toISOString(), auto: f.includes("-auto"), before_restore: f.includes("-before-restore"), before_update: f.includes("-before-update") };
   }).sort((a, b) => b.created_at.localeCompare(a.created_at));
 }
 
@@ -119,12 +120,13 @@ export function deleteBackup(ctx, name) {
   fs.unlinkSync(backupPath(ctx, name));
 }
 
-// 자동 백업은 keep 개만 남긴다(직접 만든 것·복원 전 백업은 지우지 않는다. 복원 전 백업은 5개까지)
+// 자동 백업은 keep 개만 남긴다(직접 만든 것은 지우지 않는다. 복원 전·업데이트 전 백업은 5개씩)
 export function pruneBackups(ctx, keep = 14) {
   const all = listBackups(ctx);
   const autos = all.filter((b) => b.auto);
   const befores = all.filter((b) => b.before_restore);
-  const drop = [...autos.slice(keep), ...befores.slice(5)];
+  const updates = all.filter((b) => b.before_update);
+  const drop = [...autos.slice(keep), ...befores.slice(5), ...updates.slice(5)];
   for (const b of drop) { try { fs.unlinkSync(path.join(ctx.cfg.backupsDir, b.name)); } catch { /* 이미 없음 */ } }
   return drop.length;
 }

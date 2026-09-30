@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { gitCommit } from "./update.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
@@ -20,6 +21,7 @@ export function loadConfig(overrides = {}, env = process.env) {
     root: ROOT,
     webDir: path.join(ROOT, "web"),
     version: pkg.version,
+    commit: String(env.INNI_COMMIT || gitCommit(ROOT) || "").slice(0, 12),
     port: Number(overrides.port ?? env.PORT ?? 3000),
     host: env.HOST || "0.0.0.0",
     dataDir,

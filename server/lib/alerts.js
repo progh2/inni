@@ -9,7 +9,7 @@ function daysLate(due, now) {
   return Math.max(1, Math.ceil((now - Date.parse(due)) / DAY));
 }
 
-export function computeAlerts(snap, { now = Date.now(), user = null, caps = new Set(), pendingUsers = 0 } = {}) {
+export function computeAlerts(snap, { now = Date.now(), user = null, caps = new Set(), pendingUsers = 0, update = null } = {}) {
   const alerts = [];
   const itemName = (id) => (snap.items.get(id) || {}).name || "?";
 
@@ -80,6 +80,16 @@ export function computeAlerts(snap, { now = Date.now(), user = null, caps = new 
       id: "repair", level: "info", kind: "repair", count: openRepairs.length, title: `처리할 고장 신고 ${openRepairs.length}건`,
       detail: openRepairs.slice(0, 3).map((r) => r.title).join(", "), go: { station: "repair", params: { status: "open" } },
     });
+  }
+  // NAS 자동 업데이트가 실패했거나 한동안 돌지 않으면 관리자에게
+  if (update && caps.has("system")) {
+    const go = { station: "systems", params: { tab: "about" } };
+    if (update.status === "error" || update.status === "rolled_back" || update.status === "held") {
+      const title = { rolled_back: "자동 업데이트를 되돌렸어요", held: "새 버전이 보류 중이에요(이전 버전으로 정상 운영)" }[update.status] || "자동 업데이트가 멈췄어요";
+      alerts.push({ id: "auto-update", level: "warn", kind: "system", count: 1, title, detail: String(update.message || ""), go });
+    } else if (update.checked_at && now - Date.parse(update.checked_at) > 3 * 3600000) {
+      alerts.push({ id: "auto-update", level: "info", kind: "system", count: 1, title: "자동 업데이트 확인이 3시간 넘게 없어요", detail: "NAS 작업 스케줄러가 켜져 있는지 확인하세요.", go });
+    }
   }
   if (pendingUsers && caps.has("users")) {
     alerts.push({

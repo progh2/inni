@@ -15,15 +15,18 @@ inni v2는 **컨테이너 1개**로 돈다. 데이터(DB·사진·백업)는 전
 ## 1. 설치
 
 ### 1-1. 파일 올리기
-NAS에 폴더를 만든다(예: `/volume1/docker/inni`). 이 저장소를 받아 그 폴더에 둔다.
+NAS의 `docker` 공유 폴더 아래에 저장소를 **git으로 받는다**(업데이트가 `git pull` 한 번이 된다 → §7).
+NAS에 git이 없으면 패키지 센터에서 **Git Server**를 설치한다.
 
 ```bash
-# NAS 에 SSH 로 들어가서(또는 File Station 으로 zip 을 올려 풀어도 됨)
+# NAS 에 SSH 로 들어가서
 cd /volume1/docker
-git clone https://github.com/<계정>/inni.git
+sudo git clone https://github.com/progh2/inni.git
 cd inni
-cp .env.example .env
+sudo cp .env.example .env
 ```
+
+git 없이 File Station으로 zip을 올려 풀어도 된다. 나중에 자동 업데이트 준비 스크립트(§7-2)가 제자리에서 git 저장소로 바꿔 준다.
 
 `.env`를 열어 채운다. 최소한 이것들:
 
@@ -127,16 +130,78 @@ docker compose logs -f inni      # "inni 2.x.x · http://0.0.0.0:3000 · 로그�
 
 시스템(09) → 알림: 봇 토큰(@BotFather)과 채팅 ID → [시험 보내기]. 15분마다 살펴서 **새로 생긴** 연체·재고 부족·고장 신고를 한 번씩 보낸다(같은 일은 다시 안 보냄). 자동 백업 결과도 받을 수 있다.
 
-## 7. 업데이트
+## 7. 업데이트 (git)
+
+inni는 **git 저장소 그대로** NAS에 두고 쓴다. 설치를 `git clone`으로 했다면 업데이트는 `git pull` 한 번이다.
+NAS에서 파일을 직접 고치지 말고, 포트·주소 같은 값은 **`.env`** 에 둔다(그래야 업데이트가 부딪히지 않는다).
+
+### 7-1. 손으로 업데이트
 
 ```bash
 cd /volume1/docker/inni
-git pull                              # 또는 새 파일로 덮어쓰기(.env 와 data/ 는 그대로 두기)
-docker compose up -d --build
+sudo docker compose exec -T inni node server/cli.js backup --reason before-update   # 업데이트 전 백업(선택이지만 권장)
+sudo git pull --ff-only
+sudo INNI_COMMIT=$(git rev-parse --short HEAD) docker compose up -d --build
 ```
 
-- 업데이트 전에 시스템 → 백업·이전 → **지금 백업**을 한 번 눌러 두면 안심.
-- DB 구조가 바뀌면 시작할 때 자동으로 옮긴다(되돌릴 땐 예전 판 + 업데이트 전 백업).
+Container Manager에서는 **프로젝트 → inni → 동작 → 빌드**(git pull 뒤)도 된다.
+DB 구조가 바뀌면 새 버전이 시작할 때 알아서 옮긴다.
+
+### 7-2. 자동 업데이트 (권장, aiapi-manager와 같은 방식)
+
+GitHub `main`에 새 버전이 올라오면 NAS가 **10분마다 스스로 확인해 가져오고 다시 빌드**한다.
+학교 NAS는 내부망이라 GitHub가 먼저 알려 줄 수 없어서, NAS가 GitHub에 묻는 방식이다.
+
+- 새 버전을 받기 **직전에 백업**(`data/backups/…-before-update.zip`, 최근 5개)을 남긴다.
+- 새 버전이 제대로 뜨지 않으면(도커 건강 확인 실패) **이전 버전으로 스스로 되돌리고**, 그 버전은 고친 버전이 올라올 때까지 **보류**한다.
+- NAS에서 저장소 파일을 고쳐 두었으면 덮어쓰지 않고 멈춘다.
+- 결과는 inni **시스템(09) → 정보 → 자동 업데이트** 줄에 보이고, 실패하면 관리자 경보에도 뜬다. 자세한 기록은 `data/auto-update.log`.
+- GitHub에서는 PR마다 시험·도커 빌드(CI)가 돌아서, 통과한 것만 `main`에 들어간다.
+
+**준비 (한 번만, 10분 정도)**
+
+1. **SSH 켜기**: DSM 제어판 → 터미널 및 SNMP → 터미널 → **SSH 서비스 활성화**(다 끝나면 꺼도 된다).
+2. **Git Server 설치**: 패키지 센터에서 `Git Server` 설치(설정은 안 해도 됨). aiapi-manager 때 이미 했다면 건너뛴다.
+3. **준비 스크립트 실행**: PC에서 PowerShell(윈도우)·터미널(맥)을 열고
+
+   ```sh
+   ssh 관리자계정@NAS주소
+   sudo bash /volume1/docker/inni/scripts/nas-auto-update-setup.sh
+   ```
+
+   - inni 저장소는 **공개**라서 배포 키 없이 https로 받는다.
+   - 비공개로 복제해 쓰는 학교는 스크립트가 **읽기 전용 배포 키** 한 줄을 보여 준다 → GitHub 저장소 → Settings → Deploy keys → Add deploy key(쓰기 권한은 끔). aiapi-manager의 키와 섞이지 않게 별칭 `github-inni`을 따로 쓴다.
+   - ZIP으로 설치한 폴더면 `.env`·`data`는 그대로 둔 채 제자리에서 git 저장소로 바꾼다.
+4. **작업 스케줄러 등록**: DSM 제어판 → 작업 스케줄러 → 생성 → 예약된 작업 → 사용자 정의 스크립트
+
+   | 탭 | 칸 | 값 |
+   |---|---|---|
+   | 일반 | 작업 / 사용자 | `inni 자동 업데이트` / `root` |
+   | 스케줄 | 실행 | 매일 · 첫 실행 00:00 · **10분마다** · 마지막 23:50 |
+   | 작업 설정 | 사용자 정의 스크립트 | `bash /volume1/docker/inni/scripts/nas-auto-update.sh` |
+   | 작업 설정 | 알림(선택) | 비정상 종료일 때만 실행 세부 정보를 이메일로 |
+
+   수업 중에는 적용을 미루려면(서울 0~7시, 17~23시에만 적용):
+   `INNI_UPDATE_HOURS="0-7,17-23" bash /volume1/docker/inni/scripts/nas-auto-update.sh`
+5. **확인**: 작업을 한 번 **실행** → inni 시스템 → 정보의 자동 업데이트 줄이 `최신 (커밋) · 확인 …`이면 끝.
+
+**문제 해결**
+
+| 자동 업데이트 줄 | 뜻과 할 일 |
+|---|---|
+| 설정 안 됨 | 작업이 아직 한 번도 안 돌았다 → 작업 스케줄러에서 **실행** |
+| 마지막 확인 … — 작업 스케줄러가 멈췄는지 | 작업이 꺼졌거나 NAS가 재시작 중이었다 → **활성화** 확인 |
+| git 이 없습니다 | Git Server 설치 |
+| GitHub 에서 가져오지 못했습니다 | NAS 인터넷 연결 확인(비공개 저장소면 배포 키). 준비 스크립트를 다시 돌리면 연결을 시험한다 |
+| NAS 에서 고친 파일이 있어 멈췄습니다 | 바꾼 값을 `.env`로 옮기고 `sudo git -C /volume1/docker/inni checkout -- .` |
+| NAS 쪽 기록이 GitHub 과 갈라졌습니다 | NAS에서 커밋을 만들었다 → 챙길 것을 챙긴 뒤 `sudo git -C /volume1/docker/inni reset --hard origin/main` |
+| 업데이트 전 백업을 만들지 못해 멈췄습니다 | `data/auto-update.log` 확인(디스크 공간 등). 급하면 `INNI_UPDATE_SKIP_BACKUP=1` |
+| 이전 버전으로 되돌렸습니다 | 새 버전이 뜨지 않아 예전 버전이 돌고 있다(서비스는 정상). 로그를 개발 쪽에 알린다. 데이터가 이상하면 안내된 `…-before-update.zip`으로 복원 |
+| 보류 중입니다 | 되돌린 그 버전은 다시 시도하지 않는다(10분마다 서비스가 흔들리지 않게). 고친 버전이 올라오면 저절로 다시 시도. 같은 버전을 다시 해 보려면 `data/auto-update.failed`를 지운다 |
+| 적용 시각이 아니라 기다립니다 | `INNI_UPDATE_HOURS` 설정대로 정상 |
+
+- **멈추기**: 작업 스케줄러에서 작업의 활성화를 끈다. 손 업데이트(7-1)는 그대로 된다.
+- 스크립트 시험(개발용): `bash scripts/nas-auto-update.test.sh` — 가짜 GitHub·docker로 적용·백업·대기·되돌림·잠금 확인(`npm test`에도 들어 있다).
 
 ## 8. 자주 묻는 것
 

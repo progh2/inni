@@ -221,7 +221,7 @@ function backupHtml() {
         <label class="field" style="width:130px"><span>남길 개수</span><input type="number" data-f="backup.keep" value="${cfg.keep}" min="1" max="365"></label>
         <button class="btn sm" type="button" data-save="backup" style="align-self:flex-end">저장</button></div></div>
       <p class="help" style="margin-top:8px">저장 위치: <code>${esc(b ? b.dir : "")}</code> — NAS 의 <b>Hyper Backup</b> 으로 이 폴더(또는 inni 폴더 전체)를 다른 곳에 한 번 더 복사해 두면 가장 안전해요.</p>
-      <div class="list" style="margin-top:10px">${b && b.backups.length ? b.backups.map((x) => `<div class="irow" data-bk="${esc(x.name)}"><span class="thumb sm blank">${icon("database")}</span><span class="tx"><span class="nm mono" style="font-size:12.5px">${esc(x.name)}</span><span class="sub">${esc(fmtDateTime(x.created_at))} · ${bytes(x.bytes)}${x.auto ? " · 자동" : x.before_restore ? " · 복원 전 자동 보관" : ""}</span></span>
+      <div class="list" style="margin-top:10px">${b && b.backups.length ? b.backups.map((x) => `<div class="irow" data-bk="${esc(x.name)}"><span class="thumb sm blank">${icon("database")}</span><span class="tx"><span class="nm mono" style="font-size:12.5px">${esc(x.name)}</span><span class="sub">${esc(fmtDateTime(x.created_at))} · ${bytes(x.bytes)}${x.auto ? " · 자동" : x.before_restore ? " · 복원 전 자동 보관" : x.before_update ? " · 업데이트 전 자동 보관" : ""}</span></span>
         <span class="end"><a class="btn xs" href="/api/backups/${encodeURIComponent(x.name)}" download>${icon("download")}</a><button class="btn xs warn" type="button" data-restore>복원</button><button class="btn xs ghost" type="button" data-bkdel>${icon("trash")}</button></span></div>`).join("") : '<div class="empty">아직 백업이 없어요</div>'}</div></section>
     <div class="stack">
       <section class="panel"><div class="panel-h"><span class="code">MIGRATION</span><h3>이전(다른 NAS·PC 로 옮기기)</h3></div>
@@ -300,13 +300,30 @@ function bindDevice(scope) {
 }
 
 // ---------------------------------------------------------------- 정보
+// NAS 자동 업데이트(scripts/nas-auto-update.sh) 상태 한 줄
+function updateRow(au) {
+  const chip = (tone, text) => `<span class="chip-s ${tone}" style="white-space:normal"><i></i>${esc(text)}</span>`;
+  if (!au) return chip("muted", "설정 안 됨 — docs/nas-deploy.md 7장 '자동 업데이트'");
+  const checked = au.checked_at ? relTime(au.checked_at) : "알 수 없음";
+  if (au.checked_at && Date.now() - Date.parse(au.checked_at) > 90 * 60000) return chip("warn", `마지막 확인 ${checked} — NAS 작업 스케줄러가 멈췄는지 확인하세요`);
+  const applied = au.applied_at ? ` · 마지막 적용 ${fmtDateTime(au.applied_at)}` : "";
+  if (au.status === "error" || au.status === "rolled_back") return chip("crit", au.message || au.status);
+  if (au.status === "held") return chip("warn", `${au.message} · 확인 ${checked}`);
+  if (au.status === "waiting" || au.status === "dry_run") return chip("warn", `${au.message} · 확인 ${checked}`);
+  if (au.status === "updated") return chip("good", `방금 적용: ${au.subject || au.commit}${applied}`);
+  return chip("good", `최신 (${au.commit || "?"}) · 확인 ${checked}${applied}`);
+}
+
 function aboutHtml() {
   const e = S ? S.env : null;
   const https = location.protocol === "https:" || location.hostname === "localhost";
+  const methods = (state.authConfig && state.authConfig.methods) || [];
+  const login = state.server.auth === "dev" ? "개발 모드(이메일)" : `Firebase — ${methods.map((m) => (m === "google" ? "구글" : "메일 링크")).join(" · ") || "구글"}`;
   return `<div class="grid g2" style="align-items:start">
     <section class="panel"><div class="panel-h"><span class="code">SYSTEM</span><h3>정보</h3></div>
-      <dl class="kv"><dt>버전</dt><dd>inni ${esc(state.server.version)}</dd><dt>로그인</dt><dd>${esc(state.server.auth === "dev" ? "개발 모드(이메일)" : "Firebase 구글")}</dd>
-        ${e ? `<dt>Firebase</dt><dd>${esc(e.firebase_project || "—")}</dd><dt>데이터</dt><dd class="mono">${esc(e.data_dir)}</dd><dt>공개 주소</dt><dd>${esc(e.public_url || "(접속 주소 사용)")}</dd>` : ""}
+      <dl class="kv"><dt>버전</dt><dd>inni ${esc(state.server.version)}${state.server.commit ? ` <span class="mono muted">${esc(state.server.commit)}</span>` : ""}</dd><dt>로그인</dt><dd>${esc(login)}</dd>
+        ${e ? `<dt>Firebase</dt><dd>${esc(e.firebase_project || "—")}</dd><dt>데이터</dt><dd class="mono">${esc(e.data_dir)}</dd><dt>공개 주소</dt><dd>${esc(e.public_url || "(접속 주소 사용)")}</dd>
+        <dt>자동 업데이트</dt><dd>${updateRow(e.auto_update)}</dd>` : ""}
         <dt>이 연결</dt><dd>${https ? '<span class="chip-s good"><i></i>보안 연결 — 카메라·마이크 사용 가능</span>' : '<span class="chip-s warn"><i></i>http — 휴대폰 카메라·마이크가 막혀요</span>'}</dd></dl></section>
     <section class="panel"><div class="panel-h"><span class="code">HTTPS</span><h3>휴대폰 카메라·마이크를 쓰려면</h3></div>
       <ol class="guide-steps"><li>시놀로지: 제어판 → 로그인 포털 → 고급 → <b>역방향 프록시</b>에 inni(예: https://inni.학교.synology.me → http://localhost:8080) 추가</li>

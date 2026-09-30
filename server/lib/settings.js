@@ -1,5 +1,6 @@
 // 학교 설정. 값은 settings 표에, 비밀 값(API 키·봇 토큰)은 secrets 표에 둔다.
 // 화면에는 비밀 값을 다시 보내지 않고 끝 네 글자만 보여 준다.
+import { readUpdateStatus } from "./update.js";
 import { getSetting, setSetting, getSecret, setSecret, secretHint } from "./db.js";
 import { str, optStr, badRequest, forbidden } from "./util.js";
 import { DEFAULT_ACCESS } from "./permissions.js";
@@ -77,6 +78,7 @@ export function adminSettings(ctx) {
   out.env = {
     allowed_domains: ctx.cfg.allowedDomains, admin_emails: ctx.cfg.adminEmails, auth_mode: ctx.cfg.authMode,
     firebase_project: ctx.cfg.firebase.projectId, public_url: ctx.cfg.publicUrl, data_dir: ctx.cfg.dataDir, version: ctx.cfg.version,
+    commit: ctx.cfg.commit, login_methods: ctx.cfg.loginMethods, auto_update: readUpdateStatus(ctx),
   };
   out.label_papers = LABEL_PAPERS;
   return out;

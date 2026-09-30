@@ -269,8 +269,9 @@ function paintBadges() {
   dot("dock", a.some((x) => x.kind === "overdue" || x.kind === "mine"));
   dot("repair", a.some((x) => x.kind === "repair"));
   dot("crew", a.some((x) => x.kind === "users"));
+  dot("systems", a.some((x) => x.kind === "system"));
   const m = document.querySelector('#tabbar [data-act="menu"] .badge-dot');
-  if (m) m.hidden = !a.some((x) => x.kind === "repair" || x.kind === "users");
+  if (m) m.hidden = !a.some((x) => x.kind === "repair" || x.kind === "users" || x.kind === "system");
 }
 
 function openAlerts() {

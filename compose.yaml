@@ -1,11 +1,15 @@
 # inni v2 — 학교 물품 관리(보급 함교)
 # 처음: cp .env.example .env 로 값을 채운 뒤  docker compose up -d --build
 # 데이터(DB·사진·백업)는 모두 ./data 폴더 하나에 있다 → 이 폴더만 백업·복사하면 이전 끝
+# 업데이트: git pull 뒤 다시 빌드, 또는 scripts/nas-auto-update.sh 로 자동(docs/nas-deploy.md 7장)
+# 포트 등은 이 파일이 아니라 .env 에서 바꾼다(자동 업데이트가 멈추지 않게)
 services:
   inni:
     build:
       context: .
       dockerfile: deploy/Dockerfile
+      args:
+        INNI_COMMIT: ${INNI_COMMIT:-}
     image: inni:v2
     restart: unless-stopped
     ports:

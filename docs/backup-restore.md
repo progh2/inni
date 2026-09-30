@@ -31,7 +31,11 @@ inni-backup-20260930-221258-auto.zip
 - 텔레그램을 켜 두면 성공/실패를 알려 준다.
 
 ### 직접 백업
-같은 화면의 **[지금 백업]** → 목록의 ⬇로 내려받기. 업데이트·큰 정리 전에 한 번.
+같은 화면의 **[지금 백업]** → 목록의 ⬇로 내려받기. 큰 정리 전에 한 번.
+
+### 업데이트 전 자동 백업
+NAS 자동 업데이트([nas-deploy.md §7-2](nas-deploy.md#7-2-자동-업데이트-권장-aiapi-manager와-같은-방식))는 새 버전을 받기 직전에
+`…-before-update.zip`을 남긴다(최근 5개). 손으로는 `docker compose exec -T inni node server/cli.js backup --reason before-update`.
 
 ### NAS 쪽에서 한 번 더(권장)
 NAS가 고장 나면 NAS 안의 백업도 같이 사라진다. `data/backups` 폴더(또는 inni 폴더 전체)를 다른 곳에 복사해 둔다.

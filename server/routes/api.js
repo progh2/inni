@@ -14,6 +14,7 @@ import * as repairs from "../lib/repairs.js";
 import * as audits from "../lib/audits.js";
 import * as users from "../lib/users.js";
 import { suggestUsefulLife } from "../lib/pps.js";
+import { readUpdateStatus } from "../lib/update.js";
 import { saveImage, sniffImage } from "../lib/uploads.js";
 import { productSearch, readProductPage, proxyImage } from "../lib/product.js";
 import { itemCard, loanBrief } from "../lib/inventory.js";
@@ -103,9 +104,9 @@ export function apiRouter(ctx) {
       settings: publicSettings(ctx),
       locations: inv.listLocations(ctx),
       categories: inv.listCategories(ctx),
-      alerts: computeAlerts(snap, { user: req.user, caps: req.caps, pendingUsers: pending }),
+      alerts: computeAlerts(snap, { user: req.user, caps: req.caps, pendingUsers: pending, update: req.caps.has("system") ? readUpdateStatus(ctx) : null }),
       counts: dashboardCounts(snap),
-      server: { version: ctx.cfg.version, auth: ctx.cfg.authMode, time: nowIso(), ai: ctx.aiReady ? ctx.aiReady() : false, public_url: ctx.cfg.publicUrl || "" },
+      server: { version: ctx.cfg.version, commit: ctx.cfg.commit, auth: ctx.cfg.authMode, time: nowIso(), ai: ctx.aiReady ? ctx.aiReady() : false, public_url: ctx.cfg.publicUrl || "" },
     });
   });
 
@@ -118,7 +119,7 @@ export function apiRouter(ctx) {
     const events = req.user.role === "student" ? listEvents(ctx.db, { actor_id: req.user.id, limit: 15 }) : listEvents(ctx.db, { limit: 25 });
     res.json({
       counts: dashboardCounts(snap),
-      alerts: computeAlerts(snap, { user: req.user, caps: req.caps, pendingUsers: pending }),
+      alerts: computeAlerts(snap, { user: req.user, caps: req.caps, pendingUsers: pending, update: req.caps.has("system") ? readUpdateStatus(ctx) : null }),
       my_loans: mine, favorites, recent_items: recentItems, events,
       active_audits: audits.listAudits(ctx).filter((a) => a.status === "active"),
     });
