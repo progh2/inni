@@ -1,8 +1,13 @@
+node_modules/
+.env
+# 실행 데이터(DB·사진·백업)는 저장소 루트의 data 폴더에만. server/data(내장 자료)는 올린다
+/data/*
+!/data/.gitignore
+/data-*/
+*.log
+.DS_Store
+# 예전 PHP 판 런타임 파일
 config.php
-data/*.sqlite
-data/*.sqlite-*
 public/uploads/**
 !public/uploads/.gitignore
 !public/uploads/.htaccess
-.DS_Store
-*.log
