@@ -1,0 +1,46 @@
+# inni v2 — 학교 물품 관리(보급 함교)
+# 처음: cp .env.example .env 로 값을 채운 뒤  docker compose up -d --build
+# 데이터(DB·사진·백업)는 모두 ./data 폴더 하나에 있다 → 이 폴더만 백업·복사하면 이전 끝
+# 업데이트: git pull 뒤 다시 빌드, 또는 scripts/nas-auto-update.sh 로 자동(docs/nas-deploy.md 7장)
+# 포트 등은 이 파일이 아니라 .env 에서 바꾼다(자동 업데이트가 멈추지 않게)
+services:
+  inni:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      args:
+        INNI_COMMIT: ${INNI_COMMIT:-}
+    image: inni:v2
+    restart: unless-stopped
+    ports:
+      - "${INNI_PORT:-8080}:3000"
+    environment:
+      TZ: ${TZ:-Asia/Seoul}
+      AUTH_MODE: ${AUTH_MODE:-firebase}
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-}
+      FIREBASE_API_KEY: ${FIREBASE_API_KEY:-}
+      FIREBASE_AUTH_DOMAIN: ${FIREBASE_AUTH_DOMAIN:-}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+      ALLOWED_DOMAINS: ${ALLOWED_DOMAINS:-}
+      LOGIN_METHODS: ${LOGIN_METHODS:-google,email}
+      SCHOOL_NAME: ${SCHOOL_NAME:-}
+      PUBLIC_URL: ${PUBLIC_URL:-}
+      SESSION_DAYS: ${SESSION_DAYS:-30}
+      SEED_DEMO: ${SEED_DEMO:-0}
+      TRUST_PROXY: ${TRUST_PROXY:-loopback, linklocal, uniquelocal}
+      # 예전 inni(PHP) DB·사진이 기본 위치(data/inni.sqlite, data/legacy-uploads)가 아닐 때만
+      LEGACY_DB: ${LEGACY_DB:-}
+      LEGACY_UPLOADS: ${LEGACY_UPLOADS:-}
+    volumes:
+      - ./data:/app/data
+    # 같은 NAS 의 aiapi-manager(LiteLLM, :4000)·Ollama 를 http://host.docker.internal:포트 로 부른다
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # (선택) 사진 배경 지우기 서버. 켜기: docker compose --profile rembg up -d
+  # 시스템 → 제품 검색·사진 → 배경 제거 서버 주소에 http://rembg:7000
+  rembg:
+    image: danielgatis/rembg:latest
+    profiles: ["rembg"]
+    command: ["s", "--host", "0.0.0.0", "--port", "7000", "--log_level", "warning"]
+    restart: unless-stopped

@@ -1,199 +1,153 @@
-# inni
+# inni — 학교 물품 보급 함교
 
-**Intelligent Inventory Navigation Interface** — 마이스터고/직업계고 기자재·비품·소모품·실 관리.
+**Intelligent Inventory Navigation Interface** — 마이스터고·직업계고의 기자재·비품·소모품·실을
+**우주선 함교**처럼 한눈에 보고, 휴대폰으로 **찾기·옮기기·빌려주기·쓰기**를 한 번에 끝내는 웹앱.
 
-스택: **PHP 8.1+ · SQLite · Google OAuth(선택) · 로컬 사진 업로드**  
-(Firebase 없음 — 배포·백업·사진 저장이 단순한 A안)
+- **찾기가 바닥**: 어느 화면에서든 이름·초성(ㅁㅌㅁㅌ)·관리번호·장소·QR·말로 찾는다. 결과 첫 줄은 "어디에".
+- **한 번 누르기 + 되돌리기**: 옮기기·빌려주기·반납·사용·입고는 시트 한 장. 확인 창 대신 [되돌리기].
+- **사진 한 장으로 등록**: AI가 이름·종류·제조사를 추정, 제품 링크를 붙이면 정보·사진을 채움, 배경 지우기 편집기.
+- **AI 보급관 "이니"**: 말이나 채팅으로 "멀티미터 어디 있어?", "드릴 2대 공구실로 옮겨 줘" → 찾아 주고 화면을 열고, **제안 카드**를 사람이 누르면 실행.
+- **학교 메일 로그인**(Firebase: 구글 계정 또는 메일 링크) · 역할과 승인.
+- **NAS 도커 한 개**, 데이터는 `data` 폴더 하나, 백업은 **zip 한 파일**.
 
-## 빠른 실행 (로컬)
+> 왜 이렇게 만들었는지는 [docs/DESIGN.md](docs/DESIGN.md) — "교사가 가장 자주 하는 일"에서 출발한 설계 노트.
 
-```bash
-cd /path/to/inni
-cp config.example.php config.php   # 로컬 예시: demo_login => true. 최초 1회 자동 복사되기도 함
-php -S 0.0.0.0:8080 -t public
-```
+---
 
-브라우저: http://localhost:8080  
-→ **담당교사로 들어가기** (데모). `demo_login`이 `true`이면 데모 버튼이 유지됩니다.
+## 빠르게 둘러보기 (로그인 없이, 예시 데이터)
 
-## Docker (로컬 스모크 / 자가 호스팅)
-
-문서 루트는 이미지에서 `public/` 입니다. 컨테이너가 처음 뜰 때 `config.example.php` → `config.php`를 만듭니다. **로컬/스모크 예시의 `demo_login`은 `true`**라서 데모 로그인으로 바로 확인할 수 있습니다. 운영 설정 예시는 `config.production.example.php` (`demo_login => false`)입니다.
+Node 22 이상.
 
 ```bash
-docker compose up --build
+npm install
+npm run demo            # http://localhost:18080  → [관리자(김담당)] 버튼
 ```
 
-구버전 Docker는 `docker-compose up --build` 와 같습니다.
+`data-demo/`에 예시 학교가 만들어진다(지워도 됨). **운영에는 쓰지 않는다**(AUTH_MODE=dev).
 
-브라우저: http://localhost:8080  
-→ **담당교사로 들어가기** (데모)
-
-운영에서는 데모 로그인을 **반드시** 끕니다. 호스트에 `config.php`를 **먼저** 만든 뒤 `demo_login => false`로 두고, `docker-compose.yml`의 주석 처리된 볼륨을 켭니다. 없는 경로를 마운트하면 Docker가 `config.php`를 디렉터리로 만들어 기동이 실패합니다.
+## NAS·서버에 설치 (도커)
 
 ```bash
-cp config.production.example.php config.php
-# config.php 에만 Google client_id / client_secret 입력. demo_login 은 false 유지.
-#   volumes:
-#     - ./config.php:/var/www/inni/config.php:ro
+git clone https://github.com/progh2/inni.git && cd inni
+cp .env.example .env    # Firebase 값·관리자 메일·학교 도메인 채우기
+docker compose up -d --build
 ```
 
-`php:8.3-apache`에 이미 들어 있는 PHP 확장을 빌드에서 검증합니다: `pdo_sqlite`, `sqlite3`, `curl`, `fileinfo`, `mbstring`.
+- 자세히: **[docs/nas-deploy.md](docs/nas-deploy.md)** (시놀로지 Container Manager, https 역방향 프록시, AI·검색 키)
+- **업데이트는 git으로**: 손으로는 `git pull` 뒤 다시 빌드, 또는 NAS가 10분마다 스스로 받아 오게(업데이트 전 백업·실패하면 되돌리기) → [nas-deploy.md §7](docs/nas-deploy.md#7-업데이트-git)
+- 로그인 준비: **[docs/firebase-setup.md](docs/firebase-setup.md)** (구글 / 학교 메일 링크, 승인된 도메인)
+- 백업·복원·이전: **[docs/backup-restore.md](docs/backup-restore.md)** (예전 PHP 판 데이터 가져오기 포함)
 
-### 볼륨
+휴대폰 카메라(스캔)·마이크(말하기)는 **https 주소**에서만 된다 → 역방향 프록시를 권한다.
 
-| 호스트 | 컨테이너 | 내용 |
-|--------|----------|------|
-| `./data` | `/var/www/inni/data` | SQLite (`inni.sqlite` + WAL/SHM) |
-| `./public/uploads` | `/var/www/inni/public/uploads` | 업로드 사진 |
-
-## 서버 배포
-
-1. PHP 8.1+ (확장: `pdo_sqlite`, `sqlite3`, `curl`, `fileinfo`, `mbstring`)
-2. 문서 루트를 **`public/`** 으로 지정
-3. `data/` 와 `public/uploads/` 쓰기 권한
-4. `config.production.example.php` → `config.php` 수정 (`demo_login => false`). 로컬 예시(`config.example.php`)를 복사했다면 이 값을 **반드시 false**로 바꾸세요. 키가 없으면 앱도 false로 취급합니다.
-
-Apache 예:
-
-```apache
-DocumentRoot /var/www/inni/public
-<Directory /var/www/inni/public>
-  AllowOverride All
-  Require all granted
-</Directory>
-```
-
-Nginx 예: `root .../public;` + `try_files $uri /index.php?$query_string;`
-
-### Google 로그인 (운영)
-
-문서 루트가 `public/` 이므로 콜백은 예쁜 경로가 아닙니다. Google이 비교하는 문자열은 **한 가지**입니다.
-
-```
-{base_url}/index.php?r=auth/google/callback
-```
-
-예: `https://school.example/index.php?r=auth/google/callback`  
-서브경로 배포: `https://school.example/inni/public/index.php?r=auth/google/callback`
-
-로그인 화면과 설정 → Google 로그인에 현재 인스턴스의 **정확한 문자열**이 표시됩니다. Console에 그 값을 그대로 넣으세요. `/auth/google/callback` 만 등록하면 앱 라우트와 맞지 않습니다.
-
-1. [Google Cloud Console](https://console.cloud.google.com/)에서 프로젝트 선택 (또는 생성)
-2. **API 및 서비스 → OAuth 동의 화면**을 외부/내부 중 학교 정책에 맞게 구성. 테스트 사용자를 넣어야 하면 담당 교사 메일을 추가
-3. **API 및 서비스 → 사용자 인증 정보 → 사용자 인증 정보 만들기 → OAuth 클라이언트 ID → 웹 애플리케이션**
-4. **승인된 자바스크립트 원본**: 사이트의 origin (예: `https://school.example`)
-5. **승인된 리디렉션 URI**: 위에서 표시된 `{base_url}/index.php?r=auth/google/callback` **한 줄, 글자 그대로**
-6. 발급된 값을 **서버의 `config.php`에만** 넣기. 저장소에 `client_id` / `client_secret`을 커밋하지 말 것
-   ```php
-   'base_url' => 'https://school.example', // 운영에서는 반드시 공개 URL로 고정
-   'demo_login' => false,
-   'google' => [
-       'client_id' => '...',
-       'client_secret' => '...',
-       'allowed_domains' => ['school.go.kr'], // 아래 정책
-       'redirect_uri' => '', // 비우면 base_url로 조합. Console과 다를 때만 Exact URI
-   ],
-   ```
-7. `allowed_domains`
-   - `[]` (비움): Google이 **인증한(`email_verified`)** 모든 도메인 허용
-   - 값이 있으면 **정확 일치만** 허용 (대소문자 무시). `mail.school.go.kr`은 `school.go.kr`에 포함되지 않음. 목록 밖은 거부(실패 폐쇄)
-8. 운영에서는 **`demo_login => false`가 필수**. 데모 버튼이 남아 있으면 학교 계정 없이 들어갑니다. 로컬/Docker 스모크만 `true`
-
-첫 Google 로그인 사용자가 owner, 이후 사용자는 `pending` → 관리자 승인.
-
-데모 시드 계정(`demo-owner`, `demo-teacher`)은 이 판정에서 제외합니다. 로컬에서 `demo_login`이 켜져 있어도 운영의 첫 Google 사용자는 owner가 됩니다. 시드만 있고 실제 owner가 없는 DB에 남아 있는 `pending` Google 계정도 다음 로그인 때 owner로 승격됩니다.
-
-`redirect_uri_mismatch`가 나면 Console 값과 로그인 화면에 찍힌 URI가 한 글자라도 다른지(http/https, 포트, 서브경로, `index.php?r=`)를 먼저 봅니다. `base_url`을 비우면 호스트/리버스 프록시에 따라 URI가 달라질 수 있습니다.
-
-### 백업
-
-복사할 경로 (호스트 기준, Compose 볼륨과 동일):
-
-- DB: `data/inni.sqlite`
-- WAL/SHM이 있으면 함께: `data/inni.sqlite-wal`, `data/inni.sqlite-shm`
-- 사진: `public/uploads/` 디렉터리 전체
-
-일관된 복사본이 필요하면 앱을 잠시 멈춘 뒤 복사하세요.
+## 개발
 
 ```bash
-docker compose stop
-mkdir -p "backup/$(date +%Y%m%d)"
-cp -a data/inni.sqlite "backup/$(date +%Y%m%d)/" 2>/dev/null || true
-cp -a data/inni.sqlite-wal data/inni.sqlite-shm "backup/$(date +%Y%m%d)/" 2>/dev/null || true
-cp -a public/uploads "backup/$(date +%Y%m%d)/"
-docker compose start
+cp .env.example .env    # AUTH_MODE=dev 로 두면 Firebase 없이 이메일만으로 로그인
+npm run dev             # 파일을 고치면 서버가 다시 뜬다 (http://localhost:3000)
+npm test                # 서버·규칙·AI 도구·로그인 토큰 시험 (node:test)
+node scripts/dev-llm.js # (선택) 흉내 LLM — AI 코어에 "OpenAI 호환 서버" http://127.0.0.1:4466
 ```
 
-동작 중 백업은 SQLite `.backup` / `VACUUM INTO`로 DB만 뜨고, 사진은 별도로 `public/uploads/`를 복사합니다.
+빌드 단계가 없다. `web/`은 브라우저 ES 모듈 그대로, `server/`는 Node ESM.
 
-## 데모 계정
+---
 
-| 버튼 | 역할 |
-|------|------|
-| 담당교사 | owner — 등록·설정 |
-| 일반교사 | teacher — 대여·조회 |
+## 화면(스테이션)
 
-운영에서는 `demo_login => false`가 **필수** (`config.production.example.php` 기본값). 로컬/Docker 스모크만 `true`.
+| # | 이름 | 하는 일 |
+|---|------|---------|
+| 01 | **함교** | CONDITION(경보 수준)·오늘 챙길 일·빠른 작업·최근 활동. 3D 선내 지도 |
+| 02 | **찾기** | 이름·초성·오타·관리번호·장소로 찾기. 재고 부족·연체·노후 칩 |
+| 03 | **장소** | 건물 › 실 › 선반 트리와 3D 지도. 장소별 물건, 장소 QR 라벨 |
+| 04 | **입출항** | 대여 데스크(사람 고르고 스캔만 하면 대여/반납), 대여 중·연체·내가 빌린 것·이동 기록 |
+| 05 | **실사** | 장소를 골라 라벨을 찍거나 눌러 확인 → 없는 것만 모아 보정·파기 |
+| 06 | **정비** | 고장 신고(누구나) → 처리·완료(담당교사), 수리비 합계·CSV |
+| 07 | **기록** | 모든 작업 기록·되돌리기·CSV, 보고서 |
+| 08 | **승무원** | 사용자 승인·역할, 미리 등록, 로그인·권한 정책 |
+| 09 | **시스템** | 학교, AI 코어, 제품 검색·사진, 알림(텔레그램), 라벨, 백업·이전, 이 기기 |
+| — | **물건** | 사진·위치·수량·장비 목록·기록. 큰 버튼: 옮기기·빌려주기·반납·사용·입고·고장 신고·라벨 |
 
-## 주요 화면
+휴대폰에서는 아래 탭(함교·찾기·**스캔**·입출항·메뉴)으로 바뀌고 3D 지도는 기본으로 꺼진다.
 
-- 홈 / 찾기 / **스캔**(카메라 QR) / 실별 목록 / **품목 목록**(검색 없이 브라우즈, 유형·재고부족·사업예산 필터) / 기자재 현황(상태·실·연체·사업예산 필터, 검색 불필요) / **연한·노후 기자재**(내용연한 임박·초과, 검색 불필요) / **실험실습재료 현황**(소모품·부품 재고·최소재고·부족·재입고 대기·최근 분출, 분출/재입고로 바로 이동) / 빠른 등록  
-- 장비 상세: 대여·반납·이동·사진·고장 신고·파기(사유·일자·증빙, 담당교사·관리자)·이력
-- 수리 상세: 상태 처리 + **수리비**(금액·업체·예산과목·비용일, 담당교사·관리자). **수리비 합계**(`reports/costs`)에서 월·연 합계. 에듀파인·감가상각 없음.
-- 품목 수정 (담당교사·관리자), 소모품·부품 **단위·최소재고**, 위치별 **로트/유통기한**(선택), 소모품·비품·부품 **재입고**, 사용 출고 **취소**와 취소 이력  
-- 품목 목록·실험실습재료 현황·홈의 **부족** 뱃지 (수량 < 최소재고, 알림과 동일)  
-- 소모품·부품 상세: 위치별 사용 출고(수량·사유), 출고 이력
-- 라벨 인쇄 (브라우저 QR + 인쇄)  
-- 실사 (담당교사·관리자): 실 선택 → 스캔/코드 확인 → 미확인 목록  
-- 사업예산 실사 (담당교사·관리자): 종료·진행 중 실사를 사업명·예산연도로 필터/집계. 장부 vs 실물(확인=장부, 미확인=0) 목록과 UTF-8 CSV. 종료된 실사의 미확인은 사유·승인자로 장부 보정(위치·상태·수량)
-- 품목 CSV (담당교사·관리자): 템플릿/목록 내려받기, 업로드로 신규·수정. **CSV UTF-8만** (xlsx 없음). 충돌 행은 건너뛰고 보고. 에듀파인 파일 동기화·실사 연동 없음. 사업명·예산연도·도입일·내용연한 열 포함  
-- 구입 사업예산: 품목·장비에 사업명(자유 입력)과 예산 연도(YYYY). 빈 값 허용. 학교별 프리셋 없음
-- 도입일·내용연한: 장비에 도입일(`purchase_date`)과 내용연한(년). 둘 다 있으면 만료 예정일 표시. 빈 값 허용. 등록·수정 시 이름/물품분류번호로 **조달청고시 제2024-30호** 내용연수를 제안(수락 시에만 `useful_life_years` 채움, 강제 아님). 시드는 `app/data/pps_useful_life.json` (고시 개정 시 items·notice만 교체). **연한·노후 보드**(`assets/aging`)는 만료 365일 이내(임박)와 만료일 지남(초과)을 일괄 표시. 파기는 장비 상세에서 사유·일자·증빙으로 처리(`retired`). 실사 보정은 실사 결과·사업예산 실사에서 (담당교사·관리자)
-- 설정·사용자 승인
-- 알림: 홈의 재고 부족·연체 대여. 담당교사(owner/manager)가 설정에서 텔레그램 채팅 ID·이벤트 on/off. 봇 토큰은 서버 `config.php`에만 (비면 연결 필요, 발송 안 함)
-- AI 자리: 설정에 OpenAI / Upstage / Ollama 연결 상태. 키는 서버 `config.php`의 `ai.api_key`만 (비면 연결 필요, 더보기 메뉴 숨김). **제안만** — 재고·대여·대장을 자동으로 바꾸지 않음. 챗봇 없음
+### 단축키(PC)
+
+| 키 | 동작 | 키 | 동작 |
+|----|------|----|------|
+| `/` | 찾기 칸 | `Ctrl+K` | 명령 팔레트(화면·명령·물건) |
+| `1`~`9` | 스테이션 이동 | `N` | 새 물건 등록 |
+| `S` | 스캔 | `E` | 이니와 대화 |
+| `T` | 3D 지도 켜기/끄기 | `A` | 상황판 모드(화면 자동 순환) |
+| `M` | 효과음 | `F` | 전체 화면 |
+| `?` | 도움말 | `Esc` | 닫기 |
+
+USB 바코드 스캐너는 어느 화면에서든 그냥 찍으면 된다(키보드 입력 속도로 알아챔).
+라벨 QR에는 `주소/q/코드`가 들어 있어 **휴대폰 기본 카메라**로 찍어도 그 물건이 열린다.
+
+## 이니 — AI 보급관
+
+오른쪽 아래 이니를 누르거나 `E`. 🎤로 말해도 된다(Web Speech, 한국어).
+
+- **AI 없이도** 규칙 명령이 된다: "멀티미터 어디 있어?", "공구실에 뭐 있어", "드릴 2대 전자실습실로 옮겨 줘", "실납 3롤 썼어", "노트북 반납", "재고 부족 보여줘".
+- **AI를 연결하면**(시스템 → AI 코어): 자연스러운 대화, 여러 단계 찾기, 사진으로 물건 이름 맞히기, 제품 페이지 정리.
+- **실행은 사람이**: 바꾸는 일은 이니가 **제안 카드**(무엇을·어디로·몇 개)를 띄우고, 사람이 버튼을 눌러야 기존 API로 실행된다. 권한·검증·기록·되돌리기는 손으로 할 때와 같다.
+- 연결 종류: **OpenAI API** · **Ollama**(학교 PC) · **AIAPI 관제 함교**(aiapi-manager 프록시, 가상 키) · **OpenAI 호환 서버**(LM Studio·vLLM 등). 대화용과 사진용 모델을 따로 고른다.
+- 학교 밖 모델에는 사람 이름을 가명으로 바꿔 보내고(끄기 가능), 월 토큰 상한을 둔다.
+
+## 사진과 제품 정보
+
+- **편집기**: 자르기·회전·뒤집기·밝기/대비/채도·자동 보정·**빠른 배경 지우기**(단색)·지우개/복원 붓.
+- **AI 배경 지우기**: 브라우저에서(모델 한 번 받음) 또는 rembg 컨테이너(`docker compose --profile rembg up -d`).
+- **이름으로 사진 찾기**: 네이버 쇼핑·이미지, 카카오 이미지 검색 API(키 넣으면). 없으면 검색 사이트 바로가기.
+- **링크로 채우기**: 쇼핑몰·제조사 페이지 주소를 붙이면 이름·제조사·가격·사진(+AI가 규격 정리). 내부망 주소는 막는다.
+- **붙여넣기**: 다른 곳에서 복사한 사진을 등록 화면에 `Ctrl+V`.
+- 등록할 때 **같은 물건이 이미 있으면** 알려 주고 "여기에 더하기"로 수량/대수만 늘린다.
+- 내용연수는 **조달청 내용연수 고시** 표에서 제안한다(수락할 때만 채움).
+
+## 역할
+
+| 역할 | 할 수 있는 일(기본) |
+|------|---------------------|
+| **관리자** | 모든 것 + AI·백업·외부 키·학교 설정 |
+| **담당교사** | 등록·수정·실사·수리 처리·사용자 승인·7일 안 작업 되돌리기 |
+| **교사** | 찾기·대여·이동·사용/입고·등록(정책으로 끌 수 있음)·고장 신고 |
+| **학생** | 찾기·고장 신고(학생 로그인은 기본 꺼짐) |
+
+처음 로그인한 사람은 **승인 대기** → 승무원 화면에서 승인. `ADMIN_EMAILS`는 바로 관리자.
+
+## 폴더
+
+```
+server/            Node 22 · Express 5 · better-sqlite3
+  lib/             DB·스키마·권한·검색·작업(트랜잭션+기록+되돌리기)·경보·실사·수리·설정·로그인
+  ai/              모델 연결(OpenAI/Ollama/호환)·도구·제안 카드·가명 처리
+  io/              백업 zip·복원·예전 DB 가져오기·CSV
+  routes/          /api (화면), /api 운영(백업·CSV·설정), /api/ai
+web/               빌드 없는 SPA
+  js/stations/     스테이션 9개 + 물건 화면
+  js/features/     검색 칸·스캐너·작업 시트·등록·사진 편집기·제품 찾기·라벨
+  js/ai/           이니(캐릭터·대화·음성)
+  js/scene/        three.js 3D 선내 지도
+  css/             함교 테마
+deploy/Dockerfile  compose.yaml  .env.example
+test/              node:test (npm test)
+scripts/           NAS 자동 업데이트(nas-auto-update*.sh) · 개발용 흉내 LLM(dev-llm.js)
+server/cli.js      명령줄: 백업(업데이트 전) · 버전
+.github/workflows  CI — PR마다 시험·도커 빌드(NAS는 통과한 main만 받는다)
+docs/              설계·배포·Firebase·백업 문서
+```
+
+## 예전 inni(PHP 판)
+
+v2는 새 폴더(`server/`, `web/`, `deploy/`, `compose.yaml`)로 다시 만들었다. 저장소에는 **v1(PHP) 코드가 아직 남아 있다**:
+`app/`, `templates/`, `public/`, `sql/`, `tests/`, `docker/`, `Dockerfile`, `docker-compose.yml`, `config*.php`.
+
+- 새 도커 이미지에는 들어가지 않는다(`.dockerignore`). Compose는 `compose.yaml`(v2)을 먼저 쓴다.
+- v1의 데이터(`data/inni.sqlite`, `public/uploads`)는 v2 처음 설정 화면에서 **ID·QR 그대로** 가져온다 → [백업·이전 §4](docs/backup-restore.md#4-예전-inniphp에서-옮기기).
+- 옮긴 뒤 v1 코드는 지워도 된다(필요하면 git 기록에 남아 있다).
+
+v1의 기능 요구(M1~M8)는 [docs/PRD.md](docs/PRD.md)·[docs/ERD.md](docs/ERD.md)에, 진행 상황은 [docs/STATUS.md](docs/STATUS.md)에 있다.
 
 ## 라이선스
 
-AGPL-3.0 — 루트 `LICENSE` 참고.
-
-## 문서
-
-- `docs/PRD.md` — 제품 요구사항  
-- `docs/ERD.md` — 도메인 모델 (구현은 SQLite 테이블로 매핑)
-- `docs/STATUS.md` — 구현 현황·검증·다음 작업
-
-## 출고 기능 검증
-
-PHP CLI와 `pdo_sqlite` 확장이 있는 환경에서:
-
-```bash
-php tests/stock.php
-php tests/catalog.php
-php tests/catalog_list.php
-php tests/budget.php
-php tests/asset_life.php
-php tests/asset_life_board.php
-php tests/pps_useful_life.php
-php tests/csrf.php
-php tests/bootstrap_owner.php
-php tests/loan.php
-php tests/google_oauth.php
-php tests/role_block.php
-php tests/scan_labels.php
-php tests/inventory.php
-php tests/inventory_budget.php
-php tests/inventory_adjust.php
-php tests/report_cost.php
-php tests/catalog_csv.php
-php tests/alerts.php
-php tests/ai.php
-php tests/more_entry.php
-php tests/asset_board.php
-php tests/material_board.php
-php tests/material_board_actions.php
-php tests/stock_lot.php
-```
-
-메모리 DB로 수량 검증, 재고 부족, 권한, 품목·위치 일치, 출고·재입고·출고 취소 이력 및 저장 실패 시 롤백을 확인합니다. `catalog.php`는 품목 수정 권한과 필드 검증을 봅니다. `catalog_list.php`는 검색어 없이 품목 전체 브라우즈와 유형·재고부족·사업예산 필터, 일반교사 조회(로그인만)를 봅니다. `budget.php`는 구입 사업명·예산연도 저장·비우기·CSV 라운드트립과 기존 DB 마이그레이션을 봅니다. `asset_life.php`는 도입일·내용연한 저장·비우기·만료 예정일·CSV 라운드트립과 기존 DB 마이그레이션을 봅니다. `asset_life_board.php`는 연한 임박/초과 판정·목록·필터와 더보기 진입을 봅니다. `pps_useful_life.php`는 조달청 시드 조회·제안·비강제(학교 특화/빈 값)를 봅니다. CSRF 검사는 유효 토큰 허용, 잘못된 토큰 거부, 반납·재입고·출고 취소 경로 GET 거부를 임시 SQLite로 확인합니다. `bootstrap_owner`는 데모 시드 사용자를 건너뛰고 첫 Google 계정을 owner로 두는 초기화 규칙을 확인합니다. 대여·반납 검사는 조건부 UPDATE, 이중/동시 요청 실패 폐쇄, 역할별 반납 범위를 확인합니다. `google_oauth`는 리디렉션 URI 조합, `allowed_domains` 실패 폐쇄, 빈/불완전 클라이언트 안내를 실제 Google 키 없이(토큰 교환 스텁) 확인합니다. `role_block`은 학생·pending·disabled의 대여·출고·등록·실사 차단과 `demo_login` 키 생략 시 off를 확인합니다. `inventory.php`는 실 선택·스캔 확인·미확인 목록·단일 진행 세션·권한을 확인합니다. `inventory_budget.php`는 사업명·예산연도 필터, 장부 vs 실물 차이, 집계, CSV, canInventory 게이트를 확인합니다. `inventory_adjust.php`는 실사 보정·파기의 권한(일반교사 거부), 성공 쓰기, 이력, CSRF 경로를 확인합니다. `report_cost.php`는 수리비 저장·권한·월/연 집계와 기존 수리 상태 머신 유지를 확인합니다. `catalog_csv.php`는 템플릿·내보내기·가져오기(신규/수정), 충돌 행 건너뜀, owner/manager 권한, xlsx 거부, UTF-8 BOM/CP949를 확인합니다. `alerts.php`는 재고 부족·연체 대여 알림과 텔레그램 발송을 HTTP 스텁으로 확인하고, 토큰 공백 실패 폐쇄·이벤트 off·중복 발송 방지·설정 CSRF·owner/manager 권한을 봅니다. `ai.php`는 프로바이더 미설정 실패 폐쇄와 AI 제안이 재고·대여·대장을 쓰지 않음을 봅니다. `asset_board.php`는 기자재 현황의 검색 없는 목록과 상태·실·연체·사업예산 필터가 기존 대여 상태 및 #32 예산 필드와 같은지 봅니다. `material_board.php`는 실험실습재료 현황의 소모품·부품 재고, 유형·부족·실·사업예산 필터와 부족 하이라이트가 알림·품목 목록과 같은지 봅니다. `material_board_actions.php`는 재입고 대기·최근 분출 섹션과 분출(`canLoan`)/재입고(`canWrite`) GET CTA가 품목 상세 `#issue`/`#restock`로 가는지 봅니다. `stock_lot.php`는 로트/유통기한·최소재고 파싱과 부족 뱃지·알림 연동을 봅니다. 실제 재고 데이터는 변경하지 않습니다.
+[AGPL-3.0](LICENSE). 브라우저 AI 배경 지우기에 쓰는 `@imgly/background-removal`(AGPL-3.0)은 CDN에서 불러온다.

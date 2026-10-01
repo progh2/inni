@@ -1,10 +1,19 @@
 .git
 .github
-config.php
-data/*.sqlite
-data/*.sqlite-*
-public/uploads/**
-!public/uploads/.gitignore
-!public/uploads/.htaccess
+node_modules
+data
+data-*
 **/.DS_Store
 *.log
+.env
+# 예전 PHP 판(이미지에 넣지 않음)
+app
+templates
+public
+sql
+tests
+docker
+config*.php
+.htaccess
+docs
+test

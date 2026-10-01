@@ -1,0 +1,30 @@
+{
+  "name": "inni",
+  "version": "2.0.0",
+  "private": true,
+  "description": "inni — 학교 기자재·비품·소모품 관리. 우주선 함교 화면과 AI 보급관 이니",
+  "license": "AGPL-3.0-only",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --env-file-if-exists=.env --watch server/index.js",
+    "demo": "AUTH_MODE=dev SEED_DEMO=1 INNI_DATA_DIR=./data-demo PORT=18080 node server/index.js",
+    "test": "node --test --test-concurrency=1 test/*.test.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/orbitron": "^5.3.0",
+    "better-sqlite3": "^13.0.3",
+    "express": "^5.2.1",
+    "jsqr": "^1.4.0",
+    "pretendard": "^1.3.9",
+    "qrcode-generator": "^2.0.4",
+    "three": "^0.186.1",
+    "yauzl": "^3.4.0",
+    "yazl": "^3.3.1"
+  },
+  "type": "module"
+}

@@ -1,0 +1,23 @@
+{
+  "name": "inni 보급 함교",
+  "short_name": "inni",
+  "description": "학교 기자재·비품·소모품 관리 — 찾기·등록·이동·대여",
+  "lang": "ko",
+  "start_url": "/#bridge",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#02060d",
+  "theme_color": "#040b16",
+  "icons": [
+    { "src": "/img/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/img/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/img/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "스캔", "url": "/#scan" },
+    { "name": "찾기", "url": "/#search?focus=1" },
+    { "name": "등록", "url": "/#add" }
+  ]
+}

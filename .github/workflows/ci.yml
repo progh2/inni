@@ -1,0 +1,40 @@
+# NAS 는 main 을 그대로 받아 간다(scripts/nas-auto-update.sh). 그래서 main 에 들어가기 전에 시험과 도커 빌드를 돌린다.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: 시험 (npm test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  docker:
+    name: 도커 이미지 빌드
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 빌드
+        run: docker build -f deploy/Dockerfile --build-arg "INNI_COMMIT=${GITHUB_SHA::7}" -t inni:ci .
+      - name: 띄워서 /health 확인
+        run: |
+          docker run -d --name inni-ci -e AUTH_MODE=dev -p 3000:3000 inni:ci
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3000/health; then echo; exit 0; fi
+            sleep 2
+          done
+          docker logs inni-ci
+          exit 1
