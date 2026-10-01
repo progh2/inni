@@ -1,6 +1,6 @@
 # inni Domain Model (ERD)
 
-> **v1(PHP) 기준 논리 모델이다.** v2의 실제 스키마는 `server/lib/schema.js`(마이그레이션 포함), 요약은 [DESIGN.md §4](DESIGN.md#데이터-모델요약).
+> **v1(PHP) 기준 논리 모델이다(v1 코드는 2026-10-01 지움, git 기록 `71930e7`).** v2의 실제 스키마는 `server/lib/schema.js`(마이그레이션 포함), 요약은 [DESIGN.md §4](DESIGN.md#데이터-모델요약).
 > 개념(품목·개체·재고 로트·위치 트리·대여·신고·기록)은 v2에서도 같고, 이름이 `catalog_items→items`, `stock_lots→stocks`, `reports→repairs`, `activity_logs→events`로 바뀌었다(`assets`·`locations`·`loans`는 그대로).
 
 단일 학교 인스턴스.  

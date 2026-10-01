@@ -4,7 +4,7 @@
 
 - **v2 "보급 함교"** 를 새로 만들었다(브랜치 `v2-bridge`). Node 22 · Express 5 · SQLite · 빌드 없는 웹 · Firebase 로그인 · 도커 한 개.
 - v1(PHP)의 기능(M1~M8)을 모두 옮기고, 찾기·한 번 누르기·사진 등록·AI 보급관·백업 zip을 중심으로 다시 설계했다 → [DESIGN.md](DESIGN.md).
-- v1 코드(`app/`, `templates/`, `public/`, `sql/`, `tests/`, `docker/`, `Dockerfile`, `docker-compose.yml`, `config*.php`)는 아직 저장소에 있다. v2와 섞이지 않으며, 정리할지 결정이 남았다.
+- v1 코드(PHP)는 v2로 옮긴 뒤 2026-10-01 저장소에서 지웠다. 필요하면 git 기록(`71930e7`)에 있다.
 
 ## v2 구현 범위
 
