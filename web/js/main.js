@@ -22,9 +22,10 @@ import repair from "./stations/repair.js";
 import log from "./stations/log.js";
 import crew from "./stations/crew.js";
 import systems from "./stations/systems.js";
+import plans from "./stations/plans.js";
 import item from "./stations/item.js";
 
-const MODULES = { bridge, search, decks, dock, audit, repair, log, crew, systems, item };
+const MODULES = { bridge, search, decks, plans, dock, audit, repair, log, crew, systems, item };
 const { state } = store;
 
 // ---------------------------------------------------------------- 화면 설정 적용
@@ -52,10 +53,14 @@ function bootLine(text, cls = "") {
   bootLines.appendChild(d);
 }
 const bootProgress = (p) => { bootBar.style.width = `${Math.round(p * 100)}%`; };
+// 로그인 화면을 거치면 두 번 불린다(로그인 전·후) → 한 번만 치운다
+let bootFinished = false;
 function bootDone() {
+  if (bootFinished) return;
+  bootFinished = true;
   bootProgress(1);
-  setTimeout(() => $("#boot").classList.add("done"), prefersReducedMotion() ? 0 : 350);
-  setTimeout(() => $("#boot").remove(), 1200);
+  setTimeout(() => { const b = $("#boot"); if (b) b.classList.add("done"); }, prefersReducedMotion() ? 0 : 350);
+  setTimeout(() => { const b = $("#boot"); if (b) b.remove(); }, 1200);
 }
 
 // ---------------------------------------------------------------- 시작
@@ -365,7 +370,7 @@ function openHelp() {
         <div><h4 style="margin:0 0 8px">단축키 (PC)</h4><div class="keys">
           <span class="kbd">/</span><span>찾기</span><span class="kbd">Ctrl K</span><span>명령 팔레트</span>
           <span class="kbd">N</span><span>새 물건 등록</span><span class="kbd">S</span><span>스캔</span>
-          <span class="kbd">E</span><span>${esc(state.ai.name)}에게 말하기</span><span class="kbd">1~9</span><span>스테이션 이동</span>
+          <span class="kbd">E</span><span>${esc(state.ai.name)}에게 말하기</span><span class="kbd">1~0</span><span>스테이션 이동</span>
           <span class="kbd">M</span><span>효과음</span><span class="kbd">T</span><span>3D 지도</span>
           <span class="kbd">A</span><span>상황판 모드</span><span class="kbd">F</span><span>전체 화면</span>
           <span class="kbd">Esc</span><span>창 닫기</span></div>
@@ -401,8 +406,8 @@ async function initScene() {
       onPick: (loc) => app.openLocation(loc.id),
     });
     if (!scene) throw new Error("WebGL 없음");
-    scene.setData(state.locations);
-    store.on("core", () => scene.setData(state.locations));
+    scene.setData(state.locations, state.plans);
+    store.on("core", () => scene.setData(state.locations, state.plans));
     app.scene = scene;
     btn.setAttribute("aria-pressed", "true");
   } catch (e) {
@@ -460,9 +465,10 @@ function bindKeys() {
     if (typing || isOverlayOpen() || ev.ctrlKey || ev.metaKey || ev.altKey) return;
     // 한글 자판이어도 키 위치로 판단
     const k = ev.code;
-    if (/^Digit[1-9]$/.test(k)) {
+    if (/^Digit[0-9]$/.test(k)) {
       const visible = STATIONS.filter((s) => !s.hidden && (!s.cap || store.can(s.cap)));
-      const s = visible[Number(k.slice(5)) - 1];
+      const n = Number(k.slice(5));
+      const s = visible[(n === 0 ? 10 : n) - 1];
       if (s) { setTimeout(() => app.go(s.id), 0); }
     } else if (k === "Slash") { ev.preventDefault(); app.omnibox.focus(); }
     else if (k === "KeyN" && store.can("register")) { ev.preventDefault(); app.addItem({}); }

@@ -1,4 +1,4 @@
-// 09 시스템: 학교 · AI 코어(이니의 두뇌) · 제품 검색·이미지 · 알림 · 라벨 · 백업·이전 · 이 기기 · 정보
+// 10 시스템: 학교 · AI 코어(이니의 두뇌) · 제품 검색·이미지 · 알림 · 라벨 · 백업·이전 · 이 기기 · 정보
 import { $, esc, icon, relTime, fmtDateTime, num, downloadBlob, bytes } from "../lib/util.js";
 import { api } from "../lib/api.js";
 import { modal, toast, toastError, confirmDialog, busy, promptDialog } from "../lib/ui.js";
@@ -346,7 +346,7 @@ function render() {
   else body = aboutHtml();
   root.innerHTML = `
     <div class="st-inner">
-      <div class="st-head"><div class="ttl"><span class="code">STATION 09 · SYSTEMS</span><h1>시스템</h1><p>학교 설정, ${esc(state.ai.name)}의 AI 두뇌, 제품 검색 키, 알림, 백업·이전을 여기서 관리합니다.</p></div></div>
+      <div class="st-head"><div class="ttl"><span class="code">STATION 10 · SYSTEMS</span><h1>시스템</h1><p>학교 설정, ${esc(state.ai.name)}의 AI 두뇌, 제품 검색 키, 알림, 백업·이전을 여기서 관리합니다.</p></div></div>
       <div class="tabs">${visible.map(([k, code, l]) => `<button class="tab" type="button" data-tab="${k}" aria-selected="${tab === k}"><span class="code">${code}</span>${l}</button>`).join("")}</div>
       <div data-body>${body}</div>
     </div>`;

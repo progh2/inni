@@ -1,4 +1,4 @@
-// 05 실사: 장소를 고르면 장부 목록이 생기고, 라벨을 찍거나 눌러 확인한다. 끝나면 차이만 모아 장부에 반영.
+// 06 실사: 장소를 고르면 장부 목록이 생기고, 라벨을 찍거나 눌러 확인한다. 끝나면 차이만 모아 장부에 반영.
 import { $, esc, icon, qty as fmtQty, thumb, fmtDateTime, relTime } from "../lib/util.js";
 import { api } from "../lib/api.js";
 import { modal, toast, toastError, confirmDialog } from "../lib/ui.js";
@@ -15,7 +15,7 @@ let cur = null;
 
 function listHtml() {
   return `
-    <div class="st-head"><div class="ttl"><span class="code">STATION 05 · INSPECTION</span><h1>실사</h1><p>장소를 고르면 장부의 물건 목록이 만들어져요. 라벨을 차례로 찍으면 끝. 없는 것만 모아 보여 드려요.</p></div>
+    <div class="st-head"><div class="ttl"><span class="code">STATION 06 · INSPECTION</span><h1>실사</h1><p>장소를 고르면 장부의 물건 목록이 만들어져요. 라벨을 차례로 찍으면 끝. 없는 것만 모아 보여 드려요.</p></div>
       <div class="tools">${can("audit") ? `<button class="btn primary" type="button" data-b="start">${icon("audit")}실사 시작</button>` : ""}</div></div>
     <div class="list">${list.length ? list.map((a) => `<button class="irow" type="button" data-a="${a.id}"><span class="thumb sm blank">${icon("audit")}</span>
       <span class="tx"><span class="nm">${esc(a.title)} ${a.status === "active" ? '<span class="tag amber">진행 중</span>' : a.status === "done" ? '<span class="tag good">끝남</span>' : '<span class="tag muted">취소</span>'}</span>

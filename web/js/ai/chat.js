@@ -7,7 +7,7 @@ import { toast, confirmDialog } from "../lib/ui.js";
 import { state, can, on as onStore } from "../lib/store.js";
 import { app, prefs, savePrefs } from "../app.js";
 import * as sfx from "../lib/sfx.js";
-import { characterHtml, mood, setBaseMood } from "./character.js";
+import { characterHtml, mood, setBaseMood, preloadCharacter } from "./character.js";
 import { listen, canListen, speak, stopListening } from "./voice.js";
 import { runLocalCommand } from "../features/commands.js";
 import { undoToast } from "../features/actions.js";
@@ -90,6 +90,23 @@ export function createInni({ getStation }) {
   launch.innerHTML = `${characterHtml({ size: "sm" })}<span class="lb"><b>${esc(name())}</b><small>보급관 AI · 묻기 E</small></span><span class="badge" hidden>0</span>`;
   launch.querySelector(".inni").dataset.live = "1";
   document.body.appendChild(launch);
+  preloadCharacter();
+  // 휴대폰: 아래로 훑어 내리는 동안은 런처가 비켜 준다(아래쪽 버튼을 가리지 않게). 멈추거나 올리면 돌아온다
+  {
+    const last = new WeakMap();
+    let back = null;
+    document.addEventListener("scroll", (ev) => {
+      if (!window.matchMedia("(max-width: 760px)").matches) return;
+      const t = ev.target === document ? document.scrollingElement : ev.target;
+      if (!t || typeof t.scrollTop !== "number") return;
+      const prev = last.get(t) ?? t.scrollTop;
+      last.set(t, t.scrollTop);
+      if (t.scrollTop - prev > 4) launch.classList.add("tuck");
+      else if (prev - t.scrollTop > 4) launch.classList.remove("tuck");
+      clearTimeout(back);
+      back = setTimeout(() => launch.classList.remove("tuck"), 900);
+    }, { capture: true, passive: true });
+  }
   const badge = launch.querySelector(".badge");
 
   // ---- 말풍선
@@ -107,7 +124,7 @@ export function createInni({ getStation }) {
   panel.setAttribute("aria-label", `${name()}와 대화`);
   panel.innerHTML = `
     <header class="inni-h">
-      ${characterHtml({ size: "md" })}
+      ${characterHtml({ size: "md", face: true })}
       <div class="inni-title"><span class="code">QUARTERMASTER AI · INNI</span><b>AI 보급관 ${esc(name())}</b><span class="inni-status" id="inni-status"></span></div>
       <div class="inni-tools">
         <button class="icon-btn" type="button" data-b="voice" aria-pressed="false" title="답을 소리 내어 읽기">${icon("volume")}</button>
@@ -513,8 +530,10 @@ export function createInni({ getStation }) {
     if (timeout) bubbleTimer = setTimeout(hideBubble, timeout);
   }
 
-  // 시작할 때 브리핑(규칙만, AI 부르지 않음)
+  // 시작할 때 브리핑(규칙만, AI 부르지 않음).
+  // 함교에는 같은 브리핑 카드가 있으니 말풍선은 띄우지 않는다(두 번 말하지 않게)
   function greet() {
+    if (getStation() === "bridge") return;
     const today = new Date().toISOString().slice(0, 10);
     if (window.matchMedia("(max-width: 760px)").matches && local.get("greeted") === today) return;
     local.set("greeted", today);

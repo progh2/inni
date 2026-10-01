@@ -1,4 +1,4 @@
-// 06 정비: 고장 신고 접수 → 처리 중 → 완료/반려. 수리비를 적으면 월·연 합계가 나온다.
+// 07 정비: 고장 신고 접수 → 처리 중 → 완료/반려. 수리비를 적으면 월·연 합계가 나온다.
 import { $, esc, icon, won, fmtDate, fmtDateTime, relTime, thumb } from "../lib/util.js";
 import { api } from "../lib/api.js";
 import { modal, toast, toastError, confirmDialog } from "../lib/ui.js";
@@ -32,7 +32,7 @@ function card(r, i) {
 function render() {
   root.innerHTML = `
     <div class="st-inner">
-      <div class="st-head"><div class="ttl"><span class="code">STATION 06 · REPAIR BAY</span><h1>정비</h1><p>고장 신고는 누구나, 처리는 담당교사가. 완료하면 장비가 다시 "사용 가능"이 돼요.</p></div>
+      <div class="st-head"><div class="ttl"><span class="code">STATION 07 · REPAIR BAY</span><h1>정비</h1><p>고장 신고는 누구나, 처리는 담당교사가. 완료하면 장비가 다시 "사용 가능"이 돼요.</p></div>
         <div class="tools">${can("repair") ? `<button class="btn warn" type="button" data-b="new">${icon("wrench")}고장 신고</button>` : ""}</div></div>
       <div class="tabs">${[["open", "OPEN", "처리할 것"], ["closed", "CLOSED", "끝난 것"], can("repair_manage") && ["costs", "COST", "수리비"]].filter(Boolean).map(([k, c, l]) => `<button class="tab" type="button" data-tab="${k}" aria-selected="${tab === k}"><span class="code">${c}</span>${l}</button>`).join("")}</div>
       ${tab === "costs" ? costsHtml() : list.length ? `<div class="cards">${list.map(card).join("")}</div>` : `<div class="empty">${tab === "open" ? "처리할 고장 신고가 없어요. 모든 장비 이상 없음!" : "기록이 없어요."}</div>`}

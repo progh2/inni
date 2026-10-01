@@ -223,7 +223,8 @@ export function confirmDialog({ title, message, detail = "", confirmLabel = "실
       const input = h.el.querySelector("#cf-typed");
       go.disabled = true;
       input.addEventListener("input", () => { go.disabled = input.value.trim() !== typed; });
-      input.addEventListener("keydown", (ev) => { if (ev.key === "Enter" && !go.disabled) go.click(); });
+      // Enter 로 확인할 때 기본 동작을 막는다: 창이 닫히며 초점이 돌아간 버튼을 같은 Enter 가 또 누르지 않게
+      input.addEventListener("keydown", (ev) => { if (ev.key === "Enter" && !ev.isComposing && !go.disabled) { ev.preventDefault(); go.click(); } });
     }
   });
 }
@@ -239,7 +240,7 @@ export function promptDialog({ title, label = "", value = "", placeholder = "", 
       onClose: () => resolve(out),
     });
     const input = h.el.querySelector("#pd-v");
-    if (!multiline) input.addEventListener("keydown", (ev) => { if (ev.key === "Enter" && !ev.isComposing) { out = input.value; h.close(); } });
+    if (!multiline) input.addEventListener("keydown", (ev) => { if (ev.key === "Enter" && !ev.isComposing) { ev.preventDefault(); out = input.value; h.close(); } });
   });
 }
 

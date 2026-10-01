@@ -260,6 +260,27 @@ CREATE TABLE alert_dispatches (
 );
 `,
   },
+  {
+    // 도면: 층(또는 단층 건물) 하나에 그림 한 장. 그 위에 그린 다각형(shapes)을 실·보관함과 잇는다.
+    // shapes = [{ location_id, pts: [[x, y], …] }]  (그림 픽셀 좌표)
+    // marks  = [{ type: entrance|stairs|elevator, x, y, label }]
+    version: 2,
+    sql: `
+CREATE TABLE floor_plans (
+  id TEXT PRIMARY KEY,
+  location_id TEXT NOT NULL UNIQUE REFERENCES locations(id) ON DELETE CASCADE,
+  image TEXT,
+  width INTEGER NOT NULL DEFAULT 0,
+  height INTEGER NOT NULL DEFAULT 0,
+  level INTEGER NOT NULL DEFAULT 1,
+  meters_per_px REAL,
+  shapes TEXT NOT NULL DEFAULT '[]',
+  marks TEXT NOT NULL DEFAULT '[]',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+`,
+  },
 ];
 
 export const SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version;
