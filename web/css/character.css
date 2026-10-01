@@ -19,89 +19,76 @@
 body.reduce-motion .modal::after, body.reduce-motion .drawer::after, body.reduce-motion .sheet::after { animation: none; display: none; }
 body.reduce-motion .modal { animation: fade 0.15s; }
 
-/* ---------------------------------------------------------------- 캐릭터 */
-.inni { position: relative; display: inline-block; width: 64px; aspect-ratio: 120 / 150; flex: none; --glow: #5fdcff; --eye: #c9f8ff; --core: #ffc857; }
-.inni svg { width: 100%; height: 100%; overflow: visible; display: block; }
+/* ---------------------------------------------------------------- 캐릭터(치비 보급관 이니, 그림: web/img/inni) */
+.inni { position: relative; display: inline-block; width: 64px; aspect-ratio: 2 / 3; flex: none; --art: url(/img/inni/idle.webp); }
+.inni.face { aspect-ratio: 1; --art: url(/img/inni/face-idle.webp); border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #17466e, #071729 72%); box-shadow: inset 0 0 0 1px rgba(95, 220, 255, 0.55), 0 0 10px rgba(95, 220, 255, 0.25); }
 .inni.sm { width: 30px; }
 .inni.md { width: 64px; }
-.inni.lg { width: 150px; }
-.inni.xl { width: 190px; }
-.inni::after { /* 홀로그램 가로줄 */
-  content: ""; position: absolute; inset: 0 0 8% 0; pointer-events: none; mix-blend-mode: screen;
-  background: repeating-linear-gradient(0deg, rgba(95, 220, 255, 0.14) 0 1px, transparent 1px 3px);
-  mask-image: radial-gradient(ellipse 60% 55% at 50% 45%, #000 60%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 45%, #000 60%, transparent 100%);
+.inni.lg { width: 140px; }
+.inni.xl { width: 170px; }
+.inni[data-mood="idle"] { --art: url(/img/inni/idle.webp); }
+.inni.face[data-mood="idle"] { --art: url(/img/inni/face-idle.webp); }
+.inni[data-mood="happy"] { --art: url(/img/inni/happy.webp); }
+.inni.face[data-mood="happy"] { --art: url(/img/inni/face-happy.webp); }
+.inni[data-mood="think"] { --art: url(/img/inni/think.webp); }
+.inni.face[data-mood="think"] { --art: url(/img/inni/face-think.webp); }
+.inni[data-mood="talk"] { --art: url(/img/inni/talk.webp); }
+.inni.face[data-mood="talk"] { --art: url(/img/inni/face-talk.webp); }
+.inni[data-mood="alert"] { --art: url(/img/inni/alert.webp); }
+.inni.face[data-mood="alert"] { --art: url(/img/inni/face-alert.webp); }
+.inni[data-mood="error"] { --art: url(/img/inni/error.webp); }
+.inni.face[data-mood="error"] { --art: url(/img/inni/face-error.webp); }
+.inni[data-mood="listen"] { --art: url(/img/inni/listen.webp); }
+.inni.face[data-mood="listen"] { --art: url(/img/inni/face-listen.webp); }
+.inni[data-mood="scan"] { --art: url(/img/inni/scan.webp); }
+.inni.face[data-mood="scan"] { --art: url(/img/inni/face-scan.webp); }
+.inni[data-mood="sleep"] { --art: url(/img/inni/sleep.webp); }
+.inni.face[data-mood="sleep"] { --art: url(/img/inni/face-sleep.webp); }
+.inni .i-art { position: absolute; inset: 0; background: var(--art) center bottom / contain no-repeat; transform-origin: 50% 100%;
+  filter: drop-shadow(0 0 5px rgba(95, 220, 255, 0.3)); animation: iFloat 4.2s ease-in-out infinite; }
+.inni.face .i-art { border-radius: 50%; overflow: hidden; filter: none; animation: none; transform-origin: 50% 50%; }
+@keyframes iFloat { 50% { transform: translateY(-2.5%); } }
+/* 발밑 홀로그램 받침·로그인 화면의 빛기둥 */
+.inni .i-base { position: absolute; left: 16%; right: 16%; bottom: -1%; height: 5%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(95, 220, 255, 0.7), rgba(95, 220, 255, 0) 70%); animation: iBase 4.2s ease-in-out infinite; }
+@keyframes iBase { 50% { transform: scaleX(0.86); opacity: 0.65; } }
+.inni .i-cone { position: absolute; left: 2%; right: 2%; bottom: 0; height: 38%; pointer-events: none;
+  clip-path: polygon(0 100%, 32% 0, 68% 0, 100% 100%); background: linear-gradient(to top, rgba(95, 220, 255, 0.3), rgba(95, 220, 255, 0)); }
+.inni::after { /* 홀로그램 가로줄(아주 옅게) */
+  content: ""; position: absolute; inset: 0 0 4% 0; pointer-events: none; mix-blend-mode: screen;
+  background: repeating-linear-gradient(0deg, rgba(95, 220, 255, 0.06) 0 1px, transparent 1px 3px);
+  mask-image: radial-gradient(ellipse 52% 56% at 50% 48%, #000 60%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 52% 56% at 50% 48%, #000 60%, transparent 100%);
 }
-.inni.sm::after { display: none; }
-.inni .i-float { animation: iFloat 4.2s ease-in-out infinite; transform-origin: 60px 80px; }
-@keyframes iFloat { 50% { transform: translateY(-4px); } }
-.inni .i-flicker { animation: iFlicker 7s infinite; }
-@keyframes iFlicker { 0%, 100% { opacity: 1; } 91% { opacity: 1; } 92% { opacity: 0.6; } 93% { opacity: 1; } 95% { opacity: 0.82; } }
-.inni .i-tip { animation: iTip 2.4s ease-in-out infinite; }
-@keyframes iTip { 50% { opacity: 0.35; } }
-.inni .i-thrust { animation: iThrust 0.18s steps(2) infinite alternate; transform-origin: 60px 124px; }
-@keyframes iThrust { to { transform: scaleY(0.82); opacity: 0.75; } }
-.inni .i-base { animation: iBase 4.2s ease-in-out infinite; transform-origin: 60px 142px; }
-@keyframes iBase { 50% { transform: scaleX(0.86); opacity: 0.6; } }
-/* 눈 깜빡임 */
-.inni .i-eye { transform-box: fill-box; transform-origin: center; animation: iBlink 5.2s infinite; }
-.inni .i-eye.r { animation-delay: 0.04s; }
-@keyframes iBlink { 0%, 92%, 100% { transform: scaleY(1); } 94% { transform: scaleY(0.08); } 96% { transform: scaleY(1); } }
-.inni .i-eyes { transition: transform 0.35s var(--ease); }
-.inni .i-happy, .inni .i-closed, .inni .i-think, .inni .i-eq, .inni .i-zz, .inni .i-x, .inni .i-scan { opacity: 0; transition: opacity 0.2s; }
-.inni .i-mouth { transition: opacity 0.2s; }
-.inni .i-hand.r { transform-box: fill-box; transform-origin: 20% 80%; }
-.inni .i-ear { transition: filter 0.3s; }
+.inni.sm::after, .inni.face::after { display: none; }
+.inni .i-fx { position: absolute; inset: 0; pointer-events: none; border-radius: inherit; }
+/* 그림이 바뀔 때 살짝 튀어 오름 */
+.inni.swap .i-art { animation: iSwap 0.35s var(--ease), iFloat 4.2s ease-in-out 0.35s infinite; }
+.inni.face.swap .i-art { animation: iSwap 0.35s var(--ease); }
+@keyframes iSwap { from { opacity: 0.55; transform: scale(0.95) translateY(2%); } }
 
-/* 생각 중: 위를 보고 점이 움직임 */
-.inni[data-mood="think"] .i-eyes { transform: translate(3px, -3px); }
-.inni[data-mood="think"] .i-think { opacity: 1; }
-.inni[data-mood="think"] .i-think circle { animation: iDot 1.1s ease-in-out infinite; }
-.inni[data-mood="think"] .i-think circle:nth-child(2) { animation-delay: 0.15s; }
-.inni[data-mood="think"] .i-think circle:nth-child(3) { animation-delay: 0.3s; }
-@keyframes iDot { 0%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
-.inni[data-mood="think"] .i-tip { animation-duration: 0.5s; }
-.inni[data-mood="think"] .i-mouth { opacity: 0; }
-/* 말하기: 입 대신 소리 막대 */
-.inni[data-mood="talk"] .i-mouth { opacity: 0; }
-.inni[data-mood="talk"] .i-eq { opacity: 1; }
-.inni[data-mood="talk"] .i-eq rect { transform-box: fill-box; transform-origin: center; animation: iEq 0.5s ease-in-out infinite alternate; }
-.inni[data-mood="talk"] .i-eq rect:nth-child(2) { animation-delay: 0.12s; }
-.inni[data-mood="talk"] .i-eq rect:nth-child(3) { animation-delay: 0.24s; }
-.inni[data-mood="talk"] .i-eq rect:nth-child(4) { animation-delay: 0.08s; }
-@keyframes iEq { from { transform: scaleY(0.3); } to { transform: scaleY(1.1); } }
-/* 기쁨: ^^ 눈, 손 흔들기, 통통 */
-.inni[data-mood="happy"] .i-eye { opacity: 0; }
-.inni[data-mood="happy"] .i-happy { opacity: 1; }
-.inni[data-mood="happy"] .i-hand.r { animation: iWave 0.5s ease-in-out 3; }
-.inni[data-mood="happy"] .i-float { animation: iHop 0.6s var(--ease) 2, iFloat 4.2s ease-in-out 1.2s infinite; }
-@keyframes iWave { 50% { transform: rotate(-28deg) translate(1px, -3px); } }
-@keyframes iHop { 40% { transform: translateY(-9px) scale(1.04); } 70% { transform: translateY(1px) scale(0.98); } }
-/* 경고: 노란 눈, 빨간 안테나, 흔들림 */
-.inni[data-mood="alert"] { --eye: #ffd36e; --glow: #ffb347; }
-.inni[data-mood="alert"] .i-tip { fill: #ff5a5a; animation-duration: 0.35s; }
-.inni[data-mood="alert"] .i-float { animation: iShake 0.4s ease-in-out 2, iFloat 4.2s ease-in-out 0.8s infinite; }
-@keyframes iShake { 25% { transform: translateX(-2px) rotate(-2deg); } 75% { transform: translateX(2px) rotate(2deg); } }
-/* 오류 */
-.inni[data-mood="error"] .i-eye { opacity: 0; }
-.inni[data-mood="error"] .i-x { opacity: 1; }
-.inni[data-mood="error"] .i-tip { fill: #ff5a5a; }
-/* 듣는 중(마이크): 귀가 빛난다 */
-.inni[data-mood="listen"] .i-ear { filter: drop-shadow(0 0 5px #ff7b7b) brightness(1.6); }
-.inni[data-mood="listen"] .i-eye { animation: none; transform: scale(1.12); }
-.inni[data-mood="listen"] .i-tip { fill: #ff7b7b; animation-duration: 0.6s; }
-/* 스캔: 눈 앞으로 빛줄기가 지나간다 */
-.inni[data-mood="scan"] .i-scan { opacity: 1; }
-.inni[data-mood="scan"] .i-scan rect { animation: iScan 0.9s ease-in-out infinite alternate; }
-@keyframes iScan { from { transform: translateY(-12px); } to { transform: translateY(14px); } }
-/* 쉬는 중(AI 꺼짐): 눈 감고 흐리게 */
-.inni[data-mood="sleep"] { filter: saturate(0.4) brightness(0.8); }
-.inni[data-mood="sleep"] .i-eye { opacity: 0; }
-.inni[data-mood="sleep"] .i-closed, .inni[data-mood="sleep"] .i-zz { opacity: 1; }
-.inni[data-mood="sleep"] .i-zz text { animation: iZz 2.6s ease-in-out infinite; }
-.inni[data-mood="sleep"] .i-zz text:nth-child(2) { animation-delay: 1.2s; }
-@keyframes iZz { 0% { opacity: 0; transform: translate(0, 4px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(6px, -10px); } }
-body.reduce-motion .inni *, body.reduce-motion .inni { animation: none !important; }
+/* 표정마다 움직임(그림은 위에서 바뀐다) */
+.inni[data-mood="happy"] .i-art { animation: iHop 0.6s var(--ease) 2, iFloat 4.2s ease-in-out 1.2s infinite; }
+@keyframes iHop { 40% { transform: translateY(-6%) scale(1.03); } 70% { transform: translateY(0.5%) scale(0.99); } }
+.inni[data-mood="alert"] .i-art { animation: iShake 0.4s ease-in-out 2, iFloat 4.2s ease-in-out 0.8s infinite; }
+@keyframes iShake { 25% { transform: translateX(-2%) rotate(-1.5deg); } 75% { transform: translateX(2%) rotate(1.5deg); } }
+.inni[data-mood="talk"] .i-art { animation: iTalk 0.5s ease-in-out infinite alternate; }
+@keyframes iTalk { to { transform: translateY(-1.2%) scale(1.012); } }
+.inni[data-mood="think"] .i-art { animation: iThink 2.6s ease-in-out infinite; }
+@keyframes iThink { 50% { transform: rotate(-2deg) translateY(-1%); } }
+.inni[data-mood="sleep"] { filter: saturate(0.7) brightness(0.85); }
+.inni[data-mood="sleep"] .i-art { animation: iBreathe 3.4s ease-in-out infinite; }
+@keyframes iBreathe { 50% { transform: scale(1.012, 0.99); } }
+/* 듣는 중(마이크): 붉은 고리가 숨쉬듯 */
+.inni[data-mood="listen"] .i-fx { animation: iListen 1.1s ease-in-out infinite; }
+.inni:not(.face)[data-mood="listen"] .i-fx { inset: auto 10% -2% 10%; height: 9%; border-radius: 50%; }
+@keyframes iListen { 0%, 100% { box-shadow: 0 0 0 1px rgba(255, 123, 123, 0.35), 0 0 6px rgba(255, 123, 123, 0.25); } 50% { box-shadow: 0 0 0 2px rgba(255, 123, 123, 0.9), 0 0 16px rgba(255, 123, 123, 0.55); } }
+/* 스캔: 청록 빛줄이 위아래로 지나간다 */
+.inni[data-mood="scan"] .i-fx { overflow: hidden; }
+.inni[data-mood="scan"] .i-fx::before { content: ""; position: absolute; left: 6%; right: 6%; height: 2px; top: 20%; background: #8ff3ff; box-shadow: 0 0 8px #8ff3ff; opacity: 0.85; animation: iScan 1s ease-in-out infinite alternate; }
+@keyframes iScan { to { top: 78%; } }
+body.reduce-motion .inni *, body.reduce-motion .inni, body.reduce-motion .inni *::before { animation: none !important; }
 
 /* ---------------------------------------------------------------- 런처(떠 있는 이니) */
 .inni-launch {
@@ -111,7 +98,7 @@ body.reduce-motion .inni *, body.reduce-motion .inni { animation: none !importan
   backdrop-filter: blur(8px); transition: 0.2s;
 }
 .inni-launch:hover, .inni-launch[aria-expanded="true"] { border-color: var(--hud); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 28px rgba(95, 220, 255, 0.45); }
-.inni-launch .inni { width: 40px; margin: -12px 0 -4px; }
+.inni-launch .inni { width: 36px; margin: 0; }
 .inni-launch .lb { display: flex; flex-direction: column; line-height: 1.15; text-align: left; }
 .inni-launch .lb b { font-size: 13px; }
 .inni-launch .lb small { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
@@ -150,7 +137,7 @@ body.reduce-motion .inni-panel, body.reduce-motion .inni-panel.closing, body.red
 .inni-panel::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0.5; background: repeating-linear-gradient(0deg, rgba(95, 220, 255, 0.03) 0 1px, transparent 1px 4px); }
 .inni-panel > * { position: relative; z-index: 1; }
 .inni-h { display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 12px; border-bottom: 1px solid var(--line); background: rgba(12, 30, 54, 0.7); }
-.inni-h .inni { width: 46px; margin: -6px 0 -8px; }
+.inni-h .inni { width: 40px; margin: 0; }
 .inni-title { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.25; }
 .inni-title .code { font: 600 9px/1 var(--font-display); letter-spacing: 0.24em; color: var(--hud-dim); }
 .inni-title b { font-size: 15px; }
@@ -214,7 +201,10 @@ body.reduce-motion .inni-panel, body.reduce-motion .inni-panel.closing, body.red
 @media (max-width: 760px) {
   .inni-launch { right: 12px; bottom: calc(var(--tab-h) + 12px); padding: 3px; }
   .inni-launch .lb { display: none; }
-  .inni-launch .inni { width: 46px; margin: -10px 2px -2px; }
+  .inni-launch .inni { width: 50px; margin: 0; }
+  .inni-launch { transition: transform 0.25s var(--ease), opacity 0.25s; }
+  /* 아래로 훑어 내리는 동안은 비켜 준다(버튼을 가리지 않게) */
+  .inni-launch.tuck { transform: translateX(calc(100% + 16px)); opacity: 0; pointer-events: none; }
   .inni-panel { left: 0; right: 0; bottom: 0; width: auto; height: calc(100dvh - 30px); border-radius: 16px 16px 0 0; padding-bottom: var(--safe-b); }
   .inni-bubble { right: 12px; left: 12px; width: auto; bottom: calc(var(--tab-h) + 74px); }
   .inni-input textarea { font-size: 16px; }
