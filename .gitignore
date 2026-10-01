@@ -6,8 +6,3 @@ node_modules/
 /data-*/
 *.log
 .DS_Store
-# 예전 PHP 판 런타임 파일
-config.php
-public/uploads/**
-!public/uploads/.gitignore
-!public/uploads/.htaccess

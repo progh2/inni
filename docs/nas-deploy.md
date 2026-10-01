@@ -53,8 +53,6 @@ docker compose logs -f inni      # "inni 2.x.x · http://0.0.0.0:3000 · 로그�
 2. 프로젝트 이름 `inni`, 경로 `/docker/inni`, 원본은 **기존 compose.yaml 사용**
 3. 다음 → 완료. 빌드가 끝나면(처음 몇 분) 컨테이너 `inni-inni-1`이 **정상(healthy)** 이 된다.
 
-> 폴더에 예전 `docker-compose.yml`(PHP 판)이 같이 있으면 Compose는 **`compose.yaml`을 먼저** 쓴다(경고가 한 줄 나온다). 예전 파일 정리는 README의 "예전 inni(PHP)" 참고.
->
 > **예전 inni(PHP)를 같은 폴더에서 도커로 돌리고 있었다면**: 프로젝트·서비스 이름이 같아서(`inni-inni-1`) `docker compose up -d --build`가 **예전 컨테이너를 v2로 바꿔 띄운다**(포트도 같은 8080). 예전 데이터 `data/inni.sqlite`는 그대로 남고, v2 처음 설정 화면에서 가져온다 → [백업·이전 §4](backup-restore.md#4-예전-inniphp에서-옮기기). 바꾸기 전에 `data/` 폴더를 한 번 복사해 두면 안심.
 
 ### 1-3. 확인

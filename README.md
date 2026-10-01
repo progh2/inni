@@ -151,14 +151,10 @@ docs/              설계·배포·Firebase·백업 문서
 
 ## 예전 inni(PHP 판)
 
-v2는 새 폴더(`server/`, `web/`, `deploy/`, `compose.yaml`)로 다시 만들었다. 저장소에는 **v1(PHP) 코드가 아직 남아 있다**:
-`app/`, `templates/`, `public/`, `sql/`, `tests/`, `docker/`, `Dockerfile`, `docker-compose.yml`, `config*.php`.
+v1(PHP·SQLite) 코드는 v2로 모두 옮긴 뒤 저장소에서 지웠다(2026-10-01). 필요하면 git 기록에 그대로 있다: `git show 71930e7:<경로>` 또는 `git checkout 71930e7`.
 
-- 새 도커 이미지에는 들어가지 않는다(`.dockerignore`). Compose는 `compose.yaml`(v2)을 먼저 쓴다.
-- v1의 데이터(`data/inni.sqlite`, `public/uploads`)는 v2 처음 설정 화면에서 **ID·QR 그대로** 가져온다 → [백업·이전 §4](docs/backup-restore.md#4-예전-inniphp에서-옮기기).
-- 옮긴 뒤 v1 코드는 지워도 된다(필요하면 git 기록에 남아 있다).
-
-v1의 기능 요구(M1~M8)는 [docs/PRD.md](docs/PRD.md)·[docs/ERD.md](docs/ERD.md)에, 진행 상황은 [docs/STATUS.md](docs/STATUS.md)에 있다.
+- v1 데이터(`data/inni.sqlite`, `public/uploads`)는 v2 처음 설정 화면에서 **ID·QR 그대로** 가져온다 → [백업·이전 §4](docs/backup-restore.md#4-예전-inniphp에서-옮기기).
+- v1의 기능 요구(M1~M8)는 [docs/PRD.md](docs/PRD.md)·[docs/ERD.md](docs/ERD.md)에, 진행 상황은 [docs/STATUS.md](docs/STATUS.md)에 있다.
 
 ## 라이선스
 
