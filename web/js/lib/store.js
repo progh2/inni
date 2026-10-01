@@ -7,6 +7,7 @@ export const state = {
   settings: null,
   locations: [],
   locMap: new Map(),
+  plans: [],
   categories: [],
   alerts: { level: "green", alerts: [] },
   counts: {},
@@ -39,6 +40,7 @@ export async function loadBootstrap() {
   state.me = b.me;
   state.settings = b.settings;
   setLocations(b.locations);
+  state.plans = b.plans || [];
   state.categories = b.categories;
   state.alerts = b.alerts;
   state.counts = b.counts;
@@ -52,6 +54,7 @@ export async function refreshCore() {
   state.me = b.me;
   state.settings = b.settings;
   setLocations(b.locations);
+  state.plans = b.plans || [];
   state.categories = b.categories;
   state.alerts = b.alerts;
   state.counts = b.counts;

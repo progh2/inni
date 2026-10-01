@@ -15,6 +15,7 @@ import * as audits from "../lib/audits.js";
 import * as users from "../lib/users.js";
 import { suggestUsefulLife } from "../lib/pps.js";
 import { readUpdateStatus } from "../lib/update.js";
+import * as plans from "../lib/plans.js";
 import { saveImage, sniffImage } from "../lib/uploads.js";
 import { productSearch, readProductPage, proxyImage } from "../lib/product.js";
 import { itemCard, loanBrief } from "../lib/inventory.js";
@@ -104,6 +105,7 @@ export function apiRouter(ctx) {
       settings: publicSettings(ctx),
       locations: inv.listLocations(ctx),
       categories: inv.listCategories(ctx),
+      plans: plans.listPlans(ctx),
       alerts: computeAlerts(snap, { user: req.user, caps: req.caps, pendingUsers: pending, update: req.caps.has("system") ? readUpdateStatus(ctx) : null }),
       counts: dashboardCounts(snap),
       server: { version: ctx.cfg.version, commit: ctx.cfg.commit, auth: ctx.cfg.authMode, time: nowIso(), ai: ctx.aiReady ? ctx.aiReady() : false, public_url: ctx.cfg.publicUrl || "" },
@@ -309,6 +311,24 @@ export function apiRouter(ctx) {
   r.post("/uploads", need("view"), express.raw({ type: () => true, limit: "13mb" }), (req, res) => {
     if (!(req.caps.has("register") || req.caps.has("edit") || req.caps.has("repair"))) throw forbidden("사진을 올릴 권한이 없습니다");
     res.status(201).json(saveImage(ctx, req.body));
+  });
+
+  // ---------------------------------------------------------------- 도면(3D 지도·위치 안내)
+  r.get("/plans", need("view"), (req, res) => res.json({ plans: plans.listPlans(ctx) }));
+  r.post("/plans", need("settings"), (req, res) => {
+    const plan = plans.createPlan(ctx, req.actor, req.body || {});
+    ctx.changed({ kind: "plans", id: plan.id });
+    res.status(201).json({ plan });
+  });
+  r.patch("/plans/:id", need("settings"), (req, res) => {
+    const plan = plans.updatePlan(ctx, req.actor, req.params.id, req.body || {});
+    ctx.changed({ kind: "plans", id: plan.id });
+    res.json({ plan });
+  });
+  r.delete("/plans/:id", need("settings"), (req, res) => {
+    const out = plans.deletePlan(ctx, req.actor, req.params.id);
+    ctx.changed({ kind: "plans", id: req.params.id });
+    res.json(out);
   });
 
   r.get("/product-search", need("register"), async (req, res) => {

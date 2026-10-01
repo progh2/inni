@@ -1,4 +1,4 @@
-// 08 승무원: 학교 구글 계정 승인·역할·사용 중지, 미리 등록, 로그인 허용 정책.
+// 09 승무원: 학교 구글 계정 승인·역할·사용 중지, 미리 등록, 로그인 허용 정책.
 import { $, esc, icon, relTime } from "../lib/util.js";
 import { api } from "../lib/api.js";
 import { modal, toast, toastError, confirmDialog } from "../lib/ui.js";
@@ -14,7 +14,7 @@ function render() {
   const pending = users.filter((u) => u.status === "pending");
   root.innerHTML = `
     <div class="st-inner">
-      <div class="st-head"><div class="ttl"><span class="code">STATION 08 · CREW</span><h1>승무원</h1><p>학교 구글 계정으로 처음 로그인하면 여기 "승인 대기"로 들어와요. 역할을 정하고 승인하세요.</p></div>
+      <div class="st-head"><div class="ttl"><span class="code">STATION 09 · CREW</span><h1>승무원</h1><p>학교 구글 계정으로 처음 로그인하면 여기 "승인 대기"로 들어와요. 역할을 정하고 승인하세요.</p></div>
         <div class="tools"><button class="btn" type="button" data-b="add">${icon("plus")}미리 등록</button></div></div>
       ${pending.length ? `<section class="panel amber" style="margin-bottom:14px"><div class="panel-h"><span class="code">PENDING</span><h3>승인 대기 ${pending.length}명</h3></div>
         <div class="list">${pending.map((u) => `<div class="irow" data-u="${u.id}"><span class="avatar" style="width:36px;height:36px">${u.photo_url ? `<img src="${esc(u.photo_url)}" referrerpolicy="no-referrer" alt="">` : esc(u.name.slice(0, 1))}</span>

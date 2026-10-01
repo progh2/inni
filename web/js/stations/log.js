@@ -1,4 +1,4 @@
-// 07 기록: 누가·언제·무엇을. 되돌리기, CSV. 보고서(사업예산·노후 장비·발주 목록)도 여기서.
+// 08 기록: 누가·언제·무엇을. 되돌리기, CSV. 보고서(사업예산·노후 장비·발주 목록)도 여기서.
 import { $, esc, icon, fmtDateTime, relTime, qty as fmtQty, won, KIND_LABEL } from "../lib/util.js";
 import { api } from "../lib/api.js";
 import { toast, toastError } from "../lib/ui.js";
@@ -43,7 +43,7 @@ function reportsHtml() {
 function render() {
   root.innerHTML = `
     <div class="st-inner">
-      <div class="st-head"><div class="ttl"><span class="code">STATION 07 · SHIP LOG</span><h1>기록</h1><p>모든 작업이 남아요. 실수는 30분 안에 되돌릴 수 있어요(담당교사는 7일).</p></div>
+      <div class="st-head"><div class="ttl"><span class="code">STATION 08 · SHIP LOG</span><h1>기록</h1><p>모든 작업이 남아요. 실수는 30분 안에 되돌릴 수 있어요(담당교사는 7일).</p></div>
         <div class="tools">${can("edit") ? `<a class="btn" href="/api/export/events.csv">${icon("download")}기록 CSV</a>` : ""}<a class="btn" href="/api/export/items.csv">${icon("download")}물품 CSV</a></div></div>
       <div class="tabs"><button class="tab" type="button" data-tab="events" aria-selected="${tab === "events"}"><span class="code">LOG</span>작업 기록</button>
         ${can("edit") ? `<button class="tab" type="button" data-tab="reports" aria-selected="${tab === "reports"}"><span class="code">REPORT</span>보고서</button>` : ""}</div>

@@ -1,4 +1,4 @@
-// 04 입출항: 대여 데스크(빌리는 사람을 고르고 스캔만 → 대여·반납이 번갈아) · 대여 중 · 내 대여 · 기록
+// 05 입출항: 대여 데스크(빌리는 사람을 고르고 스캔만 → 대여·반납이 번갈아) · 대여 중 · 내 대여 · 기록
 import { $, esc, icon, qty as fmtQty, dueLabel, thumb, fmtDateTime, fmtTime, relTime } from "../lib/util.js";
 import { api } from "../lib/api.js";
 import { modal, toast, toastError } from "../lib/ui.js";
@@ -69,7 +69,7 @@ function deskHtml() {
 function render() {
   root.innerHTML = `
     <div class="st-inner">
-      <div class="st-head"><div class="ttl"><span class="code">STATION 04 · DOCKING BAY</span><h1>입출항</h1><p>빌려주고 돌려받는 곳. 수업 시작·끝에는 대여 데스크에서 스캔만 하세요.</p></div></div>
+      <div class="st-head"><div class="ttl"><span class="code">STATION 05 · DOCKING BAY</span><h1>입출항</h1><p>빌려주고 돌려받는 곳. 수업 시작·끝에는 대여 데스크에서 스캔만 하세요.</p></div></div>
       ${tabs()}
       <div data-body>${tab === "desk" ? deskHtml() : listHtml()}</div>
     </div>`;

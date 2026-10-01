@@ -28,6 +28,30 @@ function overviewHtml() {
     <div class="pick-grid">${rooms.map((l) => `<button class="pick" type="button" data-loc="${l.id}"><span class="n">${esc(l.name)}${l.code ? ` <small class="muted mono">${esc(l.code)}</small>` : ""}</span><span class="p">${esc(l.path)}</span><span class="p">${l.items}종${l.units ? ` · 장비 ${l.units}대` : ""}${l.alerts ? ` · <span style="color:var(--amber)">경보 ${l.alerts}</span>` : ""}</span></button>`).join("") || '<div class="empty">실이 없어요</div>'}</div>`;
 }
 
+// 이 장소가 그려진 도면(자기 자신 또는 위 장소). 3D 지도에서 그 층·그 자리가 빛난다
+function planSpot(l) {
+  const ids = [l.id, ...[...(l.path_ids || [])].reverse()];
+  for (const id of ids) {
+    const p = state.plans.find((pl) => pl.shapes.some((s) => s.location_id === id));
+    if (p) return { plan: p, host: state.locMap.get(p.location_id), at: state.locMap.get(id) };
+  }
+  return null;
+}
+function whereHtml(l) {
+  const spot = planSpot(l);
+  const lv = (n) => (n < 0 ? `지하 ${-n}층` : `${n}층`);
+  if (spot) {
+    const where = spot.host ? (spot.host.kind === "floor" ? spot.host.path || spot.host.name : `${spot.host.name} ${lv(spot.plan.level)}`) : lv(spot.plan.level);
+    return `<div class="where-line">${icon("plan")}<span><b>${esc(where)}</b> 도면${spot.at && spot.at.id !== l.id ? ` · ${esc(spot.at.name)} 안` : ""}</span>
+      ${app.scene ? `<button class="btn xs" type="button" data-b="map">${icon("decks")}3D에서 보기</button>` : ""}
+      ${can("settings") ? `<button class="btn xs ghost" type="button" data-b="plan" data-host="${spot.plan.location_id}">도면 고치기</button>` : ""}</div>`;
+  }
+  if (can("settings") && ["room", "zone", "storage", "bin"].includes(l.kind)) {
+    return `<div class="where-line muted">${icon("plan")}<span>아직 도면에 그리지 않았어요. 도면(04)에서 그리면 3D 지도에서 그 자리를 비춰요.</span><button class="btn xs ghost" type="button" data-b="plan">도면으로</button></div>`;
+  }
+  return "";
+}
+
 function detailHtml() {
   const l = contents.location;
   const kids = (l.children || []).map((id) => state.locMap.get(id)).filter(Boolean);
@@ -38,6 +62,7 @@ function detailHtml() {
       <h2 style="margin:4px 0 2px;font-size:22px">${esc(l.name)}</h2><div class="help" style="margin:0">${esc(l.path)}${l.manager ? ` · 담당 ${esc(l.manager.name)}` : ""}</div></div>
       ${l.code ? `<span class="code-badge">${esc(l.code)}</span>` : ""}</div>
     ${l.description ? `<p class="help" style="margin-top:8px">${esc(l.description)}</p>` : ""}
+    ${whereHtml(state.locMap.get(l.id) || l)}
     <div class="row" style="margin:12px 0">
       ${can("register") ? `<button class="btn amber sm" type="button" data-b="add">${icon("plus")}여기에 등록</button>` : ""}
       <button class="btn sm" type="button" data-b="label">${icon("print")}장소 라벨</button>
@@ -137,6 +162,7 @@ export default {
       else if (k === "label" && loc) printLabels([{ kind: "location", loc }]);
       else if (k === "labels-all") printLabels(locationTree().filter((x) => x.kind !== "building").map((x) => ({ kind: "location", loc: { ...x, kind_label: KIND[x.kind] } })));
       else if (k === "map" && loc && app.scene) app.scene.highlight([loc.id]);
+      else if (k === "plan") app.go("plans", b.dataset.host ? { host: b.dataset.host } : {});
       else if (k === "audit" && loc) {
         try {
           const a = await api.post("/api/audits", { location_id: loc.id });

@@ -46,7 +46,7 @@ export function orphanUploads(ctx) {
       if (r.thumb) used.add(r.thumb.replace(/^\/?uploads\//, ""));
     }
   }
-  for (const r of db.prepare("SELECT image FROM locations WHERE image IS NOT NULL UNION ALL SELECT image FROM repairs WHERE image IS NOT NULL").all()) {
+  for (const r of db.prepare("SELECT image FROM locations WHERE image IS NOT NULL UNION ALL SELECT image FROM repairs WHERE image IS NOT NULL UNION ALL SELECT image FROM floor_plans WHERE image IS NOT NULL").all()) {
     used.add(String(r.image).replace(/^\/?uploads\//, ""));
   }
   const out = [];

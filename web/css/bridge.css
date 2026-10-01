@@ -121,6 +121,10 @@ body.reduce-motion .scanlines { display: none; }
 .s-label.dim { opacity: 0.3; }
 .s-label.hot { border-color: var(--amber); box-shadow: 0 0 14px rgba(255, 200, 87, 0.45); color: #fff; z-index: 2; }
 .s-label.alert { border-color: rgba(236, 100, 100, 0.7); }
+.s-label.floor { border-color: rgba(95, 220, 255, 0.55); color: var(--hud); font: 600 10px/1 var(--font-display); letter-spacing: 0.14em; padding: 3px 7px; }
+.s-label.mark { font-size: 10px; padding: 2px 6px; border-color: rgba(88, 240, 192, 0.6); color: #b9ffe8; }
+.s-label.mark.stairs { border-color: rgba(255, 200, 87, 0.6); color: #ffe3a6; }
+.s-label.mark.elevator { border-color: rgba(159, 184, 255, 0.6); color: #d6e0ff; }
 
 /* ---------------------------------------------------------------- 앱 틀 */
 .app {
